@@ -2,7 +2,7 @@
 #include "signal.h"
 #include "timers.h"
 
-volatile unsigned long MILLISECONDS = 0;
+volatile unsigned int MILLISECONDS = 0;
 unsigned long TIMER_MS = 0;
 unsigned long TIMER_MS_OLD = 0;
 
@@ -16,7 +16,6 @@ void TMRB_init(unsigned int period){
      * CCIS_0 -- CCIxA
      * OUTMOD_7 -- PWM output mode: 7 - PWM reset/set
      */
-
     TBCCTL1 = CM_0 + CCIS_0 + CLLD_0 + OUTMOD_7;
     TBCCTL2 = CM_0 + CCIS_0 + CLLD_0 + OUTMOD_7;
     TBCCTL3 = CM_0 + CCIS_0 + CLLD_0 + OUTMOD_7;
@@ -26,7 +25,7 @@ void TMRB_init(unsigned int period){
 
     /* TBCCR0, Timer_B Capture/Compare Register 0 */
     TBCCR0 = period;
-
+    
     /* TBCCR1, Timer_B Capture/Compare Register 1 */
     TBCCR1 = 0; 
     TBCCR2 = 0; 
@@ -50,7 +49,9 @@ void TMRB_init(unsigned int period){
     P4DIR = 0x7E;
 }
 
-void TMRA_init(void){
+// 16001 = 1ms
+void TMRA_init(unsigned int period){
+    MILLISECONDS = 0;
     /* 
      * TACCTL0, Capture/Compare Control Register 0
      * 
@@ -66,7 +67,7 @@ void TMRA_init(void){
     TACCTL0 = CM_0 + CCIS_0 + OUTMOD_0 + CCIE;
 
     /* TACCR0, Timer_A Capture/Compare Register 0 */
-    TACCR0 = 16001;
+    TACCR0 = period;
 
     /* 
      * TACTL, Timer_A3 Control Register
@@ -83,5 +84,4 @@ void TMRA_init(void){
 interrupt (TIMERA0_VECTOR) TIMERA0_ISR_HOOK(void){
     MILLISECONDS++;
 }
-
 
