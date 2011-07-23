@@ -101,6 +101,8 @@ void lcd_wrchar(unsigned char c);
 void lcd_putchar(unsigned char c);
 void lcd_drawcircle(unsigned int x, unsigned int y, unsigned int radius, unsigned char color, int width);
 void lcd_drawline(int x0, int y0, int x1, int y1, int color, int width);
+void lcd_drawprogressbar(int x0, int y0, int x1, int y1, int color, int colorprogress, int percent);
+
 
 // ************************************************************************
 // **                                                                    **

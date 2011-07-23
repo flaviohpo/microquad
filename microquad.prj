@@ -1,33 +1,28 @@
 <project version="Crimson Editor 3.60">
-	<category name="macros" expanded="yes">
-		<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
-		<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compilalib.bat" />
-		<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\grava.bat" />
-	</category>
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.h" />
+	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.o" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.o" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\main.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\ppm.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\ppm.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\timers.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\timers.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad.prj" />
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.c" linenum="25" placement="0:1:-1:-1:-8:-30:100:100:948:376" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.h" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.h" linenum="1" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.c" linenum="11" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\ppm.c" linenum="1" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\ppm.h" linenum="5" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\timers.c" linenum="4" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\timers.h" linenum="3" placement="0:1:-1:-1:-8:-30:0:0:852:280" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\main.c" linenum="6" placement="2:3:-1:-1:-8:-30:25:25:877:305" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.h" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.c" linenum="1" placement="0:1:-1:-1:-8:-30:50:50:898:326" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.h" linenum="1" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.h" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.o" linenum="1" placement="0:1:-1:-1:-8:-30:0:0:852:280" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.c" linenum="1" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.h" linenum="1" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.o" linenum="1" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\main.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad.prj" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
+	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" linenum="1" placement="2:3:-1:-1:-8:-30:0:0:852:280" />
 </workspace>
 

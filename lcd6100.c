@@ -176,10 +176,20 @@ const char asciitable[640] = {
                             0x78,0x46,0x41,0x46,0x78,
                          };
          
+
+                         
+
+// printf para LCDNOKIA
+int putchar(int c)
+{
+    lcd_putchar(c);
+    return 0;
+}
+                         
 void lcd_setcolor(unsigned char foreground_color, unsigned char background_color)
 {
-  color_back = background_color;
-  color_fore = foreground_color;
+    color_back = background_color;
+    color_fore = foreground_color;
 }
 
 /*
@@ -486,3 +496,8 @@ void lcd_putchar(unsigned char c)
   }
 }
 
+void lcd_drawprogressbar(int x0, int y0, int x1, int y1, int color, int colorprogress, int percent){
+    int x1progress = ((x1 - x0) * percent) / 100;
+    lcd_fillrect(x0, y0, x1progress, y1,color);
+    lcd_fillrect(x1progress, y0, x1, y1,colorprogress);
+}
