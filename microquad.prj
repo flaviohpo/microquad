@@ -5,6 +5,10 @@
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.h" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.o" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\eeprom.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\eeprom.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\i2c.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\i2c.h" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.h" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.o" />
@@ -14,15 +18,18 @@
 
 <workspace version="Crimson Editor 3.60">
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.c" linenum="1" placement="0:1:-1:-1:-8:-30:50:50:898:326" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.h" linenum="1" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\analog.h" linenum="18" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.c" linenum="13" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.h" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\delay.o" linenum="1" placement="0:1:-1:-1:-8:-30:0:0:852:280" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.c" linenum="1" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.h" linenum="1" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.o" linenum="1" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\main.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad.prj" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
-	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" linenum="1" placement="2:3:-1:-1:-8:-30:0:0:852:280" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.c" linenum="45" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\lcd6100.h" linenum="104" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\main.c" linenum="266" placement="2:3:-1:-1:-8:-30:100:100:952:380" />
+	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" linenum="2" placement="0:1:-1:-1:-8:-30:0:0:852:280" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\i2c.c" linenum="37" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\i2c.h" linenum="18" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\eeprom.c" linenum="2" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\eeprom.h" linenum="4" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad.h" linenum="16" placement="0:1:-1:-1:-8:-30:0:0:852:280" />
+	<localfile path="C:\Users\flaviohpo\Desktop\TCC\FlightControl\sources\FlightControl\flightcontrol.c" linenum="683" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
 </workspace>
 

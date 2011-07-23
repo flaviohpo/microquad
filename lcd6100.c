@@ -496,8 +496,8 @@ void lcd_putchar(unsigned char c)
   }
 }
 
-void lcd_drawprogressbar(int x0, int y0, int x1, int y1, int color, int colorprogress, int percent){
-    int x1progress = ((x1 - x0) * percent) / 100;
-    lcd_fillrect(x0, y0, x1progress, y1,color);
-    lcd_fillrect(x1progress, y0, x1, y1,colorprogress);
+void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogress, int percent){
+    int lx_progress = (lx * percent) / 100;
+    lcd_fillrect(x, y, lx_progress, ly,color);
+    lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly,colorprogress);
 }

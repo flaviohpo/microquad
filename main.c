@@ -5,12 +5,19 @@
 #include "delay.h"
 #include "analog.h"
 #include "lcd6100.h"
+#include "eeprom.h"
+#include "i2c.h"
+#include "microquad.h"
 
-#define PPM_P1MASK 0xFF
+volatile unsigned int Milliseconds = 0;
+volatile unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
+volatile unsigned int PPMValue[8] = {0,0,0,0,0,0,0,0};
 
-unsigned int Milliseconds = 0;
-unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
-unsigned int PPMValue[8] = {0,0,0,0,0,0,0,0};
+float PPMSlope[8] = {1, 1, 1, 1, 1, 1, 1, 1};
+float PPMOffset[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+int ChannelInput[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+char MotorArmed = 0;
 
 void clock_init(void)
 {
@@ -127,61 +134,256 @@ interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
     }
 }
 
+void calibrate_radio(void){
+    
+    if(MotorArmed == 1 ){
+        return;
+    }
+
+    int i = 0, k;    
+    float PPMMin[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    float PPMMax[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    fourbytes ValorAux;        
+    
+    lcd_goto(2,5);
+    printf("MOVE STICKS\nALL DIRECTIONS");
+    delayms(3000);
+    lcd_clear(BLACK);
+
+    for(i = 0; i < 8; i++){ // zera offset e slope
+        PPMOffset[i] = 0;
+        PPMSlope[i] = 1;
+    }
+
+    for(i = 0; i < 8; i++){ // coloca um valor inicial em max min
+        PPMMin[i] = PPMValue[i];
+        PPMMax[i] = PPMMin[i];
+    }
+    
+    for(k = 200; k > 0; k--){
+        draw_rc_inputs();
+        lcd_goto(0, 13);
+        printf("%d ", k);
+        delayms(1);
+        for(i = 0; i < 8; i++){ // pega max min
+            if(PPMMax[i] < PPMValue[i]){ // nao ta pegando maximo
+                PPMMax[i] = PPMValue[i];
+            }
+            if(PPMMin[i] > PPMValue[i]){
+                PPMMin[i] = PPMValue[i];
+            }
+        }
+    }
+    
+    for(i = 0; i < 8; i++){ // calcula offset e slope pra deixar na faixa de 1000 a 2000
+        PPMSlope[i] = 2000.0 / (PPMMax[i] - PPMMin[i]);
+        PPMOffset[i] = 2000.0 - (PPMSlope[i] * PPMMin[i]);
+    }
+
+    // grava dados na EEPROM
+    if(EEPROMFound){
+        i2c_change_address(EEPROM_I2C_ADDR);
+        
+        // grava yaw slope 
+        ValorAux.f = PPMSlope[YAW_CH];
+        i2c_write16_multiples(_RADIO_YAW_SLOPE, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava throttle slope 
+        ValorAux.f = PPMSlope[THROTTLE_CH];
+        i2c_write16_multiples(_RADIO_THROTTLE_SLOPE, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava pitch slope 
+        ValorAux.f = PPMSlope[PITCH_CH];
+        i2c_write16_multiples(_RADIO_PITCH_SLOPE, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava roll slope 
+        ValorAux.f = PPMSlope[ROLL_CH];
+        i2c_write16_multiples(_RADIO_ROLL_SLOPE, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava ch5 slope 
+        ValorAux.f = PPMSlope[CH5_CH];
+        i2c_write16_multiples(_RADIO_CH5_SLOPE, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava ch6 slope 
+        ValorAux.f = PPMSlope[CH6_CH];
+        i2c_write16_multiples(_RADIO_CH6_SLOPE, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava yaw offset 
+        ValorAux.f = PPMOffset[YAW_CH];
+        i2c_write16_multiples(_RADIO_YAW_OFFSET, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava throttle offset 
+        ValorAux.f = PPMOffset[THROTTLE_CH];
+        i2c_write16_multiples(_RADIO_THROTTLE_OFFSET, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava pitch offset 
+        ValorAux.f = PPMOffset[PITCH_CH];
+        i2c_write16_multiples(_RADIO_PITCH_OFFSET, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava roll offset 
+        ValorAux.f = PPMOffset[ROLL_CH];
+        i2c_write16_multiples(_RADIO_ROLL_OFFSET, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava ch5 offset 
+        ValorAux.f = PPMOffset[CH5_CH];
+        i2c_write16_multiples(_RADIO_CH5_OFFSET, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        // grava ch6 offset 
+        ValorAux.f = PPMOffset[CH6_CH];
+        i2c_write16_multiples(_RADIO_CH6_OFFSET, ValorAux.c, 4);
+        
+    }
+}
+
+void process_rc(void){
+    ChannelInput[THROTTLE_CH] = PPMValue[THROTTLE_CH] * PPMSlope[THROTTLE_CH] + PPMOffset[THROTTLE_CH];
+    ChannelInput[YAW_CH] = PPMValue[YAW_CH] * PPMSlope[YAW_CH] + PPMOffset[YAW_CH];
+    ChannelInput[PITCH_CH] = PPMValue[PITCH_CH] * PPMSlope[PITCH_CH] + PPMOffset[PITCH_CH]; // pitch invertido
+    ChannelInput[ROLL_CH] = PPMValue[ROLL_CH] * PPMSlope[ROLL_CH] + PPMOffset[ROLL_CH];
+    ChannelInput[CH5_CH] = PPMValue[CH5_CH] * PPMSlope[CH5_CH] + PPMOffset[CH5_CH];
+    ChannelInput[CH6_CH] = PPMValue[CH6_CH] * PPMSlope[CH6_CH] + PPMOffset[CH6_CH];
+    ChannelInput[7] = PPMValue[7];
+}
+
+void load_transmitter_values(void){
+    fourbytes ValorAux;
+
+    if(EEPROMFound == 1){
+        i2c_change_address(EEPROM_I2C_ADDR);    
+
+        // load yaw slope e offset
+        i2c_read16_multiples(_RADIO_YAW_SLOPE, ValorAux.c, 4);
+        PPMSlope[YAW_CH] = ValorAux.f;
+        i2c_read16_multiples(_RADIO_YAW_OFFSET, ValorAux.c, 4);
+        PPMOffset[YAW_CH] = ValorAux.f;
+        
+        // load throttle slope  e offset
+        i2c_read16_multiples(_RADIO_THROTTLE_SLOPE, ValorAux.c, 4);
+        PPMSlope[THROTTLE_CH] = ValorAux.f;
+        i2c_read16_multiples(_RADIO_THROTTLE_OFFSET, ValorAux.c, 4);
+        PPMOffset[THROTTLE_CH] = ValorAux.f;
+        
+        // load pitch slope  e offset
+        i2c_read16_multiples(_RADIO_PITCH_SLOPE, ValorAux.c, 4);
+        PPMSlope[PITCH_CH] = ValorAux.f;
+        i2c_read16_multiples(_RADIO_PITCH_OFFSET, ValorAux.c, 4);
+        PPMOffset[PITCH_CH] = ValorAux.f;
+        
+        // load roll slope  e offset
+        i2c_read16_multiples(_RADIO_ROLL_SLOPE, ValorAux.c, 4);
+        PPMSlope[ROLL_CH] = ValorAux.f;
+        i2c_read16_multiples(_RADIO_ROLL_OFFSET, ValorAux.c, 4);
+        PPMOffset[ROLL_CH] = ValorAux.f;
+    
+        // load ch5 slope  e offset
+        i2c_read16_multiples(_RADIO_CH5_SLOPE, ValorAux.c, 4);
+        PPMSlope[CH5_CH] = ValorAux.f;
+        i2c_read16_multiples(_RADIO_CH5_OFFSET, ValorAux.c, 4);
+        PPMOffset[CH5_CH] = ValorAux.f;
+    
+        // load ch6 slope  e offset
+        i2c_read16_multiples(_RADIO_CH6_SLOPE, ValorAux.c, 4);
+        PPMSlope[CH6_CH] = ValorAux.f;
+        i2c_read16_multiples(_RADIO_CH6_OFFSET, ValorAux.c, 4);
+        PPMOffset[CH6_CH] = ValorAux.f;
+    }
+}
+
 void draw_rc_inputs(){
     unsigned int i = 0, k = 0, h = 0;
+    lcd_goto(0,0);
+    printf("     RC inputs");
     lcd_goto(0,2);
     
-    printf("ch[%d]: %d", 0, PPMValue[0]);
-    k = 16 + (8*0); //posicao inicial em y
-    /*
-    if(PPMValue[0] > 4000){
-        h=100;
-    }
-    else{
-        if(PPMValue[0] < 2001){
-            h = 0;
-        }
-        else{
-            h = ((PPMValue[0] - 2000) * 10) / 200;
-        }
-    }*/
-    lcd_drawprogressbar(80,16,120,24,WHITE, BLUE, 50);
-/*
     for(i = 0; i < 8; i++){
-        printf("ch[%d]: %d", i, PPMValue[i]);
-        k = 16+(8*i); //posicao inicial em y
-        if(PPMValue[i] > 4000){
+        printf("ch[%d]: %d   \n", i, ChannelInput[i]);
+        k = 21 + (8 * i); //posicao inicial em y
+        if(ChannelInput[i] > 4000){
             h=100;
         }
         else{
-            if(PPMValue[i] < 2001){
+            if(ChannelInput[i] < 2001){
                 h = 0;
             }
             else{
-                h = ((PPMValue[i] - 2000) * 10) / 200;
+                h = ((ChannelInput[i] - 2000) * 10) / 200;
             }
         }
-        lcd_drawprogressbar(60,k,120,k+8,WHITE, BLUE, h);
-    }*/
+        lcd_drawprogressbar(80,k,45,4,WHITE, BLUE, h);
+    }
+}
+
+int findfirst(int startaddress){
+    for(; startaddress < 255; startaddress++){
+        i2c_config(startaddress);
+        if(!i2c_find_device()){
+            return startaddress;
+        }
+    }   
+    return 0;
 }
 
 int main(){
     WDTCTL = WDTPW + WDTHOLD;
+    
     clock_init();
     timer_a3_init();
     p1_init();
     analog_init();
+    i2c_init();
     
     eint();
 
     lcd_init(BLACK);
     
-    delayms(200);
+    //printf("address: %d", findfirst(0));
+    //delayms(10000);
     
-    draw_rc_inputs();
+    i2c_config(EEPROM_I2C_ADDR);
+    EEPROMFound = !(i2c_find_device());
+    
+    if(EEPROMFound){
+        printf("EEPROM found\n");
+        load_transmitter_values();
+        //carregar os outros parametros
+    }
+    else{
+        color_back = RED;
+        color_fore = BLACK;
+        printf("EEPROM not found\n");
+        color_back = BLACK;
+        color_fore = WHITE;
+    }
+    delayms(5000);
+    
+    //calibrate_radio();
     
     while(1){
-        delayms(10);
+        delayms(100);
+        process_rc();
+        draw_rc_inputs();
         
     }
 }
