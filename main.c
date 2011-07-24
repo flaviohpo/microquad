@@ -136,7 +136,7 @@ interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
 
 void calibrate_radio(void){
     
-    if(MotorArmed == 1 ){
+    if(MotorArmed == 1 ){ // nao faz se os motores estiverem armados
         return;
     }
 
@@ -264,7 +264,7 @@ void process_rc(void){
     ChannelInput[ROLL_CH] = PPMValue[ROLL_CH] * PPMSlope[ROLL_CH] + PPMOffset[ROLL_CH];
     ChannelInput[CH5_CH] = PPMValue[CH5_CH] * PPMSlope[CH5_CH] + PPMOffset[CH5_CH];
     ChannelInput[CH6_CH] = PPMValue[CH6_CH] * PPMSlope[CH6_CH] + PPMOffset[CH6_CH];
-    ChannelInput[7] = PPMValue[7];
+    ChannelInput[CH7_CH] = PPMValue[CH7_CH] * PPMSlope[CH7_CH] + PPMOffset[CH7_CH];
 }
 
 void load_transmitter_values(void){
@@ -335,7 +335,7 @@ void draw_rc_inputs(){
     }
 }
 
-int findfirst(int startaddress){
+int find_first(int startaddress){
     for(; startaddress < 255; startaddress++){
         i2c_config(startaddress);
         if(!i2c_find_device()){
@@ -343,6 +343,14 @@ int findfirst(int startaddress){
         }
     }   
     return 0;
+}
+
+void show_menu(void){
+    
+}
+
+void process_menu(void){
+    
 }
 
 int main(){
