@@ -16,55 +16,75 @@ volatile unsigned int MenuCounter = 0;
     StatusFlags:
     ----------------------------------
     |FirstSetup | Reserved | Reserved|
-    ----------------------------------
-*/
-char StatusFlags[3] = {0, 0, 0};
-char MenuVisible = 0;
-char SetupDone = 0;
+    ----------------------------------*/
+char StatusFlags[3] = {0, 0, 0};// ficam guardados na EEPROM
+char MenuVisible = FALSE;       // indica se o menu deve ser processado ou nao
+char SetupDone = FALSE;         // fica true quando acaba o setup, serve para saber se ja pode comecar a ler o radio
+char MotorArmed = FALSE;        // seguranca, o loop de controle so eh feito quando esta variavei for TRUE
 
-MENU_STEPSET MenuStep = DISPLAY;
-MENU_OPTION MenuOption = READY;
+MENU_STEPSET MenuStep = DISPLAY;        // gerencia o menu principal
+MENU_STEPSET MenuAnalog = DISPLAY;      // gerencia os canais analog visiveis
+MENU_OPTION MenuOption = READY;         // guarda a opcao escolhida no menu principal
 
-float PPMSlope[8] = {1, 1, 1, 1, 1, 1, 1, 1};
-float PPMOffset[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+// variaveis usadas no menu analog graph
+char AnalogSelect = 7;      // serve para selecionar a entrada no menu analog
+char AnalogChecked = 0x00;  // verifica se a entrada X deve ser mostrada no grafico
+char AnalogGraph[8][100];   // um vetor para cada entrada analogica, guarda as ultimas 100 leituras, total = 800B
+char AnalogColours[8] = {BLUE, LIME, RED, YELLOW, ORANGE, MAGENTA, AQUA, WHITE}; 
 
-volatile unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
+// variaveis ajuste radio
+float PPMSlope[8] = {1, 1, 1, 1, 1, 1, 1, 1};   // leitura do radio: leitura_ajustada = slope * leitura_real + offset
+float PPMOffset[8] = {0, 0, 0, 0, 0, 0, 0, 0};  // ver funcao process_rc() calibrate_radio()
+
+// variaveis leitura radio raw
+volatile unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};            // 
 volatile unsigned int PPMValue[8] = {0,0,0,0,0,0,0,0};
 volatile unsigned int ChannelInput[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
-char MotorArmed = 0;
-
 int main(){
-    WDTCTL = WDTPW + WDTHOLD;
+    WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
 
     INICIO: //loop main, vir para ca no caso de um reset
-    setup();
+    setup();    // inicializa perifericos e verifica se precisa calibrar o radio
 
     lcd_clear(BLACK);
     
     MenuOption = RADIO_RAW;
     MenuStep = DISPLAY;
-    MenuVisible = 1;
-    
+    MenuVisible = TRUE;     // inicializa mostrando o menu
+        
     while(1){
-        if(MotorArmed == 1){
+        /* os Counters sao incrementados na interrution do timerA
+        esta parte do codigo nao esta dentro da interruption do timerA porque ela eh muito extensa
+        e a prioridade da interrupcao do timerA eh uma das mais altas, fazendo com que as interruption
+        da P1 e P2 fiquem esperando. Isso prejudica a leitura do radio. Se a prioridade da P1 e P2 for
+        maior que a do timerA todo o codigo a seguir poderia estar la dentro da interruption do timerA.
+        Outra maneira eh delegar a leitura dos PPM para outro MSP, algum bem pequeno, so precisa de uma
+        P1 completa. */
+        if(MotorArmed == TRUE){
             if(ControlCounter >= CONTROL_PERIOD){
                 main_loop();
                 ControlCounter = 0;
             }
         }
         
-        if(SetupDone == 1){
+        if(SetupDone == TRUE){
             if(RCCounter >= RC_PERIOD){
                 process_rc();
                 RCCounter = 0;
             }
         }
     
-        if(MenuVisible == 1){
+        if(MenuVisible == TRUE){
             if(MenuCounter >= MENU_PERIOD){
                 process_menu();
                 MenuCounter = 0;   
+            }
+        }
+        else{
+            if(ChannelInput[CH6_CH] > 3500){
+                MenuVisible = TRUE;
+                MotorArmed = FALSE;
             }
         }
     }
@@ -73,7 +93,7 @@ int main(){
 void process_menu(void){
     switch(MenuStep){
         case DISPLAY:
-            lcd_goto(0,13);
+            lcd_goto(0,14);
             printf("DISPLAY             ");
             
             lcd_clear(BLACK);
@@ -83,8 +103,8 @@ void process_menu(void){
             MenuStep = SELECT;
             break;
         
-        case SELECT:
-            lcd_goto(0,13);
+        case SELECT: // fica neste step a maior parte do tempo
+            lcd_goto(0,14);
             printf("SELECT            ");
             
             lcd_goto(0,(int)MenuOption + 2);
@@ -102,13 +122,13 @@ void process_menu(void){
             
             // select
             if(ChannelInput[ROLL_CH] > 3500){
-                MenuStep = WAIT_ROLL_BACK;
+                MenuStep = WAIT_ROLL_LEFT;
             }
             
             break;
         
         case WAIT_PITCH_DOWN:
-            lcd_goto(0,13);
+            lcd_goto(0,14);
             printf("WAIT PITCH DOWN    ");
             
             if(ChannelInput[PITCH_CH] > 2500){
@@ -122,7 +142,7 @@ void process_menu(void){
             break;
         
         case WAIT_PITCH_UP:
-            lcd_goto(0,13);
+            lcd_goto(0,14);
             printf("WAIT PITCH UP    ");
 
             if(ChannelInput[PITCH_CH] < 3500){
@@ -135,9 +155,9 @@ void process_menu(void){
             }
             break;
         
-        case WAIT_ROLL_BACK:
-            lcd_goto(0,13);
-            printf("WAIT ROLL BACK    ");
+        case WAIT_ROLL_LEFT:
+            lcd_goto(0,14);
+            printf("WAIT ROLL LEFT    ");
             
             if(ChannelInput[ROLL_CH] < 3500){
                 lcd_clear(BLACK);
@@ -147,7 +167,7 @@ void process_menu(void){
             break;
             
         case WAIT_CH7_BACK:
-            lcd_goto(0,13);
+            lcd_goto(0,14);
             printf("WAIT CH7 BACK    ");
             
             if(ChannelInput[CH7_CH] < 2500){
@@ -158,10 +178,14 @@ void process_menu(void){
         case PROCESS_OPTION:
             process_option();
             break;
+            
+        case WAIT_ROLL_RIGHT:
+            break;    
     }
 }
 
 void process_option(){
+    int i;
     switch (MenuOption){
         case RADIO_RAW:
             draw_rc_inputs(1);
@@ -170,22 +194,155 @@ void process_option(){
             draw_rc_inputs(0);
             break;
         case ANALOG_MONITOR:
-        
+            process_analog_menu();
             break;
         
         case READY:
-        
+            lcd_clear(BLACK);
+            for(i = 5; i >= 0; i--){ // contagem regressiva
+                lcd_goto(8,8);
+                printf("%d", i);
+                delayms(1000);
+            }
+            MotorArmed = TRUE;
+            MenuVisible = FALSE;
+            lcd_clear(BLACK);
+            MenuStep = DISPLAY;
             break;
             
         case INITIAL_SETTINGS:
+            
             // seta o flag initial setup
             break;          
     }
     
     if(ChannelInput[CH7_CH] > 3500){
         MenuStep = WAIT_CH7_BACK;
+        MenuAnalog = DISPLAY;   // serve para colocar o menu analog na posicao inicial para quando for acessado denovo
         lcd_clear(BLACK);
     }
+}
+
+void draw_analog_graph(void){
+    lcd_goto(4,4);
+    printf("FAZER");
+}
+
+void process_analog_menu(void){
+    switch(MenuAnalog){
+        case DISPLAY:
+            lcd_goto(0,14);
+            printf("DISPLAY             ");
+
+            refresh_analog_menu();
+            MenuAnalog = SELECT;
+            break;
+        case SELECT:
+            lcd_goto(0,14);
+            printf("SELECT            ");
+
+            // move para os lados
+            if(ChannelInput[ROLL_CH] > 3500){
+                MenuAnalog = WAIT_ROLL_LEFT;
+            }
+            else{
+                if(ChannelInput[ROLL_CH] < 2500){
+                    MenuAnalog = WAIT_ROLL_RIGHT;
+                }
+            }
+            
+            // check uncheck
+            if(ChannelInput[PITCH_CH] < 2500){
+                MenuAnalog = WAIT_PITCH_DOWN;
+            }
+            else{
+                if(ChannelInput[PITCH_CH] > 3500){
+                    MenuAnalog = WAIT_PITCH_UP;
+                }
+            }
+            
+            break;
+        case WAIT_PITCH_DOWN:
+            lcd_goto(0,14);
+            printf("WAIT PITCH DOWN    ");
+
+            if(ChannelInput[PITCH_CH] > 2500){
+                AnalogChecked = AnalogChecked^(1<<AnalogSelect);
+                MenuAnalog = DISPLAY;
+            }
+            break;
+            
+        case WAIT_PITCH_UP:
+            lcd_goto(0,14);
+            printf("WAIT PITCH UP    ");
+
+            if(ChannelInput[PITCH_CH] < 3500){
+                AnalogChecked = AnalogChecked^(1<<AnalogSelect);
+                MenuAnalog = DISPLAY;
+            }
+            break;
+            
+        case WAIT_ROLL_RIGHT:
+                lcd_goto(0,14);
+                printf("WAIT ROLL RIGHT ");
+
+                if(ChannelInput[PITCH_CH] < 3500){
+                    if(AnalogSelect > 0){
+                        AnalogSelect--;
+                    }
+                    MenuAnalog = DISPLAY;
+                }
+            break;
+            
+        case WAIT_ROLL_LEFT:
+                lcd_goto(0,14);
+                printf("WAIT ROLL LEFT   ");
+        
+                if(ChannelInput[PITCH_CH] > 2500){
+                   if(AnalogSelect < 7){
+                        AnalogSelect++;
+                    }
+                    MenuAnalog = DISPLAY;
+
+                }
+            break;
+            
+        case PROCESS_OPTION:
+            break;
+        case WAIT_CH7_BACK:
+            break;
+    }
+}
+
+void refresh_analog_menu(void){
+    int i;
+    lcd_goto(1,12);
+    for(i = 0; i < 8; i++){             // para as 8 entradas analogicas
+        if((1 << i) & AnalogChecked){   // se a entrada analogica estiver visible
+            color_back = LIME;          // a cor do fundo muda para azul
+            color_fore = BLACK;
+        }
+        else{                           // senao
+            color_back = BLACK;         // a cor do fundo muda para preto
+            color_fore = LIME;
+        }
+        
+        if(AnalogSelect == i){          // se o cursor estiver em cima   
+            color_fore = RED;           // a cor da letra muda para vermelho 
+        }                                                                
+        else{                           // se nao                        
+            if(color_back == LIME){
+                color_fore = BLACK;
+            }
+        }                               
+        
+        printf("%d",i);
+        // ajusta as cores para o normal
+        color_fore = LIME;
+        color_back = BLACK;
+        printf(" ");
+    }
+    printf("                    ");
 }
 
 interrupt (TIMERA0_VECTOR) TIMERA0_ISR_HOOK(void){
@@ -331,7 +488,7 @@ void calibrate_radio(void){
     
     for(k = 120; k > 0; k--){
         draw_rc_inputs(1);
-        lcd_goto(0, 13);
+        lcd_goto(0, 14);
         printf("%d ", k);
         delayms(1);
         for(i = 0; i < 8; i++){ // pega max min
@@ -614,9 +771,18 @@ void setup(){
         color_fore = LIME;
     }
     
+    delayms(5000);
+    
     SetupDone = 1;
 }
 
-
+void analog_graph_clear(void){
+    int i, k;
+    for(i = 0; i < 8; i++){
+        for(k = 0; k < 100; k++){
+            AnalogGraph[i][k] = 0;
+        }
+    }
+}
 
 
