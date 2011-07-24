@@ -235,8 +235,7 @@ unsigned char i2c_write16_multiples(unsigned int reg, unsigned char dat[], unsig
   return status;
 }
 
-unsigned char i2c_read_byte(unsigned char reg, unsigned char *dat)
-{
+unsigned char i2c_read_byte(unsigned char reg, unsigned char *dat){
   unsigned char status = 0;
 
   i2c_start();
@@ -280,8 +279,7 @@ unsigned char i2c_read_multiples(unsigned char reg, unsigned char dat[], unsigne
   return status;
 }
 
-unsigned char i2c_read16_byte(unsigned int reg, unsigned char *dat)
-{
+unsigned char i2c_read16_byte(unsigned int reg, unsigned char *dat){
   unsigned char status = 0;
 
   i2c_start();
@@ -301,8 +299,7 @@ unsigned char i2c_read16_byte(unsigned int reg, unsigned char *dat)
   return status;
 }
 
-unsigned char i2c_read16_multiples(unsigned int reg, unsigned char dat[], unsigned char len)
-{
+unsigned char i2c_read16_multiples(unsigned int reg, unsigned char dat[], unsigned char len){
   unsigned char i = 0, status = 0;
 
   i2c_start();

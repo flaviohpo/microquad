@@ -43,7 +43,7 @@
 unsigned char LCD_linecount= 0;
 unsigned char LCD_charcount=0 ;
 unsigned char color_back = BLACK;
-unsigned char color_fore = WHITE;
+unsigned char color_fore = LIME;
 
 const char asciitable[640] = {
                             0x00,0x00,0x00,0x00,0x00,    // NULL char...

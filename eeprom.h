@@ -3,6 +3,9 @@
 
 #define EEPROM_I2C_ADDR 0xA6 // 8bit address
 
+// status
+#define _STATUS_FLAGS            0x0000
+
 // transmitter data
 #define _RADIO_ROLL_SLOPE       0x0003
 #define _RADIO_PITCH_SLOPE      0x0007

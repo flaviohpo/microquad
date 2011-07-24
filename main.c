@@ -9,15 +9,190 @@
 #include "i2c.h"
 #include "microquad.h"
 
-volatile unsigned int Milliseconds = 0;
-volatile unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
-volatile unsigned int PPMValue[8] = {0,0,0,0,0,0,0,0};
+volatile unsigned int ControlCounter = 0;
+volatile unsigned int RCCounter = 0;
+volatile unsigned int MenuCounter = 0;
+/*
+    StatusFlags:
+    ----------------------------------
+    |FirstSetup | Reserved | Reserved|
+    ----------------------------------
+*/
+char StatusFlags[3] = {0, 0, 0};
+char MenuVisible = 0;
+char SetupDone = 0;
+
+MENU_STEPSET MenuStep = DISPLAY;
+MENU_OPTION MenuOption = READY;
 
 float PPMSlope[8] = {1, 1, 1, 1, 1, 1, 1, 1};
 float PPMOffset[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-int ChannelInput[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+
+volatile unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
+volatile unsigned int PPMValue[8] = {0,0,0,0,0,0,0,0};
+volatile unsigned int ChannelInput[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 char MotorArmed = 0;
+
+int main(){
+    WDTCTL = WDTPW + WDTHOLD;
+
+    INICIO: //loop main, vir para ca no caso de um reset
+    setup();
+
+    lcd_clear(BLACK);
+    
+    MenuOption = RADIO_RAW;
+    MenuStep = DISPLAY;
+    MenuVisible = 1;
+    
+    while(1){
+        if(MotorArmed == 1){
+            if(ControlCounter >= CONTROL_PERIOD){
+                main_loop();
+                ControlCounter = 0;
+            }
+        }
+        
+        if(SetupDone == 1){
+            if(RCCounter >= RC_PERIOD){
+                process_rc();
+                RCCounter = 0;
+            }
+        }
+    
+        if(MenuVisible == 1){
+            if(MenuCounter >= MENU_PERIOD){
+                process_menu();
+                MenuCounter = 0;   
+            }
+        }
+    }
+}
+
+void process_menu(void){
+    switch(MenuStep){
+        case DISPLAY:
+            lcd_goto(0,13);
+            printf("DISPLAY             ");
+            
+            lcd_clear(BLACK);
+            lcd_goto(0,0);
+            printf("   MAIN MENU\n\n");
+            printf("  Radio raw\n  Radio correct\n  Analog Monitor\n  Ready\n  Set init settings");
+            MenuStep = SELECT;
+            break;
+        
+        case SELECT:
+            lcd_goto(0,13);
+            printf("SELECT            ");
+            
+            lcd_goto(0,(int)MenuOption + 2);
+            printf(">");
+            
+            // movimento pra baixo e pra cima
+            if(ChannelInput[PITCH_CH] < 2500){
+                MenuStep = WAIT_PITCH_DOWN;
+            }
+            else{
+                if(ChannelInput[PITCH_CH] > 3500){
+                    MenuStep = WAIT_PITCH_UP;
+                }
+            }
+            
+            // select
+            if(ChannelInput[ROLL_CH] > 3500){
+                MenuStep = WAIT_ROLL_BACK;
+            }
+            
+            break;
+        
+        case WAIT_PITCH_DOWN:
+            lcd_goto(0,13);
+            printf("WAIT PITCH DOWN    ");
+            
+            if(ChannelInput[PITCH_CH] > 2500){
+                lcd_goto(0,(int)MenuOption + 2);
+                printf(" ");
+                if((int)MenuOption > 0){
+                    MenuOption = (MENU_OPTION)(MenuOption - 1);
+                }
+                MenuStep = SELECT;
+            }
+            break;
+        
+        case WAIT_PITCH_UP:
+            lcd_goto(0,13);
+            printf("WAIT PITCH UP    ");
+
+            if(ChannelInput[PITCH_CH] < 3500){
+                lcd_goto(0,(int)MenuOption + 2);
+                printf(" ");
+                if((int)MenuOption < MENU_LENGHT){
+                    MenuOption = (MENU_OPTION)(MenuOption + 1);
+                }
+                MenuStep = SELECT;
+            }
+            break;
+        
+        case WAIT_ROLL_BACK:
+            lcd_goto(0,13);
+            printf("WAIT ROLL BACK    ");
+            
+            if(ChannelInput[ROLL_CH] < 3500){
+                lcd_clear(BLACK);
+                lcd_goto(0,0);  
+                MenuStep = PROCESS_OPTION;
+            }
+            break;
+            
+        case WAIT_CH7_BACK:
+            lcd_goto(0,13);
+            printf("WAIT CH7 BACK    ");
+            
+            if(ChannelInput[CH7_CH] < 2500){
+                MenuStep = DISPLAY;
+            }
+            break;
+                    
+        case PROCESS_OPTION:
+            process_option();
+            break;
+    }
+}
+
+void process_option(){
+    switch (MenuOption){
+        case RADIO_RAW:
+            draw_rc_inputs(1);
+            break;
+        case RADIO_CORRECT:
+            draw_rc_inputs(0);
+            break;
+        case ANALOG_MONITOR:
+        
+            break;
+        
+        case READY:
+        
+            break;
+            
+        case INITIAL_SETTINGS:
+            // seta o flag initial setup
+            break;          
+    }
+    
+    if(ChannelInput[CH7_CH] > 3500){
+        MenuStep = WAIT_CH7_BACK;
+        lcd_clear(BLACK);
+    }
+}
+
+interrupt (TIMERA0_VECTOR) TIMERA0_ISR_HOOK(void){
+    ControlCounter++;
+    RCCounter++;
+    MenuCounter++;
+}
 
 void clock_init(void)
 {
@@ -101,14 +276,6 @@ void timer_a3_init(void)
     TACTL = TASSEL_2 + ID_3 + MC_1;
 }
 
-interrupt (TIMERA0_VECTOR) TIMERA0_ISR_HOOK(void){
-    Milliseconds += 2;
-    if(Milliseconds == 10){
-        //faz o controle
-        Milliseconds = 0;
-    }
-}
-
 interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
     unsigned int PPM_aux = TAR; // captura aqui pra ser mais exato
     // aqui eh usado PPM_P1_MASK, pq eh a interrupcao da P1 
@@ -146,7 +313,9 @@ void calibrate_radio(void){
     fourbytes ValorAux;        
     
     lcd_goto(2,5);
+    color_fore = RED;
     printf("MOVE STICKS\nALL DIRECTIONS");
+    color_fore = LIME;
     delayms(3000);
     lcd_clear(BLACK);
 
@@ -160,8 +329,8 @@ void calibrate_radio(void){
         PPMMax[i] = PPMMin[i];
     }
     
-    for(k = 200; k > 0; k--){
-        draw_rc_inputs();
+    for(k = 120; k > 0; k--){
+        draw_rc_inputs(1);
         lcd_goto(0, 13);
         printf("%d ", k);
         delayms(1);
@@ -174,6 +343,8 @@ void calibrate_radio(void){
             }
         }
     }
+    
+    lcd_clear(BLACK);
     
     for(i = 0; i < 8; i++){ // calcula offset e slope pra deixar na faixa de 1000 a 2000
         PPMSlope[i] = 2000.0 / (PPMMax[i] - PPMMin[i]);
@@ -220,6 +391,12 @@ void calibrate_radio(void){
         
         delayms(100);
         
+        // grava ch7 slope 
+        ValorAux.f = PPMSlope[CH7_CH];
+        i2c_write16_multiples(_RADIO_CH7_SLOPE, ValorAux.c, 4);
+        
+        delayms(100);
+        
         // grava yaw offset 
         ValorAux.f = PPMOffset[YAW_CH];
         i2c_write16_multiples(_RADIO_YAW_OFFSET, ValorAux.c, 4);
@@ -254,6 +431,17 @@ void calibrate_radio(void){
         ValorAux.f = PPMOffset[CH6_CH];
         i2c_write16_multiples(_RADIO_CH6_OFFSET, ValorAux.c, 4);
         
+        delayms(100);
+        
+        // grava ch7 offset 
+        ValorAux.f = PPMOffset[CH7_CH];
+        i2c_write16_multiples(_RADIO_CH7_OFFSET, ValorAux.c, 4);
+        
+        delayms(100);
+        
+        lcd_goto(2,2);
+        printf("Params saved.");
+        delayms(2000);
     }
 }
 
@@ -308,27 +496,53 @@ void load_transmitter_values(void){
         PPMSlope[CH6_CH] = ValorAux.f;
         i2c_read16_multiples(_RADIO_CH6_OFFSET, ValorAux.c, 4);
         PPMOffset[CH6_CH] = ValorAux.f;
+        
+        // load ch7 slope  e offset
+        i2c_read16_multiples(_RADIO_CH7_SLOPE, ValorAux.c, 4);
+        PPMSlope[CH7_CH] = ValorAux.f;
+        i2c_read16_multiples(_RADIO_CH7_OFFSET, ValorAux.c, 4);
+        PPMOffset[CH7_CH] = ValorAux.f;
     }
 }
 
-void draw_rc_inputs(){
+void draw_rc_inputs(char raw){
     unsigned int i = 0, k = 0, h = 0;
     lcd_goto(0,0);
     printf("     RC inputs");
     lcd_goto(0,2);
     
     for(i = 0; i < 8; i++){
-        printf("ch[%d]: %d   \n", i, ChannelInput[i]);
-        k = 21 + (8 * i); //posicao inicial em y
-        if(ChannelInput[i] > 4000){
-            h=100;
+        if(!raw){
+            printf("ch[%d]: %d   \n", i, ChannelInput[i]);
         }
         else{
-            if(ChannelInput[i] < 2001){
-                h = 0;
+            printf("ch[%d]: %d   \n", i, PPMValue[i]);
+        }
+        k = 21 + (8 * i); //posicao inicial em y
+        if(!raw){
+            if(ChannelInput[i] > 4000){
+                h=100;
             }
             else{
-                h = ((ChannelInput[i] - 2000) * 10) / 200;
+                if(ChannelInput[i] < 2001){
+                    h = 0;
+                }
+                else{
+                    h = ((ChannelInput[i] - 2000) * 10) / 200;
+                }
+            }
+        }
+        else{
+            if(PPMValue[i] > 4000){
+                h=100;
+            }
+            else{
+                if(PPMValue[i] < 2001){
+                    h = 0;
+                }
+                else{
+                    h = ((PPMValue[i] - 2000) * 10) / 200;
+                }
             }
         }
         lcd_drawprogressbar(80,k,45,4,WHITE, BLUE, h);
@@ -345,54 +559,64 @@ int find_first(int startaddress){
     return 0;
 }
 
-void show_menu(void){
+
+// loop de controle
+void main_loop(){
+    
     
 }
 
-void process_menu(void){
-    
-}
-
-int main(){
-    WDTCTL = WDTPW + WDTHOLD;
+void setup(){
     
     clock_init();
+    
     timer_a3_init();
+    
     p1_init();
+    
     analog_init();
+    
     i2c_init();
     
     eint();
-
+    
     lcd_init(BLACK);
     
-    //printf("address: %d", findfirst(0));
-    //delayms(10000);
-    
+    //printf("EEPROM ADDRESS: %dd\n", find_first(0));
+
     i2c_config(EEPROM_I2C_ADDR);
     EEPROMFound = !(i2c_find_device());
     
     if(EEPROMFound){
         printf("EEPROM found\n");
-        load_transmitter_values();
-        //carregar os outros parametros
+        i2c_read16_multiples(_STATUS_FLAGS, StatusFlags, 3);
+        printf("SF: %d %d %d\n", StatusFlags[0], StatusFlags[1], StatusFlags[2]);
+
+        //if(1){
+        if(StatusFlags[0] != 0){
+            printf("Calibrando radio...\n");
+            delayms(4000);
+            calibrate_radio();
+            StatusFlags[0] = 0;
+            StatusFlags[1] = 0;
+            StatusFlags[2] = 0;
+            i2c_write16_multiples(_STATUS_FLAGS, StatusFlags, 3);
+        }
+        else{
+            load_transmitter_values();
+            printf("RC params loaded\n");
+            //carregar os outros parametros
+        }
     }
     else{
-        color_back = RED;
-        color_fore = BLACK;
+        color_fore = RED;
         printf("EEPROM not found\n");
-        color_back = BLACK;
-        color_fore = WHITE;
+        color_fore = LIME;
     }
-    delayms(5000);
     
-    //calibrate_radio();
-    
-    while(1){
-        delayms(100);
-        process_rc();
-        draw_rc_inputs();
-        
-    }
+    SetupDone = 1;
 }
+
+
+
 
