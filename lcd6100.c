@@ -23,17 +23,7 @@
 //     |           -->--           |<------------+
 //  131|                           |
 //     +---------------------------+
-/* 
-    avacalhado por flavio em 20/11/2010
-    - lcd_drawcircle(...);
-    - lcd_drawline(...);
-    - otimizacao do codigo:
-        - funcao n6100_sendcommand e n6100_senddata viraram uma so: n6100_send(char,char)
-        - o codigo foi reduzido em aproximadamente 20% de tamanho
-        - fonts.h foi movido para lcd6100.h
-        - prototipos foram movidos para lcd6100.h
-        - cor ORANGE e LIME foram adicionadas
-*/                             
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "msp430x261x.h"
@@ -362,7 +352,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, int color, int width) {
+void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
     int dy = y1 - y0;
     int dx = x1 - x0;
     int stepx, stepy;
@@ -382,7 +372,8 @@ void lcd_drawline(int x0, int y0, int x1, int y1, int color, int width) {
     }
     dy <<= 1; // dy is now 2*dy
     dx <<= 1; // dx is now 2*dx
-    lcd_fillrect(x0, y0, width, width, color);
+    
+    lcd_drawpoint(x0, y0, color);
 
     if (dx > dy) {
         int fraction = dy - (dx >> 1); // same as 2*dy - dx
@@ -393,7 +384,7 @@ void lcd_drawline(int x0, int y0, int x1, int y1, int color, int width) {
             }
             x0 += stepx;
             fraction += dy; // same as fraction -= 2*dy
-            lcd_fillrect(x0, y0, width, width, color);
+            lcd_drawpoint(x0, y0, color);
         }
     } 
     else {
@@ -405,9 +396,25 @@ void lcd_drawline(int x0, int y0, int x1, int y1, int color, int width) {
             }
             y0 += stepy;
             fraction += dx;
-            lcd_fillrect(x0, y0, width, width, color);
+            lcd_drawpoint(x0, y0, color);
         }
     }
+}
+
+void lcd_drawpoint(unsigned char x, unsigned char y, int color)
+{
+    n6100_sendcom2(0x2a, x, x);
+    n6100_sendcom2(0x2b, y, y);
+    
+    n6100_send(0x2c, 3);
+    n6100_send(color, 1);
+
+    
+    P5OUT &= ~SDA;
+    P5OUT |= CSX;
+    
+    n6100_sendcom2(0x2a, 0, 0x83);
+    n6100_sendcom2(0x2b, 0, 0x83);
 }
 
 void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char p[])

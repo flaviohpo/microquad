@@ -12,6 +12,7 @@
 volatile unsigned int ControlCounter = 0;
 volatile unsigned int RCCounter = 0;
 volatile unsigned int MenuCounter = 0;
+
 /*
     StatusFlags:
     ----------------------------------
@@ -29,7 +30,7 @@ MENU_OPTION MenuOption = READY;         // guarda a opcao escolhida no menu prin
 // variaveis usadas no menu analog graph
 char AnalogSelect = 7;      // serve para selecionar a entrada no menu analog
 char AnalogChecked = 0x00;  // verifica se a entrada X deve ser mostrada no grafico
-char AnalogGraph[8][100];   // um vetor para cada entrada analogica, guarda as ultimas 100 leituras, total = 800B
+char AnalogGraph[8][GRAPH_LENGHT];   // um vetor para cada entrada analogica, guarda as ultimas GRAPH_LENGHT leituras, total = 800B
 char AnalogColours[8] = {BLUE, LIME, RED, YELLOW, ORANGE, MAGENTA, AQUA, WHITE}; 
 
 // variaveis ajuste radio
@@ -61,11 +62,12 @@ int main(){
         maior que a do timerA todo o codigo a seguir poderia estar la dentro da interruption do timerA.
         Outra maneira eh delegar a leitura dos PPM para outro MSP, algum bem pequeno, so precisa de uma
         P1 completa. */
-        if(MotorArmed == TRUE){
-            if(ControlCounter >= CONTROL_PERIOD){
+        if(ControlCounter >= CONTROL_PERIOD){
+            analog_refresh_all();
+            if(MotorArmed == TRUE){
                 main_loop();
-                ControlCounter = 0;
             }
+            ControlCounter = 0;
         }
         
         if(SetupDone == TRUE){
@@ -219,18 +221,41 @@ void process_option(){
     if(ChannelInput[CH7_CH] > 3500){
         MenuStep = WAIT_CH7_BACK;
         MenuAnalog = DISPLAY;   // serve para colocar o menu analog na posicao inicial para quando for acessado denovo
+        analog_graph_clear_all();
         lcd_clear(BLACK);
     }
 }
 
 void draw_analog_graph(void){
-    lcd_goto(4,4);
-    printf("FAZER");
+    int i, k;
+    for(i = 0; i < 8; i++){
+        if((1 << i) & AnalogChecked){
+            for(k = 0; k < (GRAPH_LENGHT - 1); k++){
+                lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k], BLACK); // apaga a posicao antiga
+                AnalogGraph[i][k] = AnalogGraph[i][k+1];
+                lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k], AnalogColours[i]); // desenha a posicao nova
+            }
+            AnalogGraph[i][GRAPH_LENGHT - 1] = GRAPH_OFFSET - ((AnalogValue[i] >> 6) & 0xFF); //inverte e ajusta ao tamanho do LCD
+        }
+    }
+    
+}
+
+void analog_graph_clear(int n){
+    int i;
+    for(i = 0; i < GRAPH_LENGHT; i++){
+        lcd_drawpoint(i+GRAPH_OFFSETX, AnalogGraph[n][i], BLACK); // apaga a posicao antiga
+        AnalogGraph[n][i] = 0;
+    }
 }
 
 void process_analog_menu(void){
+    draw_analog_graph();
     switch(MenuAnalog){
         case DISPLAY:
+            lcd_goto(4,0);
+            printf("ANALOG GRAPH   ");
+            
             lcd_goto(0,14);
             printf("DISPLAY             ");
 
@@ -278,6 +303,7 @@ void process_analog_menu(void){
 
             if(ChannelInput[PITCH_CH] < 3500){
                 AnalogChecked = AnalogChecked^(1<<AnalogSelect);
+                analog_graph_clear(AnalogSelect);
                 MenuAnalog = DISPLAY;
             }
             break;
@@ -770,18 +796,20 @@ void setup(){
         printf("EEPROM not found\n");
         color_fore = LIME;
     }
+    analog_graph_clear_all();    
     
-    delayms(5000);
+    lcd_drawline(10,80,90,90,RED);
+    lcd_drawline(10,90,90,80,BLUE);
     
+    delayms(1500);
+
     SetupDone = 1;
 }
 
-void analog_graph_clear(void){
-    int i, k;
+void analog_graph_clear_all(void){
+    int i;
     for(i = 0; i < 8; i++){
-        for(k = 0; k < 100; k++){
-            AnalogGraph[i][k] = 0;
-        }
+        analog_graph_clear(i);
     }
 }
 

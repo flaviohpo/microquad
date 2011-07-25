@@ -14,7 +14,7 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\analog.c" linenum="1" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\analog.c" linenum="35" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\analog.h" linenum="1" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\delay.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\delay.h" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
@@ -22,9 +22,9 @@
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\eeprom.h" linenum="17" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\i2c.c" linenum="216" placement="0:1:-1:-1:-8:-30:50:50:902:330" />
 	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\i2c.h" linenum="116" placement="0:1:-1:-1:-8:-30:75:75:927:355" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\lcd6100.c" linenum="46" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\lcd6100.h" linenum="59" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\main.c" linenum="186" placement="2:3:-1:-1:-8:-30:0:0:852:280" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\microquad.h" linenum="23" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\lcd6100.c" linenum="355" placement="0:1:-1:-1:-8:-30:100:100:952:380" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\lcd6100.h" linenum="41" placement="0:1:-1:-1:-8:-30:125:125:977:405" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\main.c" linenum="364" placement="2:3:-1:-1:-8:-30:0:0:852:280" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\microquad\microquad.h" linenum="21" placement="0:1:-1:-1:-8:-30:25:25:877:305" />
 </workspace>
 

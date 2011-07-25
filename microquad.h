@@ -16,6 +16,9 @@
 #define MENU_PERIOD 69
 
 #define MENU_LENGHT 4
+#define GRAPH_LENGHT 100
+#define GRAPH_OFFSET 85
+#define GRAPH_OFFSETX 10
 
 // MENU OPTIONS
 typedef enum{
@@ -37,7 +40,7 @@ typedef enum{
     INITIAL_SETTINGS
 }MENU_OPTION;
 
-void analog_graph_clear(void);
+
 void clock_init(void);
 void p1_init(void);
 void timer_a3_init(void);
@@ -49,6 +52,8 @@ void process_menu(void);
 void process_rc(void);
 void main_loop(void);
 void process_option(void);
+void analog_graph_clear(int n);
+void analog_graph_clear_all(void);
 void draw_analog_graph(void);
 void process_analog_menu(void);
 void refresh_analog_menu(void);
