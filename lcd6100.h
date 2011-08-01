@@ -56,7 +56,7 @@
 #define MAGENTA         0xe3
 #define BLUE            0x03
 #define AQUA            0x1f
-#define LIME            0x3c
+#define LIME            0x1c
 #define YELLOW          0xfc
 #define RED             0xe0
 #define SILVER          0xb6
@@ -117,7 +117,7 @@ void lcd_putchar(unsigned char c);
 void lcd_drawcircle(unsigned int x, unsigned int y, unsigned int radius, unsigned char color, int width);
 void lcd_drawline(int x0, int y0, int x1, int y1, int color);
 void lcd_drawprogressbar(int x0, int y0, int x1, int y1, int color, int colorprogress, int percent);
-
+void lcd_putdot(int from, int to);
 
 // ************************************************************************
 // **                                                                    **
@@ -130,6 +130,7 @@ void lcd_drawprogressbar(int x0, int y0, int x1, int y1, int color, int colorpro
 // **                                                                    **
 // ************************************************************************
 //
+
 
 
 

@@ -1,8 +1,8 @@
 #include "msp430x261x.h"
 #include "analog.h"
 
-int AnalogOffset[8] = {0,0,0,0, 0,0,0,0};
-int AnalogValue[8] = {0,0,0,0, 0,0,0,0}; 
+unsigned int AnalogOffset[8] = {0,0,0,0, 0,0,0,0};
+unsigned int AnalogValue[8] = {0,0,0,0, 0,0,0,0}; 
 
 void analog_init(void){
     P6SEL = ANALOG_ENABLE;

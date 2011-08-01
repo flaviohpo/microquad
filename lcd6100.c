@@ -504,7 +504,20 @@ void lcd_putchar(unsigned char c)
 }
 
 void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogress, int percent){
+    if(ly < 1 || lx < 1 || percent < 0)
+        return;
+        
     int lx_progress = (lx * percent) / 100;
     lcd_fillrect(x, y, lx_progress, ly,color);
     lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly,colorprogress);
+}
+
+void lcd_putdot(int from, int to){
+    if(from > to) return;
+    lcd_goto(from, LCD_linecount);
+    
+    while(from < to){
+        lcd_putchar('.');
+        from++;
+    }
 }

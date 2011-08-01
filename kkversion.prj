@@ -1,0 +1,26 @@
+<project version="Crimson Editor 3.60">
+	<category name="KKsource" expanded="yes">
+		<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\QuadControllerV4_5\QuadControllerV4_5\QuadControllerV4_5.asm" />
+		<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\XXcontroller_KR_v1_5\XXcontrol_KR.c" />
+	</category>
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\analog.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\analog.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\delay.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\delay.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\eeprom.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\eeprom.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\fazer" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\i2c.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\i2c.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\lcd6100.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\lcd6100.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\main.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\microquad.h" />
+</project>
+
+<workspace version="Crimson Editor 3.60">
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\main.c" linenum="83" placement="0:1:-1:-1:-8:-30:75:75:1146:343" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\QuadControllerV4_5\QuadControllerV4_5\QuadControllerV4_5.asm" linenum="1" placement="2:3:-1:-1:-8:-30:125:125:1200:397" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\XXcontroller_KR_v1_5\XXcontrol_KR.c" linenum="1" placement="0:1:-1:-1:-8:-30:0:0:1075:272" />
+</workspace>
+
