@@ -1,5 +1,7 @@
 #define PPM_P1MASK 0xFF
 
+#define LOW_BAT 2050
+
 // descobrir valor bom
 #define PITCH_P_DEFAULT     1
 #define YAW_P_DEFAULT       1

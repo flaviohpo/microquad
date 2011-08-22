@@ -1,5 +1,5 @@
 <project version="Crimson Editor 3.60">
-	<category name="KKsource" expanded="yes">
+	<category name="KKsource" expanded="no">
 		<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\QuadControllerV4_5\QuadControllerV4_5\QuadControllerV4_5.asm" />
 		<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\XXcontroller_KR_v1_5\XXcontrol_KR.c" />
 	</category>
@@ -19,8 +19,9 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\main.c" linenum="83" placement="0:1:-1:-1:-8:-30:75:75:1146:343" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\QuadControllerV4_5\QuadControllerV4_5\QuadControllerV4_5.asm" linenum="1" placement="2:3:-1:-1:-8:-30:125:125:1200:397" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\XXcontroller_KR_v1_5\XXcontrol_KR.c" linenum="1" placement="0:1:-1:-1:-8:-30:0:0:1075:272" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\main.c" linenum="85" placement="2:3:-1:-1:-8:-30:100:100:1171:368" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\lcd6100.c" linenum="453" placement="0:1:-1:-1:-8:-30:50:50:1125:322" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\microquad.h" linenum="3" placement="0:1:-1:-1:-8:-30:75:75:1150:347" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\analog.h" linenum="20" placement="0:1:-1:-1:-8:-30:100:100:1175:372" />
 </workspace>
 

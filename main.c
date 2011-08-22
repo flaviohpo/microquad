@@ -10,6 +10,7 @@
 #include "microquad.h"
 
 volatile unsigned int MenuCounter = 0;
+char low_battery_flag = 0;
 
 char MenuVisible = FALSE;       // indica se o menu deve ser processado ou nao
 char MotorArmed = FALSE;        // seguranca, o loop de controle so eh feito quando esta variavei for TRUE
@@ -66,14 +67,24 @@ int main(){
         }
 
         if(MenuVisible == TRUE){
-            analog_refresh_all();
-            process_menu();
+            if(!low_battery_flag){
+                analog_refresh_all();
+                process_menu();
+            }
         }
         else{
             if(PPMValue[CH6_CH] > STICK_UP_THRESHOLD){
                 MenuVisible = TRUE;
                 MotorArmed = FALSE;
             }
+        }
+        
+        if((AnalogValue[BATTERY_CH] < LOW_BAT) && low_battery_flag == FALSE){
+            low_battery_flag = TRUE;
+            MenuVisible = FALSE;   
+            lcd_clear(BLACK);
+            lcd_goto(1,8);
+            printf("LOW BATTERY!!!");
         }
     }
 }
@@ -85,7 +96,7 @@ void main_loop(){
     rx_get_channels();
     // arm disarm nao tem
     // calibra gyro quando throttle < 1%
-    if(Throttle < 2){
+    if(ControlRef[THROTTLE] < 2){
         for(i = 0; i<4; i++){
             MotorOut[i] = 0;
         }
@@ -97,28 +108,28 @@ void main_loop(){
         analog_refresh_channel(GYRO_PITCH_CH);
         analog_refresh_channel(GYRO_ROLL_CH);
         // adiciona throttle
-        MotorOut[FRONT] = Throttle;
-        MotorOut[LEFT] = Throttle;
-        MotorOut[RIGHT] = Throttle;
-        MotorOut[BACK] = Throttle;
+        MotorOut[FRONT] = ControlRef[THROTTLE];
+        MotorOut[LEFT] = ControlRef[THROTTLE];
+        MotorOut[RIGHT] = ControlRef[THROTTLE];
+        MotorOut[BACK] = ControlRef[THROTTLE];
         // adiciona gyro e rc roll
         AnalogValue[GYRO_ROLL_CH] = (AnalogValue[GYRO_ROLL_CH] >> 2) * Gain[PROPORTIONAL][ROLL] / 100; // passa a leitura do gyro para 10bits
         ControlRef[ROLL] = ControlRef[ROLL] * ROLL_RC_GAIN / 100;
-        ControlRef[ROLL] += AnalogValue[GYRO_ROLL_CH]
+        ControlRef[ROLL] += AnalogValue[GYRO_ROLL_CH];
         
         MotorOut[LEFT] += ControlRef[ROLL];
         MotorOut[RIGHT] -= ControlRef[ROLL];
         // adiciona pitch
         AnalogValue[GYRO_PITCH_CH] = (AnalogValue[GYRO_PITCH_CH] >> 2) * Gain[PROPORTIONAL][PITCH] / 100; // passa a leitura do gyro para 10bits
         ControlRef[PITCH] = ControlRef[PITCH] * PITCH_RC_GAIN / 100;
-        ControlRef[PITCH] += AnalogValue[GYRO_PITCH_CH]
+        ControlRef[PITCH] += AnalogValue[GYRO_PITCH_CH];
         
         MotorOut[BACK] += ControlRef[PITCH];
         MotorOut[FRONT] -= ControlRef[PITCH];
         // adiciona yaw
         AnalogValue[GYRO_YAW_CH] = (AnalogValue[GYRO_YAW_CH] >> 2) * Gain[PROPORTIONAL][YAW] / 100; // passa a leitura do gyro para 10bits
         ControlRef[YAW] = ControlRef[YAW] * YAW_RC_GAIN / 100;
-        ControlRef[YAW] += AnalogValue[GYRO_YAW_CH]
+        ControlRef[YAW] += AnalogValue[GYRO_YAW_CH];
         
         MotorOut[RIGHT] += ControlRef[YAW];
         MotorOut[LEFT] += ControlRef[YAW];
@@ -523,6 +534,9 @@ void draw_analog_graph(void){
     int i, k, j, y;
     for(i = 0; i < 8; i++){
         if((1 << i) & AnalogChecked){
+            // mostra escrito o valor
+            lcd_goto(0,i+2);
+            printf("%d   ", AnalogValue[i]);
             // apaga
             for(k = 0; k < (GRAPH_LENGHT - 1); k++){
                 lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] ,BLACK);
@@ -644,6 +658,10 @@ void show_settings(void){
 // arrumar
 void analog_graph_clear(int i){
     int k, j, y;
+    // apaga o valor
+    lcd_goto(0,i+2);
+    printf("    ");
+    // apaga o grafico
     for(k = 0; k < (GRAPH_LENGHT - 1); k++){
         lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] ,BLACK);
         j = AnalogGraph[i][k]; // posicao atual
