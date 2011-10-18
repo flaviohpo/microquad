@@ -1,0 +1,23 @@
+<project version="Crimson Editor 3.60">
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\analog.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\analog.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\delay.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\delay.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\eeprom.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\eeprom.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\i2c.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\i2c.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\lcd6100.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\lcd6100.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\main.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\microquad.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.h" />
+</project>
+
+<workspace version="Crimson Editor 3.60">
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.c" linenum="284" placement="0:1:-1:-1:-8:-30:125:125:1196:393" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.h" linenum="59" placement="0:1:-1:-1:-8:-30:0:0:1075:272" />
+	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\main.c" linenum="199" placement="2:3:-1:-1:-8:-30:125:125:1200:397" />
+</workspace>
+

@@ -1,0 +1,32 @@
+<project version="Crimson Editor 3.60">
+    <category name="KKsource" expanded="no">
+        <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\QuadControllerV4_5\QuadControllerV4_5\QuadControllerV4_5.asm" />
+        <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\XXcontroller_KR_v1_5\XXcontrol_KR.c" />
+    </category>
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.c" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.h" />
+    <localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.c" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.h" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\eeprom.c" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\eeprom.h" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\fazer" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\i2c.c" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\i2c.h" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\itg3200.c" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\itg3200.h" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\lcd6100.c" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\lcd6100.h" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" />
+    <localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" />
+</project>
+
+<workspace version="Crimson Editor 3.60">
+    <localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\itg3200.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:1171:368" />
+    <localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\main.c" linenum="1" placement="2:3:-1:-1:-8:-30:125:125:1200:397" />
+    <localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\itg3200.h" linenum="53" placement="0:1:-1:-1:-8:-30:0:0:1075:272" />
+    <localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\i2c.h" linenum="88" placement="0:1:-1:-1:-8:-30:25:25:1100:297" />
+    <localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\microquad.h" linenum="3" placement="0:1:-1:-1:-8:-30:50:50:1125:322" />
+    <localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\delay.h" linenum="1" placement="0:1:-1:-1:-8:-30:75:75:1150:347" />
+</workspace>
+
