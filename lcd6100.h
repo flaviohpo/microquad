@@ -89,8 +89,8 @@ extern unsigned char color_fore;
 
 extern unsigned char LCD_linecount;
 extern unsigned char LCD_charcount ;
-extern unsigned char color_back;
-extern unsigned char color_fore;
+extern unsigned char LCD_back_color;
+extern unsigned char LCD_fore_color;
 
 
 extern const char asciitable[640];
@@ -118,7 +118,7 @@ void lcd_drawcircle(unsigned int x, unsigned int y, unsigned int radius, unsigne
 void lcd_drawline(int x0, int y0, int x1, int y1, int color);
 void lcd_drawprogressbar(int x0, int y0, int x1, int y1, int color, int colorprogress, int percent);
 void lcd_putdot(int from, int to);
-
+void lcd_set_colour(unsigned char back, unsigned char fore);
 // ************************************************************************
 // **                                                                    **
 // **  TABELA ASCII para LCDs Gráficos                                   **

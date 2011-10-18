@@ -13,4 +13,3 @@ void delay2us(void);
 void delay5us(void);
 void delayus(unsigned int tempo);
 void delayms(unsigned int tempo);
-

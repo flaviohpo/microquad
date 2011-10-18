@@ -26,14 +26,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "msp430x261x.h"
+#include "msp430f2618.h"
 #include "lcd6100.h"
 #include "delay.h"
 
 unsigned char LCD_linecount= 0;
 unsigned char LCD_charcount=0 ;
-unsigned char color_back = BLACK;
-unsigned char color_fore = LIME;
+unsigned char LCD_back_color = BLACK;
+unsigned char LCD_fore_color = LIME;
 
 const char asciitable[640] = {
                             0x00,0x00,0x00,0x00,0x00,    // NULL char...
@@ -178,8 +178,8 @@ int putchar(int c)
                          
 void lcd_setcolor(unsigned char foreground_color, unsigned char background_color)
 {
-    color_back = background_color;
-    color_fore = foreground_color;
+    LCD_back_color = background_color;
+    LCD_fore_color = foreground_color;
 }
 
 /*
@@ -477,10 +477,10 @@ void lcd_wrchar(unsigned char c)
     for (i=0; i<5; i++)
     {
       v = asciitable[j];
-      if(v & mask) n6100_send(color_fore,0); else n6100_send(color_back,0);
+      if(v & mask) n6100_send(LCD_fore_color,0); else n6100_send(LCD_back_color,0);
       j += 1;
     }
-    n6100_send(color_back,0);
+    n6100_send(LCD_back_color,0);
     mask <<= 1;
   }
 }
@@ -510,6 +510,11 @@ void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogr
     int lx_progress = (lx * percent) / 100;
     lcd_fillrect(x, y, lx_progress, ly,color);
     lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly,colorprogress);
+}
+
+void lcd_set_colour(unsigned char back, unsigned char fore){
+    LCD_fore_color = fore;
+    LCD_back_color = back;
 }
 
 void lcd_putdot(int from, int to){

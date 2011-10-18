@@ -27,6 +27,7 @@ typedef union{
 typedef union{
     int i;
     char c[2];
+    unsigned char uc[2];
 }twobytes;
 
 extern unsigned char EEPROMFound;

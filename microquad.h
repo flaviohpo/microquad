@@ -1,6 +1,8 @@
 #define PPM_P1MASK 0xFF
 
-#define LOW_BAT 2050
+#define ITG3200
+//#define LPR510AL
+#define LOW_BAT 2000
 
 // descobrir valor bom
 #define PITCH_P_DEFAULT     1
@@ -60,14 +62,8 @@
 #define GRAPH_OFFSETX 25
 
 char FlightModeNames[3][10] = {"Normal", "Acro", "UFO"};
-char MenuOptionNames[MENU_LENGHT][18] = {"Ready", "Change mode", "Control Ref", "Radio raw", "Analog monitor", "Change PID", "Recalibrate gyro", "Recalibrate radio", "Show settings", "Default settings", "Save current PID"};
+char MenuOptionNames[MENU_LENGHT][18] = {"Ready", "Test Motor", "Control Ref", "Radio raw", "Analog monitor", "Change PID", "Recalibrate gyro", "Recalibrate radio", "Show settings", "Default settings", "Save current PID"};
 char PIDMenuOptionNames[9][8] = {"P Roll", "P Yaw", "P Pitch", "D Roll", "D Yaw", "D Pitch", "I Roll", "I Yaw", "I Pitch"};
-
-typedef enum{
-    NORMAL = 0,
-    ACRO,
-    UFO
-}FLIGHT_MODE;
 
 // MENU OPTIONS
 typedef enum{
@@ -83,7 +79,7 @@ typedef enum{
 
 typedef enum{
     READY = 0,
-    CHANGE_FLIGHT_MODE,
+    TEST_MOTORS,
     CONTROL_REF,
     RADIO_RAW,
     ANALOG_MONITOR,
@@ -109,7 +105,8 @@ typedef enum{
 
 void clock_init(void);
 void p1_init(void);
-void timer_a3_init(void);
+void timer_init(void);
+inline void set_motor(int, int, int, int);
 void calibrate_radio(void);
 void calibrate_gyro(void);
 void load_eeprom_values(void);
@@ -123,6 +120,8 @@ void process_PID_option(void);
 void analog_graph_clear(int n);
 void analog_graph_clear_all(void);
 void draw_analog_graph(void);
+void draw_motors_bar(void);
+void process_motor_menu(void);
 void process_analog_menu(void);
 void refresh_analog_menu(void);
 void setup(void);

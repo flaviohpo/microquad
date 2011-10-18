@@ -1,4 +1,4 @@
-#include "msp430x261x.h"
+#include "msp430f2618.h"
 #include "analog.h"
 
 unsigned int AnalogOffset[8] = {0,0,0,0, 0,0,0,0};

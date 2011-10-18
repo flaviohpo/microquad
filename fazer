@@ -1,10 +1,18 @@
+imagem de entrada e uma barrinha de loading com um console pra mostrar o que ta fazendo
+
+guardar tempo de voo ( detectar quando a bateria foi carregada para inciar automaticamente uma nova contagem )
+
 gravar na EEPROM o ultimo modo de voo selecionado
 
-controle
+melhorar controle
 
-barra de rolagem no show settings
+implementar biblioteca de menus com funcao de next page
 
 descobrir valores default pro PID
+
+tirar auto calibrate low throttle
+
+inverter a ordem dos valores no show analog graph
 
 adicionar acelerometro e controle da camera
 
