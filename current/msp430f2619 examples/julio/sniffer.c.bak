@@ -1,0 +1,262 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <msp430x2619.h>
+#include "lcd2112.h"
+
+#define led     port3.out.pin0
+
+#define sw1     port1.in.pin0
+#define sw2     port1.in.pin1
+#define sw3     port1.in.pin2
+#define sw4     port1.in.pin3
+
+#define sda     port2.in.pin6 
+#define scl     port2.in.pin7
+
+
+unsigned char buffer[4000];
+const unsigned char hexadecimal[16] = {"0123456789ABCDEF"};
+
+int putchar(int c);
+
+void config_serial(void);
+void send_serial(unsigned char c);
+unsigned char receive_serial(void);
+
+void configura_cpu(void);
+void delayus(unsigned int tempo);
+void delayms(unsigned int tempo);
+
+unsigned char readkeyboard(void);
+unsigned char waitpress(void);
+void waitrelease(void);
+void waitkey(unsigned char key);
+unsigned char waitanykey(void);
+
+void state_machine(void);
+
+unsigned char hhex(unsigned char v);
+unsigned char lhex(unsigned char v);
+
+
+
+int main (void)
+{
+  unsigned char i, v;
+  char str[100];
+
+  WDTCTL = WDTPW + WDTHOLD;     // desliga watchdog timer
+  configura_cpu();
+
+  lcd_initmodule(nao_virado);
+  config_serial();
+
+  printf("Enviando dados pela serial");  
+  strcpy(str, "Enviando dados pela porta serial...\r\n");
+  while(1)
+  {
+    i = 0;
+    while(str[i] != '\0') send_serial(str[i++]);
+    delayms(100);
+//    send_serial('J');
+//    delayms(10);
+//    if((IFG2 & UCA0RXIFG) == 1)
+//    {
+//      v = receive_serial();
+//      lcd_putchar(v);
+//    }
+  }    
+
+  return 0;
+}   
+
+// Printf implementation...
+//
+int putchar(int c)
+{
+  lcd_wrchar(c);
+  return 0;
+}
+
+// ** 9600 bps, 8N1 ...
+//
+void config_serial(void)
+{
+  UCA0CTL1 = 0x81;
+  UCA0CTL0 = 0x00;
+  UCA0BR0 = 104;
+  UCA0BR1 = 0;
+  UCA0MCTL = 0x31;
+  UCA0CTL1 = 0x80;
+}
+
+unsigned char receive_serial(void)
+{
+  while(!(IFG2 & UCA0RXIFG));
+  return UCA0RXBUF;
+}
+
+void send_serial(unsigned char c)
+{
+  while(!(IFG2 & UCA0TXIFG));
+  UCA0TXBUF = c;                    // TX -> RXed character
+}
+
+
+void configura_cpu(void)
+{
+  // configura o clock para 16MHz...
+  DCOCTL = 0x77;
+  BCSCTL1 = 0x0f;
+  BCSCTL2 = 0x08;
+  BCSCTL3 = 0x8c;
+
+  // Configura as portas...
+  P1DIR = 0xf0;
+  P2DIR = 0x00;
+  P3DIR = 0xd7;
+  P3SEL = 0x30;
+  P4DIR = 0xff;
+  P5DIR = 0x70;
+  P5SEL = 0x70;
+}
+
+// T = 0.2923us * tempo (aproximadamente...)
+//
+void delayus(unsigned int tempo)
+{
+    int i;
+    
+    for(i = 0; i < tempo; i++) nop();
+}
+
+// Aproximadamente 1ms...
+//
+void delayms(unsigned int tempo)
+{
+    int i;
+    
+    for(i = 0; i < tempo; i++) delayus(3420);
+}
+
+
+unsigned char readkeyboard(void)
+{
+  unsigned char tecla = 0;
+  if(sw1 == 0) tecla = '1';
+  if(sw2 == 0) tecla = '2';
+  if(sw3 == 0) tecla = '3';
+  if(sw4 == 0) tecla = '4';
+
+  return tecla;
+}
+
+unsigned char waitpress(void)
+{
+  unsigned char v = 0;
+  while(v == 0) 
+  {
+    v = readkeyboard();
+    delayms(1);
+  }
+
+  return v;
+}
+
+void waitrelease(void)
+{
+  while(readkeyboard() != 0) delayms(1);
+}
+
+void waitkey(unsigned char key)
+{
+  while(readkeyboard() != key) delayms(1);
+  waitrelease();
+}
+
+unsigned char waitanykey(void)
+{
+  unsigned char v;
+
+  v = waitpress();
+  waitrelease();
+
+  return v;
+}
+
+
+void state_machine(void)
+{
+  unsigned int contador, x;
+
+  contador = 0;
+  x = 0;
+
+  estado_a:
+    if(sda && scl) goto estado_b;
+    goto estado_a;
+
+  estado_b:
+    if(!sda && scl)
+    {
+      led = 1;
+      buffer[contador++] = '*';
+      x = 0;
+      goto estado_c;
+    }
+    goto estado_b;
+  estado_c:
+    if(!scl) goto estado_d;
+    goto estado_c;
+  estado_d:
+    if(sda && scl) goto estado_e;
+    if(!sda && scl) goto estado_f;
+    goto estado_d;
+  estado_e:
+    if(sda && scl) goto estado_e;
+    if(!scl)
+    {
+      x <<= 1;
+      x++;
+      goto estado_d;
+    }
+    if(!sda && scl) 
+    {
+      buffer[contador++] = hhex(x/256);
+      buffer[contador++] = lhex(x/256);
+      if(x%256) buffer[contador++] = '-'; else buffer[contador++] = '+';
+      buffer[contador++] = '#';
+      goto estado_c;
+    }
+    goto estado_e;
+  estado_f:
+    if(!sda && scl) goto estado_f;
+    if(!scl)
+    {
+      x <<= 1;
+      goto estado_d;
+    }
+    if(sda && scl)
+    {
+      buffer[contador++] = hhex(x/256);
+      buffer[contador++] = lhex(x/256);
+      if(x%256) buffer[contador++] = '-'; else buffer[contador++] = '+';
+      buffer[contador++] = '.';
+      goto estado_b;
+    }
+    goto estado_f;
+}
+
+unsigned char hhex(unsigned char v)
+{
+  return hexadecimal[(v & 0xf0) >> 4];
+}
+
+unsigned char lhex(unsigned char v)
+{
+  return hexadecimal[(v & 0x0f)];
+}
+
+
+

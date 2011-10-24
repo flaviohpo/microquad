@@ -27,13 +27,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "msp430f2618.h"
-#include "lcd6100.h"
+#include "color.h"
 #include "delay.h"
+#include "lcd6100.h"
 
-unsigned char LCD_linecount= 0;
-unsigned char LCD_charcount=0 ;
-unsigned char LCD_back_color = BLACK;
-unsigned char LCD_fore_color = LIME;
+unsigned char LCDLineCount = 0;
+unsigned char LCDCharCount = 0;
+unsigned char LCDBackColor = BLACK;
+unsigned char LCDForeColor = LIME;
 
 const char asciitable[640] = {
                             0x00,0x00,0x00,0x00,0x00,    // NULL char...
@@ -165,9 +166,6 @@ const char asciitable[640] = {
                             0x10,0x08,0x08,0x10,0x08,
                             0x78,0x46,0x41,0x46,0x78,
                          };
-         
-
-                         
 
 // printf para LCDNOKIA
 int putchar(int c)
@@ -178,8 +176,8 @@ int putchar(int c)
                          
 void lcd_setcolor(unsigned char foreground_color, unsigned char background_color)
 {
-    LCD_back_color = background_color;
-    LCD_fore_color = foreground_color;
+    LCDBackColor = background_color;
+    LCDForeColor = foreground_color;
 }
 
 /*
@@ -223,7 +221,7 @@ void n6100_send(unsigned char data, unsigned char cmd)
     P5OUT |= CSX;
 }
 
-void lcd_init(unsigned char cor)
+void lcd_init(unsigned char color)
 {
     P5DIR |= CSX + SDA + SCLK + RESX;
     
@@ -276,14 +274,14 @@ void lcd_init(unsigned char cor)
   // Memory Access Control...  
   n6100_sendcom1(0x36, invertido);
   // Agradecimentos...
-  lcd_fillrect(0, 0, 132, 132, cor);
+  lcd_fillrect(0, 0, 132, 132, color);
   //n6100_putlogo(2, 2, 128, 128, (unsigned char *)Matrix);
   //delayms(4000);
 }
 
-void lcd_clear(unsigned char cor) 
+void lcd_clear(unsigned char color) 
 {
-  lcd_fillrect(0, 0, 132, 132, cor);
+  lcd_fillrect(0, 0, 132, 132, color);
 }
 
 void n6100_sendcom1(unsigned char comm, unsigned char dat)
@@ -299,7 +297,7 @@ void n6100_sendcom2(unsigned char comm, unsigned char dat1, unsigned char dat2)
     n6100_send(dat2, 0);
 }
 
-void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char cor)
+void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char color)
 {
     unsigned int addr, max;
     
@@ -311,7 +309,7 @@ void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned c
     max = lx*ly;
     for(addr=0; addr<max; addr++)
     {
-      n6100_send(cor, 1);
+      n6100_send(color, 1);
     }
     
     P5OUT &= ~SDA;
@@ -348,11 +346,11 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
         lcd_fillrect(x0 + y, y0 + x,width,width, color);
         lcd_fillrect(x0 - y, y0 + x,width,width, color);
         lcd_fillrect(x0 + y, y0 - x,width,width, color);
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
+        lcd_fillrect(x0 - y,y0 - x,width,width, color);   
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
     int dy = y1 - y0;
     int dx = x1 - x0;
     int stepx, stepy;
@@ -401,13 +399,13 @@ void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
     }
 }
 
-void lcd_drawpoint(unsigned char x, unsigned char y, int color)
+void lcd_drawpoint(unsigned char x, unsigned char y, unsigned char color)
 {
     n6100_sendcom2(0x2a, x, x);
     n6100_sendcom2(0x2b, y, y);
     
     n6100_send(0x2c, 3);
-    n6100_send(color, 1);
+    n6100_send((unsigned char)color, 1);
 
     
     P5OUT &= ~SDA;
@@ -441,10 +439,10 @@ void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned ch
 
 void lcd_newline(void)
 {
-    if (++LCD_linecount == LCD_NLINE){
-        LCD_linecount = 0; 
+    if (++LCDLineCount == LCD_NLINE){
+        LCDLineCount = 0; 
     }
-    LCD_charcount = 0;
+    LCDCharCount = 0;
 }
 
 void lcd_goto(unsigned char x, unsigned char y)
@@ -452,8 +450,8 @@ void lcd_goto(unsigned char x, unsigned char y)
     if (x > LCD_NCHAR-1) x = 0;
     if (y > LCD_NLINE-1) y = 0;
     
-    LCD_charcount = x;
-    LCD_linecount = y;
+    LCDCharCount = x;
+    LCDLineCount = y;
 }
 
 void lcd_wrchar(unsigned char c)
@@ -462,9 +460,9 @@ void lcd_wrchar(unsigned char c)
   unsigned char i, k, v, mask;
 
   // Posiciona área para copiar...
-  i=6*LCD_charcount;
+  i=6*LCDCharCount;
   n6100_sendcom2(0x2a, i, i+5);
-  i=8*(LCD_linecount)+2;
+  i=8*(LCDLineCount)+2;
   n6100_sendcom2(0x2b, i, i+7);
 
   // Rotina de escrita na memória...
@@ -477,10 +475,10 @@ void lcd_wrchar(unsigned char c)
     for (i=0; i<5; i++)
     {
       v = asciitable[j];
-      if(v & mask) n6100_send(LCD_fore_color,0); else n6100_send(LCD_back_color,0);
+      if(v & mask) n6100_send((unsigned char)LCDForeColor,0); else n6100_send((unsigned char)LCDBackColor,0);
       j += 1;
     }
-    n6100_send(LCD_back_color,0);
+    n6100_send((unsigned char)LCDBackColor,0);
     mask <<= 1;
   }
 }
@@ -491,35 +489,31 @@ void lcd_putchar(unsigned char c)
   {
     case 10 : lcd_newline();
               break;
-    case 13 : LCD_charcount = 0;
+    case 13 : LCDCharCount = 0;
               break;
-    default : if (LCD_charcount++ < LCD_NCHAR) lcd_wrchar(c);
+    default : if (LCDCharCount++ < LCD_NCHAR) lcd_wrchar(c);
               else
               {
                 lcd_newline();
                 lcd_wrchar(c);
-                LCD_charcount++;
+                LCDCharCount++;
               }
   }
 }
 
-void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogress, int percent){
+void lcd_drawprogressbar(int x, int y, int lx, int ly, unsigned char color, unsigned char colorprogress, int percent){
     if(ly < 1 || lx < 1 || percent < 0)
         return;
         
     int lx_progress = (lx * percent) / 100;
-    lcd_fillrect(x, y, lx_progress, ly,color);
-    lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly,colorprogress);
+    lcd_fillrect(x, y, lx_progress, ly, color);
+    lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly, colorprogress);
 }
 
-void lcd_set_colour(unsigned char back, unsigned char fore){
-    LCD_fore_color = fore;
-    LCD_back_color = back;
-}
 
 void lcd_putdot(int from, int to){
     if(from > to) return;
-    lcd_goto(from, LCD_linecount);
+    lcd_goto(from, LCDLineCount);
     
     while(from < to){
         lcd_putchar('.');

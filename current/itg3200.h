@@ -1,4 +1,4 @@
-#define ITG_I2C_ADDR 0xD0 //0xD0 if tied low, 0xD2 if tied high
+#define ITG_I2C_ADDR 0xD0 //0xD0 if tied low, 0xD2 if tied high 8bits address
 
 #define ITG_WHO_AM_I    0x00
 #define ITG_SMPLRT_DIV  0x15
@@ -29,8 +29,6 @@
 #define ITG_DLPF_FS_SEL_0   (1<<3)
 #define ITG_DLPF_FS_SEL_1   (1<<4)
 
-//Power Management Register Bits
-//Recommended to set CLK_SEL to 1,2 or 3 at startup for more stable clock
 #define ITG_PWR_MGM_CLK_SEL_0   (1<<0)
 #define ITG_PWR_MGM_CLK_SEL_1   (1<<1)
 #define ITG_PWR_MGM_CLK_SEL_2   (1<<2)
@@ -48,14 +46,15 @@
 #define ITG_INT_CFG_ITG_RDY_EN  (1<<2)
 #define ITG_INT_CFG_RAW_RDY_EN  (1<<0)
 
-extern char ITGFound;
+extern unsigned char ITG3200Found;
+extern unsigned char ITG3200Done;
 
-void ITG_init();
-char ITG_read(char register_addr, char *value);
-char ITG_write(char register_addr, char value);
+unsigned char ITG3200_init(void);
+unsigned char ITG3200_read(unsigned char register_addr, unsigned char *value);
+unsigned char ITG3200_write(unsigned char register_addr, unsigned char value);
 
 //Return the values in engineering units (degrees/second and degrees C)
-int ITG_getX(void);
-int ITG_getY(void);
-int ITG_getZ(void);
-int ITG_getTemp(void);
+unsigned char ITG3200_getX(int *valor);
+unsigned char ITG3200_getY(int *valor);
+unsigned char ITG3200_getZ(int *valor);
+unsigned char ITG3200_getTemp(int *valor);

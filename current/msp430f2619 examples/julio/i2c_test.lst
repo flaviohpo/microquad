@@ -1,0 +1,4438 @@
+
+i2c_test.o:     file format elf32-msp430
+
+Disassembly of section .text:
+
+0000f800 <__low_level_init>:
+    f800:	b2 40 80 5a 	mov	#23168,	&0x0120	;#0x5a80
+    f804:	20 01 
+
+0000f806 <__do_copy_data>:
+    f806:	3f 40 00 00 	mov	#0,	r15	;#0x0000
+    f80a:	0f 93       	cmp	#0,	r15	;r3 As==00
+    f80c:	05 24       	jz	$+12     	;abs 0xf818
+    f80e:	2f 83       	decd	r15		;
+    f810:	9f 4f 12 fc 	mov	-1006(r15),512(r15);
+    f814:	00 02 
+    f816:	fb 23       	jnz	$-8      	;abs 0xf80e
+
+0000f818 <__do_clear_bss>:
+    f818:	3f 40 08 00 	mov	#8,	r15	;#0x0008
+    f81c:	0f 93       	cmp	#0,	r15	;r3 As==00
+    f81e:	04 24       	jz	$+10     	;abs 0xf828
+    f820:	1f 83       	dec	r15		;
+    f822:	cf 43 00 02 	mov.b	#0,	512(r15);r3 As==00
+    f826:	fc 23       	jnz	$-6      	;abs 0xf820
+
+0000f828 <__jump_to_main>:
+    f828:	30 40 32 f8 	br	#0xf832		;
+
+0000f82c <__ctors_end>:
+    f82c:	30 40 30 f8 	br	#0xf830		;
+
+0000f830 <_unexpected_>:
+    f830:	00 13       	reti			
+
+0000f832 <main>:
+    f832:	31 40 80 02 	mov	#640,	r1	;#0x0280
+    f836:	b0 12 54 f9 	call	#-1708		;#0xf954
+    f83a:	b0 12 a6 f9 	call	#-1626		;#0xf9a6
+    f83e:	3b 40 21 00 	mov	#33,	r11	;#0x0021
+    f842:	fb d0 10 00 	bis.b	#16,	0(r11)	;#0x0010
+    f846:	00 00 
+    f848:	fb d0 20 00 	bis.b	#32,	0(r11)	;#0x0020
+    f84c:	00 00 
+    f84e:	3f 40 b8 0b 	mov	#3000,	r15	;#0x0bb8
+    f852:	b0 12 86 f9 	call	#-1658		;#0xf986
+    f856:	fb f0 ef ff 	and.b	#-17,	0(r11)	;#0xffef
+    f85a:	00 00 
+    f85c:	fb f0 df ff 	and.b	#-33,	0(r11)	;#0xffdf
+    f860:	00 00 
+    f862:	3f 40 e8 03 	mov	#1000,	r15	;#0x03e8
+    f866:	b0 12 86 f9 	call	#-1658		;#0xf986
+    f86a:	7f 40 a0 ff 	mov.b	#-96,	r15	;#0xffa0
+    f86e:	b0 12 0e fb 	call	#-1266		;#0xfb0e
+    f872:	4f 93       	cmp.b	#0,	r15	;r3 As==00
+    f874:	69 20       	jnz	$+212    	;abs 0xf948
+    f876:	f2 d0 10 00 	bis.b	#16,	&0x0021	;#0x0010
+    f87a:	21 00 
+    f87c:	6b 42       	mov.b	#4,	r11	;r2 As==10
+    f87e:	f2 40 20 00 	mov.b	#32,	&0x0200	;#0x0020
+    f882:	00 02 
+    f884:	f2 40 a9 ff 	mov.b	#-87,	&0x0201	;#0xffa9
+    f888:	01 02 
+    f88a:	f2 40 5f 00 	mov.b	#95,	&0x0202	;#0x005f
+    f88e:	02 02 
+    f890:	f2 40 8d ff 	mov.b	#-115,	&0x0203	;#0xff8d
+    f894:	03 02 
+    f896:	6c 42       	mov.b	#4,	r12	;r2 As==10
+    f898:	3d 40 00 02 	mov	#512,	r13	;#0x0200
+    f89c:	3e 40 10 00 	mov	#16,	r14	;#0x0010
+    f8a0:	7f 40 a0 ff 	mov.b	#-96,	r15	;#0xffa0
+    f8a4:	b0 12 28 fb 	call	#-1240		;#0xfb28
+    f8a8:	4f 93       	cmp.b	#0,	r15	;r3 As==00
+    f8aa:	4a 20       	jnz	$+150    	;abs 0xf940
+    f8ac:	f2 d0 10 00 	bis.b	#16,	&0x0021	;#0x0010
+    f8b0:	21 00 
+    f8b2:	6c 42       	mov.b	#4,	r12	;r2 As==10
+    f8b4:	3d 40 00 02 	mov	#512,	r13	;#0x0200
+    f8b8:	3e 40 10 00 	mov	#16,	r14	;#0x0010
+    f8bc:	7f 40 a0 ff 	mov.b	#-96,	r15	;#0xffa0
+    f8c0:	b0 12 8a fb 	call	#-1142		;#0xfb8a
+    f8c4:	4f 93       	cmp.b	#0,	r15	;r3 As==00
+    f8c6:	38 20       	jnz	$+114    	;abs 0xf938
+    f8c8:	f2 d0 10 00 	bis.b	#16,	&0x0021	;#0x0010
+    f8cc:	21 00 
+    f8ce:	f2 40 11 00 	mov.b	#17,	&0x0200	;#0x0011
+    f8d2:	00 02 
+    f8d4:	f2 40 5e 00 	mov.b	#94,	&0x0201	;#0x005e
+    f8d8:	01 02 
+    f8da:	f2 40 cc ff 	mov.b	#-52,	&0x0202	;#0xffcc
+    f8de:	02 02 
+    f8e0:	f2 40 bd ff 	mov.b	#-67,	&0x0203	;#0xffbd
+    f8e4:	03 02 
+    f8e6:	6c 42       	mov.b	#4,	r12	;r2 As==10
+    f8e8:	3d 40 00 02 	mov	#512,	r13	;#0x0200
+    f8ec:	3e 40 14 00 	mov	#20,	r14	;#0x0014
+    f8f0:	7f 40 a0 ff 	mov.b	#-96,	r15	;#0xffa0
+    f8f4:	b0 12 28 fb 	call	#-1240		;#0xfb28
+    f8f8:	4f 93       	cmp.b	#0,	r15	;r3 As==00
+    f8fa:	1a 20       	jnz	$+54     	;abs 0xf930
+    f8fc:	f2 d0 10 00 	bis.b	#16,	&0x0021	;#0x0010
+    f900:	21 00 
+    f902:	6c 42       	mov.b	#4,	r12	;r2 As==10
+    f904:	3d 40 00 02 	mov	#512,	r13	;#0x0200
+    f908:	3e 40 14 00 	mov	#20,	r14	;#0x0014
+    f90c:	7f 40 a0 ff 	mov.b	#-96,	r15	;#0xffa0
+    f910:	b0 12 8a fb 	call	#-1142		;#0xfb8a
+    f914:	4f 93       	cmp.b	#0,	r15	;r3 As==00
+    f916:	08 20       	jnz	$+18     	;abs 0xf928
+    f918:	f2 d0 10 00 	bis.b	#16,	&0x0021	;#0x0010
+    f91c:	21 00 
+    f91e:	7b 53       	add.b	#-1,	r11	;r3 As==11
+    f920:	7b b0 80 00 	bit.b	#128,	r11	;#0x0080
+    f924:	ac 37       	jge	$-166    	;abs 0xf87e
+    f926:	ff 3f       	jmp	$+0      	;abs 0xf926
+    f928:	f2 d0 20 00 	bis.b	#32,	&0x0021	;#0x0020
+    f92c:	21 00 
+    f92e:	f7 3f       	jmp	$-16     	;abs 0xf91e
+    f930:	f2 d0 20 00 	bis.b	#32,	&0x0021	;#0x0020
+    f934:	21 00 
+    f936:	e5 3f       	jmp	$-52     	;abs 0xf902
+    f938:	f2 d0 20 00 	bis.b	#32,	&0x0021	;#0x0020
+    f93c:	21 00 
+    f93e:	c7 3f       	jmp	$-112    	;abs 0xf8ce
+    f940:	f2 d0 20 00 	bis.b	#32,	&0x0021	;#0x0020
+    f944:	21 00 
+    f946:	b5 3f       	jmp	$-148    	;abs 0xf8b2
+    f948:	f2 d0 20 00 	bis.b	#32,	&0x0021	;#0x0020
+    f94c:	21 00 
+    f94e:	96 3f       	jmp	$-210    	;abs 0xf87c
+    f950:	30 40 10 fc 	br	#0xfc10		;
+
+0000f954 <configura_cpu>:
+    f954:	b2 40 80 5a 	mov	#23168,	&0x0120	;#0x5a80
+    f958:	20 01 
+    f95a:	d2 42 fd 10 	mov.b	&0x10fd,&0x0057	;0x10fd
+    f95e:	57 00 
+    f960:	d2 42 fc 10 	mov.b	&0x10fc,&0x0056	;0x10fc
+    f964:	56 00 
+    f966:	c2 43 58 00 	mov.b	#0,	&0x0058	;r3 As==00
+    f96a:	c2 43 53 00 	mov.b	#0,	&0x0053	;r3 As==00
+    f96e:	f2 40 33 00 	mov.b	#51,	&0x0022	;#0x0033
+    f972:	22 00 
+    f974:	30 41       	ret			
+
+0000f976 <delayus>:
+    f976:	0e 43       	clr	r14		;
+    f978:	0e 9f       	cmp	r15,	r14	;
+    f97a:	04 2c       	jc	$+10     	;abs 0xf984
+    f97c:	03 43       	nop			
+    f97e:	1e 53       	inc	r14		;
+    f980:	0e 9f       	cmp	r15,	r14	;
+    f982:	fc 2b       	jnc	$-6      	;abs 0xf97c
+    f984:	30 41       	ret			
+
+0000f986 <delayms>:
+    f986:	0b 12       	push	r11		;
+    f988:	0a 12       	push	r10		;
+    f98a:	0a 4f       	mov	r15,	r10	;
+    f98c:	0b 43       	clr	r11		;
+    f98e:	0b 9f       	cmp	r15,	r11	;
+    f990:	07 2c       	jc	$+16     	;abs 0xf9a0
+    f992:	3f 40 20 03 	mov	#800,	r15	;#0x0320
+    f996:	b0 12 76 f9 	call	#-1674		;#0xf976
+    f99a:	1b 53       	inc	r11		;
+    f99c:	0b 9a       	cmp	r10,	r11	;
+    f99e:	f9 2b       	jnc	$-12     	;abs 0xf992
+    f9a0:	3a 41       	pop	r10		;
+    f9a2:	3b 41       	pop	r11		;
+    f9a4:	30 41       	ret			
+
+0000f9a6 <init_i2c>:
+    f9a6:	f2 40 33 00 	mov.b	#51,	&0x0022	;#0x0033
+    f9aa:	22 00 
+    f9ac:	3f 40 21 00 	mov	#33,	r15	;#0x0021
+    f9b0:	df d3 00 00 	bis.b	#1,	0(r15)	;r3 As==01
+    f9b4:	ef d3 00 00 	bis.b	#2,	0(r15)	;r3 As==10
+    f9b8:	2f 42       	mov	#4,	r15	;r2 As==10
+    f9ba:	b0 12 76 f9 	call	#-1674		;#0xf976
+    f9be:	30 41       	ret			
+
+0000f9c0 <start_i2c>:
+    f9c0:	0b 12       	push	r11		;
+    f9c2:	3b 40 21 00 	mov	#33,	r11	;#0x0021
+    f9c6:	db c3 00 00 	bic.b	#1,	0(r11)	;r3 As==01
+    f9ca:	2f 42       	mov	#4,	r15	;r2 As==10
+    f9cc:	b0 12 76 f9 	call	#-1674		;#0xf976
+    f9d0:	eb c3 00 00 	bic.b	#2,	0(r11)	;r3 As==10
+    f9d4:	2f 42       	mov	#4,	r15	;r2 As==10
+    f9d6:	b0 12 76 f9 	call	#-1674		;#0xf976
+    f9da:	3b 41       	pop	r11		;
+    f9dc:	30 41       	ret			
+
+0000f9de <stop_i2c>:
+    f9de:	0b 12       	push	r11		;
+    f9e0:	3b 40 21 00 	mov	#33,	r11	;#0x0021
+    f9e4:	eb d3 00 00 	bis.b	#2,	0(r11)	;r3 As==10
+    f9e8:	2f 42       	mov	#4,	r15	;r2 As==10
+    f9ea:	b0 12 76 f9 	call	#-1674		;#0xf976
+    f9ee:	db d3 00 00 	bis.b	#1,	0(r11)	;r3 As==01
+    f9f2:	2f 42       	mov	#4,	r15	;r2 As==10
+    f9f4:	b0 12 76 f9 	call	#-1674		;#0xf976
+    f9f8:	3b 41       	pop	r11		;
+    f9fa:	30 41       	ret			
+
+0000f9fc <send_0>:
+    f9fc:	0b 12       	push	r11		;
+    f9fe:	3b 40 21 00 	mov	#33,	r11	;#0x0021
+    fa02:	db c3 00 00 	bic.b	#1,	0(r11)	;r3 As==01
+    fa06:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa08:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa0c:	eb d3 00 00 	bis.b	#2,	0(r11)	;r3 As==10
+    fa10:	2f 42       	mov	#4,	r15	;r2 As==10
+    fa12:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa16:	eb c3 00 00 	bic.b	#2,	0(r11)	;r3 As==10
+    fa1a:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa1c:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa20:	3b 41       	pop	r11		;
+    fa22:	30 41       	ret			
+
+0000fa24 <send_1>:
+    fa24:	0b 12       	push	r11		;
+    fa26:	3b 40 21 00 	mov	#33,	r11	;#0x0021
+    fa2a:	db d3 00 00 	bis.b	#1,	0(r11)	;r3 As==01
+    fa2e:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa30:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa34:	eb d3 00 00 	bis.b	#2,	0(r11)	;r3 As==10
+    fa38:	2f 42       	mov	#4,	r15	;r2 As==10
+    fa3a:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa3e:	eb c3 00 00 	bic.b	#2,	0(r11)	;r3 As==10
+    fa42:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa44:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa48:	db c3 00 00 	bic.b	#1,	0(r11)	;r3 As==01
+    fa4c:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa4e:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa52:	3b 41       	pop	r11		;
+    fa54:	30 41       	ret			
+
+0000fa56 <lebit>:
+    fa56:	0b 12       	push	r11		;
+    fa58:	e2 d3 21 00 	bis.b	#2,	&0x0021	;r3 As==10
+    fa5c:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa5e:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa62:	d2 b3 20 00 	bit.b	#1,	&0x0020	;r3 As==01
+    fa66:	02 24       	jz	$+6      	;abs 0xfa6c
+    fa68:	5b 43       	mov.b	#1,	r11	;r3 As==01
+    fa6a:	01 3c       	jmp	$+4      	;abs 0xfa6e
+    fa6c:	4b 43       	clr.b	r11		;
+    fa6e:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa70:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa74:	e2 c3 21 00 	bic.b	#2,	&0x0021	;r3 As==10
+    fa78:	2f 43       	mov	#2,	r15	;r3 As==10
+    fa7a:	b0 12 76 f9 	call	#-1674		;#0xf976
+    fa7e:	4f 4b       	mov.b	r11,	r15	;
+    fa80:	3b 41       	pop	r11		;
+    fa82:	30 41       	ret			
+
+0000fa84 <le_i2c>:
+    fa84:	0b 12       	push	r11		;
+    fa86:	0a 12       	push	r10		;
+    fa88:	09 12       	push	r9		;
+    fa8a:	49 4f       	mov.b	r15,	r9	;
+    fa8c:	4a 43       	clr.b	r10		;
+    fa8e:	f2 40 32 00 	mov.b	#50,	&0x0022	;#0x0032
+    fa92:	22 00 
+    fa94:	4b 43       	clr.b	r11		;
+    fa96:	4a 5a       	rla.b	r10		;
+    fa98:	b0 12 56 fa 	call	#-1450		;#0xfa56
+    fa9c:	4f 93       	cmp.b	#0,	r15	;r3 As==00
+    fa9e:	01 24       	jz	$+4      	;abs 0xfaa2
+    faa0:	5a 53       	inc.b	r10		;
+    faa2:	5b 53       	inc.b	r11		;
+    faa4:	7b 92       	cmp.b	#8,	r11	;r2 As==11
+    faa6:	f7 2b       	jnc	$-16     	;abs 0xfa96
+    faa8:	f2 40 33 00 	mov.b	#51,	&0x0022	;#0x0033
+    faac:	22 00 
+    faae:	49 93       	cmp.b	#0,	r9	;r3 As==00
+    fab0:	03 20       	jnz	$+8      	;abs 0xfab8
+    fab2:	b0 12 fc f9 	call	#-1540		;#0xf9fc
+    fab6:	02 3c       	jmp	$+6      	;abs 0xfabc
+    fab8:	b0 12 24 fa 	call	#-1500		;#0xfa24
+    fabc:	4f 4a       	mov.b	r10,	r15	;
+    fabe:	39 41       	pop	r9		;
+    fac0:	3a 41       	pop	r10		;
+    fac2:	3b 41       	pop	r11		;
+    fac4:	30 41       	ret			
+
+0000fac6 <escreve_i2c>:
+    fac6:	0b 12       	push	r11		;
+    fac8:	0a 12       	push	r10		;
+    faca:	09 12       	push	r9		;
+    facc:	49 4f       	mov.b	r15,	r9	;
+    face:	7b 40 80 ff 	mov.b	#-128,	r11	;#0xff80
+    fad2:	4a 43       	clr.b	r10		;
+    fad4:	4f 49       	mov.b	r9,	r15	;
+    fad6:	4f fb       	and.b	r11,	r15	;
+    fad8:	08 24       	jz	$+18     	;abs 0xfaea
+    fada:	b0 12 24 fa 	call	#-1500		;#0xfa24
+    fade:	12 c3       	clrc			
+    fae0:	4b 10       	rrc.b	r11		;
+    fae2:	5a 53       	inc.b	r10		;
+    fae4:	7a 92       	cmp.b	#8,	r10	;r2 As==11
+    fae6:	f6 2b       	jnc	$-18     	;abs 0xfad4
+    fae8:	03 3c       	jmp	$+8      	;abs 0xfaf0
+    faea:	b0 12 fc f9 	call	#-1540		;#0xf9fc
+    faee:	f7 3f       	jmp	$-16     	;abs 0xfade
+    faf0:	f2 40 32 00 	mov.b	#50,	&0x0022	;#0x0032
+    faf4:	22 00 
+    faf6:	b0 12 56 fa 	call	#-1450		;#0xfa56
+    fafa:	f2 40 33 00 	mov.b	#51,	&0x0022	;#0x0033
+    fafe:	22 00 
+    fb00:	d2 c3 21 00 	bic.b	#1,	&0x0021	;r3 As==01
+    fb04:	7f f3       	and.b	#-1,	r15	;r3 As==11
+    fb06:	39 41       	pop	r9		;
+    fb08:	3a 41       	pop	r10		;
+    fb0a:	3b 41       	pop	r11		;
+    fb0c:	30 41       	ret			
+
+0000fb0e <mem_found>:
+    fb0e:	0b 12       	push	r11		;
+    fb10:	4b 4f       	mov.b	r15,	r11	;
+    fb12:	b0 12 c0 f9 	call	#-1600		;#0xf9c0
+    fb16:	4f 4b       	mov.b	r11,	r15	;
+    fb18:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fb1c:	4b 4f       	mov.b	r15,	r11	;
+    fb1e:	b0 12 de f9 	call	#-1570		;#0xf9de
+    fb22:	4f 4b       	mov.b	r11,	r15	;
+    fb24:	3b 41       	pop	r11		;
+    fb26:	30 41       	ret			
+
+0000fb28 <mem_write>:
+    fb28:	0b 12       	push	r11		;
+    fb2a:	0a 12       	push	r10		;
+    fb2c:	09 12       	push	r9		;
+    fb2e:	08 12       	push	r8		;
+    fb30:	4a 4f       	mov.b	r15,	r10	;
+    fb32:	0b 4e       	mov	r14,	r11	;
+    fb34:	08 4d       	mov	r13,	r8	;
+    fb36:	49 4c       	mov.b	r12,	r9	;
+    fb38:	b0 12 c0 f9 	call	#-1600		;#0xf9c0
+    fb3c:	4f 4a       	mov.b	r10,	r15	;
+    fb3e:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fb42:	4a 4f       	mov.b	r15,	r10	;
+    fb44:	0f 4b       	mov	r11,	r15	;
+    fb46:	8f 10       	swpb	r15		;
+    fb48:	7f f3       	and.b	#-1,	r15	;r3 As==11
+    fb4a:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fb4e:	4a 5f       	add.b	r15,	r10	;
+    fb50:	7b f3       	and.b	#-1,	r11	;r3 As==11
+    fb52:	4f 4b       	mov.b	r11,	r15	;
+    fb54:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fb58:	4a 5f       	add.b	r15,	r10	;
+    fb5a:	4b 43       	clr.b	r11		;
+    fb5c:	4b 99       	cmp.b	r9,	r11	;
+    fb5e:	09 2c       	jc	$+20     	;abs 0xfb72
+    fb60:	4f 4b       	mov.b	r11,	r15	;
+    fb62:	0f 58       	add	r8,	r15	;
+    fb64:	6f 4f       	mov.b	@r15,	r15	;
+    fb66:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fb6a:	4a 5f       	add.b	r15,	r10	;
+    fb6c:	5b 53       	inc.b	r11		;
+    fb6e:	4b 99       	cmp.b	r9,	r11	;
+    fb70:	f7 2b       	jnc	$-16     	;abs 0xfb60
+    fb72:	b0 12 de f9 	call	#-1570		;#0xf9de
+    fb76:	3f 40 0a 00 	mov	#10,	r15	;#0x000a
+    fb7a:	b0 12 86 f9 	call	#-1658		;#0xf986
+    fb7e:	4f 4a       	mov.b	r10,	r15	;
+    fb80:	38 41       	pop	r8		;
+    fb82:	39 41       	pop	r9		;
+    fb84:	3a 41       	pop	r10		;
+    fb86:	3b 41       	pop	r11		;
+    fb88:	30 41       	ret			
+
+0000fb8a <mem_read>:
+    fb8a:	0b 12       	push	r11		;
+    fb8c:	0a 12       	push	r10		;
+    fb8e:	09 12       	push	r9		;
+    fb90:	08 12       	push	r8		;
+    fb92:	07 12       	push	r7		;
+    fb94:	4a 4f       	mov.b	r15,	r10	;
+    fb96:	0b 4e       	mov	r14,	r11	;
+    fb98:	08 4d       	mov	r13,	r8	;
+    fb9a:	49 4c       	mov.b	r12,	r9	;
+    fb9c:	b0 12 c0 f9 	call	#-1600		;#0xf9c0
+    fba0:	4f 4a       	mov.b	r10,	r15	;
+    fba2:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fba6:	0f 4b       	mov	r11,	r15	;
+    fba8:	8f 10       	swpb	r15		;
+    fbaa:	7f f3       	and.b	#-1,	r15	;r3 As==11
+    fbac:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fbb0:	7b f3       	and.b	#-1,	r11	;r3 As==11
+    fbb2:	4f 4b       	mov.b	r11,	r15	;
+    fbb4:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fbb8:	b0 12 de f9 	call	#-1570		;#0xf9de
+    fbbc:	b0 12 c0 f9 	call	#-1600		;#0xf9c0
+    fbc0:	5a 53       	inc.b	r10		;
+    fbc2:	4f 4a       	mov.b	r10,	r15	;
+    fbc4:	b0 12 c6 fa 	call	#-1338		;#0xfac6
+    fbc8:	47 4f       	mov.b	r15,	r7	;
+    fbca:	4a 43       	clr.b	r10		;
+    fbcc:	79 f3       	and.b	#-1,	r9	;r3 As==11
+    fbce:	39 53       	add	#-1,	r9	;r3 As==11
+    fbd0:	19 93       	cmp	#1,	r9	;r3 As==01
+    fbd2:	0e 38       	jl	$+30     	;abs 0xfbf0
+    fbd4:	0b 43       	clr	r11		;
+    fbd6:	4f 43       	clr.b	r15		;
+    fbd8:	b0 12 84 fa 	call	#-1404		;#0xfa84
+    fbdc:	4e 4f       	mov.b	r15,	r14	;
+    fbde:	0f 48       	mov	r8,	r15	;
+    fbe0:	0f 5b       	add	r11,	r15	;
+    fbe2:	cf 4e 00 00 	mov.b	r14,	0(r15)	;
+    fbe6:	5a 53       	inc.b	r10		;
+    fbe8:	4b 4a       	mov.b	r10,	r11	;
+    fbea:	0b 99       	cmp	r9,	r11	;
+    fbec:	f4 3b       	jl	$-22     	;abs 0xfbd6
+    fbee:	01 3c       	jmp	$+4      	;abs 0xfbf2
+    fbf0:	0b 43       	clr	r11		;
+    fbf2:	5f 43       	mov.b	#1,	r15	;r3 As==01
+    fbf4:	b0 12 84 fa 	call	#-1404		;#0xfa84
+    fbf8:	08 5b       	add	r11,	r8	;
+    fbfa:	c8 4f 00 00 	mov.b	r15,	0(r8)	;
+    fbfe:	b0 12 de f9 	call	#-1570		;#0xf9de
+    fc02:	4f 47       	mov.b	r7,	r15	;
+    fc04:	37 41       	pop	r7		;
+    fc06:	38 41       	pop	r8		;
+    fc08:	39 41       	pop	r9		;
+    fc0a:	3a 41       	pop	r10		;
+    fc0c:	3b 41       	pop	r11		;
+    fc0e:	30 41       	ret			
+
+0000fc10 <__stop_progExec__>:
+    fc10:	ff 3f       	jmp	$+0      	;abs 0xfc10
+Disassembly of section .bss:
+
+00000200 <__bss_start>:
+	...
+Disassembly of section .vectors:
+
+0000ffe0 <InterruptVectors>:
+    ffe0:	2c f8       	interrupt service routine at 0xf82c
+    ffe2:	2c f8       	interrupt service routine at 0xf82c
+    ffe4:	2c f8       	interrupt service routine at 0xf82c
+    ffe6:	2c f8       	interrupt service routine at 0xf82c
+    ffe8:	2c f8       	interrupt service routine at 0xf82c
+    ffea:	2c f8       	interrupt service routine at 0xf82c
+    ffec:	2c f8       	interrupt service routine at 0xf82c
+    ffee:	2c f8       	interrupt service routine at 0xf82c
+    fff0:	2c f8       	interrupt service routine at 0xf82c
+    fff2:	2c f8       	interrupt service routine at 0xf82c
+    fff4:	2c f8       	interrupt service routine at 0xf82c
+    fff6:	2c f8       	interrupt service routine at 0xf82c
+    fff8:	2c f8       	interrupt service routine at 0xf82c
+    fffa:	2c f8       	interrupt service routine at 0xf82c
+    fffc:	2c f8       	interrupt service routine at 0xf82c
+    fffe:	00 f8       	interrupt service routine at 0xf800
+Disassembly of section .stab:
+
+00000000 <.stab>:
+       0:	01 00       	.word	0x0001;	????
+       2:	00 00       	beq			
+       4:	00 00       	beq			
+       6:	65 01       	.word	0x0165;	????
+       8:	aa 0f       	.word	0x0faa;	????
+       a:	00 00       	beq			
+       c:	01 00       	.word	0x0001;	????
+       e:	00 00       	beq			
+      10:	64 00       	.word	0x0064;	????
+      12:	00 00       	beq			
+      14:	2c f8       	and	@r8,	r12	;
+      16:	00 00       	beq			
+      18:	2b 00       	.word	0x002b;	????
+      1a:	00 00       	beq			
+      1c:	84 00       	.word	0x0084;	????
+      1e:	00 00       	beq			
+      20:	2c f8       	and	@r8,	r12	;
+      22:	00 00       	beq			
+      24:	00 00       	beq			
+      26:	00 00       	beq			
+      28:	44 00       	.word	0x0044;	????
+      2a:	28 00       	.word	0x0028;	????
+      2c:	2c f8       	and	@r8,	r12	;
+      2e:	00 00       	beq			
+      30:	00 00       	beq			
+      32:	00 00       	beq			
+      34:	44 00       	.word	0x0044;	????
+      36:	2a 00       	.word	0x002a;	????
+      38:	30 f8       	and	@r8+,	r0	;
+      3a:	00 00       	beq			
+      3c:	00 00       	beq			
+      3e:	00 00       	beq			
+      40:	44 00       	.word	0x0044;	????
+      42:	4e 00       	.word	0x004e;	????
+      44:	e0 ff 00 00 	and.b	@r15,	0x0000	; PC rel. 0x0046
+      48:	00 00       	beq			
+      4a:	00 00       	beq			
+      4c:	44 00       	.word	0x0044;	????
+      4e:	4f 00       	.word	0x004f;	????
+      50:	e2 ff 00 00 	and.b	@r15,	&0x0000	;
+      54:	00 00       	beq			
+      56:	00 00       	beq			
+      58:	44 00       	.word	0x0044;	????
+      5a:	50 00       	.word	0x0050;	????
+      5c:	e4 ff 00 00 	and.b	@r15,	0(r4)	;
+      60:	00 00       	beq			
+      62:	00 00       	beq			
+      64:	44 00       	.word	0x0044;	????
+      66:	51 00       	.word	0x0051;	????
+      68:	e6 ff 00 00 	and.b	@r15,	0(r6)	;
+      6c:	00 00       	beq			
+      6e:	00 00       	beq			
+      70:	44 00       	.word	0x0044;	????
+      72:	52 00       	.word	0x0052;	????
+      74:	e8 ff 00 00 	and.b	@r15,	0(r8)	;
+      78:	00 00       	beq			
+      7a:	00 00       	beq			
+      7c:	44 00       	.word	0x0044;	????
+      7e:	53 00       	.word	0x0053;	????
+      80:	ea ff 00 00 	and.b	@r15,	0(r10)	;
+      84:	00 00       	beq			
+      86:	00 00       	beq			
+      88:	44 00       	.word	0x0044;	????
+      8a:	54 00       	.word	0x0054;	????
+      8c:	ec ff 00 00 	and.b	@r15,	0(r12)	;
+      90:	00 00       	beq			
+      92:	00 00       	beq			
+      94:	44 00       	.word	0x0044;	????
+      96:	55 00       	.word	0x0055;	????
+      98:	ee ff 00 00 	and.b	@r15,	0(r14)	;
+      9c:	00 00       	beq			
+      9e:	00 00       	beq			
+      a0:	44 00       	.word	0x0044;	????
+      a2:	56 00       	.word	0x0056;	????
+      a4:	f0 ff 00 00 	and.b	@r15+,	0x0000	; PC rel. 0x00a6
+      a8:	00 00       	beq			
+      aa:	00 00       	beq			
+      ac:	44 00       	.word	0x0044;	????
+      ae:	57 00       	.word	0x0057;	????
+      b0:	f2 ff 00 00 	and.b	@r15+,	&0x0000	;
+      b4:	00 00       	beq			
+      b6:	00 00       	beq			
+      b8:	44 00       	.word	0x0044;	????
+      ba:	58 00       	.word	0x0058;	????
+      bc:	f4 ff 00 00 	and.b	@r15+,	0(r4)	;
+      c0:	00 00       	beq			
+      c2:	00 00       	beq			
+      c4:	44 00       	.word	0x0044;	????
+      c6:	59 00       	.word	0x0059;	????
+      c8:	f6 ff 00 00 	and.b	@r15+,	0(r6)	;
+      cc:	00 00       	beq			
+      ce:	00 00       	beq			
+      d0:	44 00       	.word	0x0044;	????
+      d2:	5a 00       	.word	0x005a;	????
+      d4:	f8 ff 00 00 	and.b	@r15+,	0(r8)	;
+      d8:	00 00       	beq			
+      da:	00 00       	beq			
+      dc:	44 00       	.word	0x0044;	????
+      de:	5b 00       	.word	0x005b;	????
+      e0:	fa ff 00 00 	and.b	@r15+,	0(r10)	;
+      e4:	00 00       	beq			
+      e6:	00 00       	beq			
+      e8:	44 00       	.word	0x0044;	????
+      ea:	5c 00       	.word	0x005c;	????
+      ec:	fc ff 00 00 	and.b	@r15+,	0(r12)	;
+      f0:	33 00       	.word	0x0033;	????
+      f2:	00 00       	beq			
+      f4:	64 00       	.word	0x0064;	????
+      f6:	00 00       	beq			
+      f8:	32 f8       	and	@r8+,	r2	;
+      fa:	00 00       	beq			
+      fc:	50 00       	.word	0x0050;	????
+      fe:	00 00       	beq			
+     100:	64 00       	.word	0x0064;	????
+     102:	00 00       	beq			
+     104:	32 f8       	and	@r8+,	r2	;
+     106:	00 00       	beq			
+     108:	5b 00       	.word	0x005b;	????
+     10a:	00 00       	beq			
+     10c:	3c 00       	.word	0x003c;	????
+     10e:	00 00       	beq			
+     110:	00 00       	beq			
+     112:	00 00       	beq			
+     114:	6a 00       	.word	0x006a;	????
+     116:	00 00       	beq			
+     118:	80 00       	.word	0x0080;	????
+     11a:	00 00       	beq			
+     11c:	00 00       	beq			
+     11e:	00 00       	beq			
+     120:	8a 00       	.word	0x008a;	????
+     122:	00 00       	beq			
+     124:	80 00       	.word	0x0080;	????
+     126:	00 00       	beq			
+     128:	00 00       	beq			
+     12a:	00 00       	beq			
+     12c:	a4 00       	.word	0x00a4;	????
+     12e:	00 00       	beq			
+     130:	80 00       	.word	0x0080;	????
+     132:	00 00       	beq			
+     134:	00 00       	beq			
+     136:	00 00       	beq			
+     138:	dd 00       	.word	0x00dd;	????
+     13a:	00 00       	beq			
+     13c:	80 00       	.word	0x0080;	????
+     13e:	00 00       	beq			
+     140:	00 00       	beq			
+     142:	00 00       	beq			
+     144:	15 01       	.word	0x0115;	????
+     146:	00 00       	beq			
+     148:	80 00       	.word	0x0080;	????
+     14a:	00 00       	beq			
+     14c:	00 00       	beq			
+     14e:	00 00       	beq			
+     150:	57 01       	.word	0x0157;	????
+     152:	00 00       	beq			
+     154:	80 00       	.word	0x0080;	????
+     156:	00 00       	beq			
+     158:	00 00       	beq			
+     15a:	00 00       	beq			
+     15c:	a8 01       	.word	0x01a8;	????
+     15e:	00 00       	beq			
+     160:	80 00       	.word	0x0080;	????
+     162:	00 00       	beq			
+     164:	00 00       	beq			
+     166:	00 00       	beq			
+     168:	f9 01       	.word	0x01f9;	????
+     16a:	00 00       	beq			
+     16c:	80 00       	.word	0x0080;	????
+     16e:	00 00       	beq			
+     170:	00 00       	beq			
+     172:	00 00       	beq			
+     174:	1f 02       	.word	0x021f;	????
+     176:	00 00       	beq			
+     178:	80 00       	.word	0x0080;	????
+     17a:	00 00       	beq			
+     17c:	00 00       	beq			
+     17e:	00 00       	beq			
+     180:	5d 02       	.word	0x025d;	????
+     182:	00 00       	beq			
+     184:	80 00       	.word	0x0080;	????
+     186:	00 00       	beq			
+     188:	00 00       	beq			
+     18a:	00 00       	beq			
+     18c:	87 02       	.word	0x0287;	????
+     18e:	00 00       	beq			
+     190:	80 00       	.word	0x0080;	????
+     192:	00 00       	beq			
+     194:	00 00       	beq			
+     196:	00 00       	beq			
+     198:	b0 02       	.word	0x02b0;	????
+     19a:	00 00       	beq			
+     19c:	80 00       	.word	0x0080;	????
+     19e:	00 00       	beq			
+     1a0:	00 00       	beq			
+     1a2:	00 00       	beq			
+     1a4:	ca 02       	.word	0x02ca;	????
+     1a6:	00 00       	beq			
+     1a8:	80 00       	.word	0x0080;	????
+     1aa:	00 00       	beq			
+     1ac:	00 00       	beq			
+     1ae:	00 00       	beq			
+     1b0:	e5 02       	.word	0x02e5;	????
+     1b2:	00 00       	beq			
+     1b4:	80 00       	.word	0x0080;	????
+     1b6:	00 00       	beq			
+     1b8:	00 00       	beq			
+     1ba:	00 00       	beq			
+     1bc:	05 03       	.word	0x0305;	????
+     1be:	00 00       	beq			
+     1c0:	80 00       	.word	0x0080;	????
+     1c2:	00 00       	beq			
+     1c4:	00 00       	beq			
+     1c6:	00 00       	beq			
+     1c8:	3e 03       	.word	0x033e;	????
+     1ca:	00 00       	beq			
+     1cc:	80 00       	.word	0x0080;	????
+     1ce:	00 00       	beq			
+     1d0:	00 00       	beq			
+     1d2:	00 00       	beq			
+     1d4:	5c 03       	.word	0x035c;	????
+     1d6:	00 00       	beq			
+     1d8:	80 00       	.word	0x0080;	????
+     1da:	00 00       	beq			
+     1dc:	00 00       	beq			
+     1de:	00 00       	beq			
+     1e0:	7b 03       	.word	0x037b;	????
+     1e2:	00 00       	beq			
+     1e4:	80 00       	.word	0x0080;	????
+     1e6:	00 00       	beq			
+     1e8:	00 00       	beq			
+     1ea:	00 00       	beq			
+     1ec:	9f 03       	.word	0x039f;	????
+     1ee:	00 00       	beq			
+     1f0:	80 00       	.word	0x0080;	????
+     1f2:	00 00       	beq			
+     1f4:	00 00       	beq			
+     1f6:	00 00       	beq			
+     1f8:	c8 03       	.word	0x03c8;	????
+     1fa:	00 00       	beq			
+     1fc:	80 00       	.word	0x0080;	????
+     1fe:	00 00       	beq			
+     200:	00 00       	beq			
+     202:	00 00       	beq			
+     204:	50 00       	.word	0x0050;	????
+     206:	00 00       	beq			
+     208:	82 00       	.word	0x0082;	????
+     20a:	00 00       	beq			
+     20c:	ce 57 01 00 	add.b	r7,	1(r14)	;
+     210:	df 03       	.word	0x03df;	????
+     212:	00 00       	beq			
+     214:	82 00       	.word	0x0082;	????
+     216:	00 00       	beq			
+     218:	00 00       	beq			
+     21a:	00 00       	beq			
+     21c:	06 04       	.word	0x0406;	????
+     21e:	00 00       	beq			
+     220:	82 00       	.word	0x0082;	????
+     222:	00 00       	beq			
+     224:	00 00       	beq			
+     226:	00 00       	beq			
+     228:	2a 04       	.word	0x042a;	????
+     22a:	00 00       	beq			
+     22c:	82 00       	.word	0x0082;	????
+     22e:	00 00       	beq			
+     230:	91 34       	jge	$+292    	;abs 0x354
+     232:	00 00       	beq			
+     234:	52 04       	.word	0x0452;	????
+     236:	00 00       	beq			
+     238:	80 00       	.word	0x0080;	????
+     23a:	26 00       	.word	0x0026;	????
+     23c:	00 00       	beq			
+     23e:	00 00       	beq			
+     240:	67 04       	.word	0x0467;	????
+     242:	00 00       	beq			
+     244:	80 00       	.word	0x0080;	????
+     246:	27 00       	.word	0x0027;	????
+     248:	00 00       	beq			
+     24a:	00 00       	beq			
+     24c:	7d 04       	.word	0x047d;	????
+     24e:	00 00       	beq			
+     250:	80 00       	.word	0x0080;	????
+     252:	29 00       	.word	0x0029;	????
+     254:	00 00       	beq			
+     256:	00 00       	beq			
+     258:	92 04       	.word	0x0492;	????
+     25a:	00 00       	beq			
+     25c:	80 00       	.word	0x0080;	????
+     25e:	2a 00       	.word	0x002a;	????
+     260:	00 00       	beq			
+     262:	00 00       	beq			
+     264:	a8 04       	.word	0x04a8;	????
+     266:	00 00       	beq			
+     268:	80 00       	.word	0x0080;	????
+     26a:	2c 00       	.word	0x002c;	????
+     26c:	00 00       	beq			
+     26e:	00 00       	beq			
+     270:	bd 04       	.word	0x04bd;	????
+     272:	00 00       	beq			
+     274:	80 00       	.word	0x0080;	????
+     276:	2d 00       	.word	0x002d;	????
+     278:	00 00       	beq			
+     27a:	00 00       	beq			
+     27c:	d3 04       	.word	0x04d3;	????
+     27e:	00 00       	beq			
+     280:	80 00       	.word	0x0080;	????
+     282:	2f 00       	.word	0x002f;	????
+     284:	00 00       	beq			
+     286:	00 00       	beq			
+     288:	e8 04       	.word	0x04e8;	????
+     28a:	00 00       	beq			
+     28c:	80 00       	.word	0x0080;	????
+     28e:	30 00       	.word	0x0030;	????
+     290:	00 00       	beq			
+     292:	00 00       	beq			
+     294:	fe 04       	.word	0x04fe;	????
+     296:	00 00       	beq			
+     298:	80 00       	.word	0x0080;	????
+     29a:	35 00       	.word	0x0035;	????
+     29c:	00 00       	beq			
+     29e:	00 00       	beq			
+     2a0:	14 05       	.word	0x0514;	????
+     2a2:	00 00       	beq			
+     2a4:	80 00       	.word	0x0080;	????
+     2a6:	36 00       	.word	0x0036;	????
+	...
+     2b0:	a2 00       	.word	0x00a2;	????
+	...
+     2ba:	00 00       	beq			
+     2bc:	a2 00       	.word	0x00a2;	????
+     2be:	00 00       	beq			
+     2c0:	00 00       	beq			
+     2c2:	00 00       	beq			
+     2c4:	2c 05       	.word	0x052c;	????
+     2c6:	00 00       	beq			
+     2c8:	82 00       	.word	0x0082;	????
+	...
+     2d2:	00 00       	beq			
+     2d4:	a2 00       	.word	0x00a2;	????
+     2d6:	00 00       	beq			
+     2d8:	00 00       	beq			
+     2da:	00 00       	beq			
+     2dc:	5a 05       	.word	0x055a;	????
+     2de:	00 00       	beq			
+     2e0:	82 00       	.word	0x0082;	????
+	...
+     2ea:	00 00       	beq			
+     2ec:	a2 00       	.word	0x00a2;	????
+     2ee:	00 00       	beq			
+     2f0:	00 00       	beq			
+     2f2:	00 00       	beq			
+     2f4:	82 05       	.word	0x0582;	????
+     2f6:	00 00       	beq			
+     2f8:	82 00       	.word	0x0082;	????
+	...
+     302:	00 00       	beq			
+     304:	a2 00       	.word	0x00a2;	????
+     306:	00 00       	beq			
+     308:	00 00       	beq			
+     30a:	00 00       	beq			
+     30c:	aa 05       	.word	0x05aa;	????
+     30e:	00 00       	beq			
+     310:	82 00       	.word	0x0082;	????
+     312:	00 00       	beq			
+     314:	0c 8a       	sub	r10,	r12	;
+     316:	00 00       	beq			
+     318:	d3 05       	.word	0x05d3;	????
+     31a:	00 00       	beq			
+     31c:	80 00       	.word	0x0080;	????
+     31e:	7f 00       	.word	0x007f;	????
+     320:	00 00       	beq			
+     322:	00 00       	beq			
+     324:	5a 06       	.word	0x065a;	????
+     326:	00 00       	beq			
+     328:	80 00       	.word	0x0080;	????
+     32a:	8f 00       	.word	0x008f;	????
+     32c:	00 00       	beq			
+     32e:	00 00       	beq			
+     330:	29 07       	.word	0x0729;	????
+     332:	00 00       	beq			
+     334:	80 00       	.word	0x0080;	????
+	...
+     33e:	00 00       	beq			
+     340:	a2 00       	.word	0x00a2;	????
+     342:	00 00       	beq			
+     344:	00 00       	beq			
+     346:	00 00       	beq			
+     348:	1f 08       	.word	0x081f;	????
+     34a:	00 00       	beq			
+     34c:	82 00       	.word	0x0082;	????
+     34e:	00 00       	beq			
+     350:	00 00       	beq			
+     352:	00 00       	beq			
+     354:	46 08       	.word	0x0846;	????
+     356:	00 00       	beq			
+     358:	82 00       	.word	0x0082;	????
+     35a:	00 00       	beq			
+     35c:	f3 50 00 00 	add.b	#0,	2165(r3);#0x0000
+     360:	75 08 
+     362:	00 00       	beq			
+     364:	80 00       	.word	0x0080;	????
+     366:	00 00       	beq			
+     368:	00 00       	beq			
+     36a:	00 00       	beq			
+     36c:	2c 09       	.word	0x092c;	????
+     36e:	00 00       	beq			
+     370:	80 00       	.word	0x0080;	????
+     372:	27 00       	.word	0x0027;	????
+     374:	00 00       	beq			
+     376:	00 00       	beq			
+     378:	48 09       	.word	0x0948;	????
+     37a:	00 00       	beq			
+     37c:	80 00       	.word	0x0080;	????
+	...
+     386:	00 00       	beq			
+     388:	a2 00       	.word	0x00a2;	????
+	...
+     392:	00 00       	beq			
+     394:	a2 00       	.word	0x00a2;	????
+     396:	00 00       	beq			
+     398:	00 00       	beq			
+     39a:	00 00       	beq			
+     39c:	dc 09       	.word	0x09dc;	????
+     39e:	00 00       	beq			
+     3a0:	82 00       	.word	0x0082;	????
+	...
+     3aa:	00 00       	beq			
+     3ac:	a2 00       	.word	0x00a2;	????
+     3ae:	00 00       	beq			
+     3b0:	00 00       	beq			
+     3b2:	00 00       	beq			
+     3b4:	03 0a       	.word	0x0a03;	????
+     3b6:	00 00       	beq			
+     3b8:	82 00       	.word	0x0082;	????
+	...
+     3c2:	00 00       	beq			
+     3c4:	a2 00       	.word	0x00a2;	????
+     3c6:	00 00       	beq			
+     3c8:	00 00       	beq			
+     3ca:	00 00       	beq			
+     3cc:	29 0a       	.word	0x0a29;	????
+     3ce:	00 00       	beq			
+     3d0:	82 00       	.word	0x0082;	????
+	...
+     3da:	00 00       	beq			
+     3dc:	a2 00       	.word	0x00a2;	????
+	...
+     3e6:	00 00       	beq			
+     3e8:	a2 00       	.word	0x00a2;	????
+     3ea:	00 00       	beq			
+     3ec:	00 00       	beq			
+     3ee:	00 00       	beq			
+     3f0:	52 0a       	.word	0x0a52;	????
+     3f2:	00 00       	beq			
+     3f4:	24 00       	.word	0x0024;	????
+     3f6:	2a 00       	.word	0x002a;	????
+     3f8:	32 f8       	and	@r8+,	r2	;
+     3fa:	00 00       	beq			
+     3fc:	00 00       	beq			
+     3fe:	00 00       	beq			
+     400:	44 00       	.word	0x0044;	????
+     402:	2a 00       	.word	0x002a;	????
+	...
+     40c:	44 00       	.word	0x0044;	????
+     40e:	2d 00       	.word	0x002d;	????
+     410:	04 00       	.word	0x0004;	????
+     412:	00 00       	beq			
+     414:	00 00       	beq			
+     416:	00 00       	beq			
+     418:	44 00       	.word	0x0044;	????
+     41a:	2e 00       	.word	0x002e;	????
+     41c:	08 00       	.word	0x0008;	????
+     41e:	00 00       	beq			
+     420:	00 00       	beq			
+     422:	00 00       	beq			
+     424:	44 00       	.word	0x0044;	????
+     426:	30 00       	.word	0x0030;	????
+     428:	0c 00       	.word	0x000c;	????
+     42a:	00 00       	beq			
+     42c:	00 00       	beq			
+     42e:	00 00       	beq			
+     430:	44 00       	.word	0x0044;	????
+     432:	31 00       	.word	0x0031;	????
+     434:	16 00       	.word	0x0016;	????
+     436:	00 00       	beq			
+     438:	00 00       	beq			
+     43a:	00 00       	beq			
+     43c:	44 00       	.word	0x0044;	????
+     43e:	32 00       	.word	0x0032;	????
+     440:	1c 00       	.word	0x001c;	????
+     442:	00 00       	beq			
+     444:	00 00       	beq			
+     446:	00 00       	beq			
+     448:	44 00       	.word	0x0044;	????
+     44a:	33 00       	.word	0x0033;	????
+     44c:	24 00       	.word	0x0024;	????
+     44e:	00 00       	beq			
+     450:	00 00       	beq			
+     452:	00 00       	beq			
+     454:	44 00       	.word	0x0044;	????
+     456:	34 00       	.word	0x0034;	????
+     458:	2a 00       	.word	0x002a;	????
+     45a:	00 00       	beq			
+     45c:	00 00       	beq			
+     45e:	00 00       	beq			
+     460:	44 00       	.word	0x0044;	????
+     462:	35 00       	.word	0x0035;	????
+     464:	30 00       	.word	0x0030;	????
+     466:	00 00       	beq			
+     468:	00 00       	beq			
+     46a:	00 00       	beq			
+     46c:	44 00       	.word	0x0044;	????
+     46e:	37 00       	.word	0x0037;	????
+     470:	38 00       	.word	0x0038;	????
+     472:	00 00       	beq			
+     474:	00 00       	beq			
+     476:	00 00       	beq			
+     478:	44 00       	.word	0x0044;	????
+     47a:	39 00       	.word	0x0039;	????
+     47c:	4a 00       	.word	0x004a;	????
+     47e:	00 00       	beq			
+     480:	00 00       	beq			
+     482:	00 00       	beq			
+     484:	44 00       	.word	0x0044;	????
+     486:	3b 00       	.word	0x003b;	????
+     488:	4c 00       	.word	0x004c;	????
+     48a:	00 00       	beq			
+     48c:	00 00       	beq			
+     48e:	00 00       	beq			
+     490:	44 00       	.word	0x0044;	????
+     492:	3c 00       	.word	0x003c;	????
+     494:	52 00       	.word	0x0052;	????
+     496:	00 00       	beq			
+     498:	00 00       	beq			
+     49a:	00 00       	beq			
+     49c:	44 00       	.word	0x0044;	????
+     49e:	3d 00       	.word	0x003d;	????
+     4a0:	58 00       	.word	0x0058;	????
+     4a2:	00 00       	beq			
+     4a4:	00 00       	beq			
+     4a6:	00 00       	beq			
+     4a8:	44 00       	.word	0x0044;	????
+     4aa:	3e 00       	.word	0x003e;	????
+     4ac:	5e 00       	.word	0x005e;	????
+     4ae:	00 00       	beq			
+     4b0:	00 00       	beq			
+     4b2:	00 00       	beq			
+     4b4:	44 00       	.word	0x0044;	????
+     4b6:	3f 00       	.word	0x003f;	????
+     4b8:	64 00       	.word	0x0064;	????
+     4ba:	00 00       	beq			
+     4bc:	00 00       	beq			
+     4be:	00 00       	beq			
+     4c0:	44 00       	.word	0x0044;	????
+     4c2:	40 00       	.word	0x0040;	????
+     4c4:	80 00       	.word	0x0080;	????
+     4c6:	00 00       	beq			
+     4c8:	00 00       	beq			
+     4ca:	00 00       	beq			
+     4cc:	44 00       	.word	0x0044;	????
+     4ce:	42 00       	.word	0x0042;	????
+     4d0:	9c 00       	.word	0x009c;	????
+     4d2:	00 00       	beq			
+     4d4:	00 00       	beq			
+     4d6:	00 00       	beq			
+     4d8:	44 00       	.word	0x0044;	????
+     4da:	43 00       	.word	0x0043;	????
+     4dc:	a2 00       	.word	0x00a2;	????
+     4de:	00 00       	beq			
+     4e0:	00 00       	beq			
+     4e2:	00 00       	beq			
+     4e4:	44 00       	.word	0x0044;	????
+     4e6:	44 00       	.word	0x0044;	????
+     4e8:	a8 00       	.word	0x00a8;	????
+     4ea:	00 00       	beq			
+     4ec:	00 00       	beq			
+     4ee:	00 00       	beq			
+     4f0:	44 00       	.word	0x0044;	????
+     4f2:	45 00       	.word	0x0045;	????
+     4f4:	ae 00       	.word	0x00ae;	????
+     4f6:	00 00       	beq			
+     4f8:	00 00       	beq			
+     4fa:	00 00       	beq			
+     4fc:	44 00       	.word	0x0044;	????
+     4fe:	46 00       	.word	0x0046;	????
+     500:	b4 00       	.word	0x00b4;	????
+     502:	00 00       	beq			
+     504:	00 00       	beq			
+     506:	00 00       	beq			
+     508:	44 00       	.word	0x0044;	????
+     50a:	47 00       	.word	0x0047;	????
+     50c:	d0 00       	.word	0x00d0;	????
+     50e:	00 00       	beq			
+     510:	00 00       	beq			
+     512:	00 00       	beq			
+     514:	44 00       	.word	0x0044;	????
+     516:	39 00       	.word	0x0039;	????
+     518:	ec 00       	.word	0x00ec;	????
+     51a:	00 00       	beq			
+     51c:	00 00       	beq			
+     51e:	00 00       	beq			
+     520:	44 00       	.word	0x0044;	????
+     522:	4a 00       	.word	0x004a;	????
+     524:	f4 00       	.word	0x00f4;	????
+     526:	00 00       	beq			
+     528:	00 00       	beq			
+     52a:	00 00       	beq			
+     52c:	44 00       	.word	0x0044;	????
+     52e:	4f 00       	.word	0x004f;	????
+     530:	1e 01       	.word	0x011e;	????
+     532:	00 00       	beq			
+     534:	5e 0a       	.word	0x0a5e;	????
+     536:	00 00       	beq			
+     538:	40 00       	.word	0x0040;	????
+     53a:	2b 00       	.word	0x002b;	????
+     53c:	0b 00       	.word	0x000b;	????
+     53e:	00 00       	beq			
+     540:	00 00       	beq			
+     542:	00 00       	beq			
+     544:	c0 00       	.word	0x00c0;	????
+     546:	00 00       	beq			
+     548:	04 00       	.word	0x0004;	????
+     54a:	00 00       	beq			
+     54c:	00 00       	beq			
+     54e:	00 00       	beq			
+     550:	e0 00       	.word	0x00e0;	????
+     552:	00 00       	beq			
+     554:	1e 01       	.word	0x011e;	????
+     556:	00 00       	beq			
+     558:	00 00       	beq			
+     55a:	00 00       	beq			
+     55c:	24 00       	.word	0x0024;	????
+     55e:	00 00       	beq			
+     560:	22 01       	.word	0x0122;	????
+     562:	00 00       	beq			
+     564:	67 0a       	.word	0x0a67;	????
+     566:	00 00       	beq			
+     568:	24 00       	.word	0x0024;	????
+     56a:	52 00       	.word	0x0052;	????
+     56c:	54 f9 00 00 	and.b	0(r9),	r4	;
+     570:	00 00       	beq			
+     572:	00 00       	beq			
+     574:	44 00       	.word	0x0044;	????
+     576:	52 00       	.word	0x0052;	????
+	...
+     580:	44 00       	.word	0x0044;	????
+     582:	53 00       	.word	0x0053;	????
+	...
+     58c:	44 00       	.word	0x0044;	????
+     58e:	55 00       	.word	0x0055;	????
+     590:	06 00       	.word	0x0006;	????
+     592:	00 00       	beq			
+     594:	00 00       	beq			
+     596:	00 00       	beq			
+     598:	44 00       	.word	0x0044;	????
+     59a:	56 00       	.word	0x0056;	????
+     59c:	0c 00       	.word	0x000c;	????
+     59e:	00 00       	beq			
+     5a0:	00 00       	beq			
+     5a2:	00 00       	beq			
+     5a4:	44 00       	.word	0x0044;	????
+     5a6:	57 00       	.word	0x0057;	????
+     5a8:	12 00       	.word	0x0012;	????
+     5aa:	00 00       	beq			
+     5ac:	00 00       	beq			
+     5ae:	00 00       	beq			
+     5b0:	44 00       	.word	0x0044;	????
+     5b2:	58 00       	.word	0x0058;	????
+     5b4:	16 00       	.word	0x0016;	????
+     5b6:	00 00       	beq			
+     5b8:	00 00       	beq			
+     5ba:	00 00       	beq			
+     5bc:	44 00       	.word	0x0044;	????
+     5be:	5a 00       	.word	0x005a;	????
+     5c0:	1a 00       	.word	0x001a;	????
+     5c2:	00 00       	beq			
+     5c4:	00 00       	beq			
+     5c6:	00 00       	beq			
+     5c8:	44 00       	.word	0x0044;	????
+     5ca:	5b 00       	.word	0x005b;	????
+     5cc:	20 00       	.word	0x0020;	????
+     5ce:	00 00       	beq			
+     5d0:	00 00       	beq			
+     5d2:	00 00       	beq			
+     5d4:	24 00       	.word	0x0024;	????
+     5d6:	00 00       	beq			
+     5d8:	22 00       	.word	0x0022;	????
+     5da:	00 00       	beq			
+     5dc:	7d 0a       	.word	0x0a7d;	????
+     5de:	00 00       	beq			
+     5e0:	24 00       	.word	0x0024;	????
+     5e2:	60 00       	.word	0x0060;	????
+     5e4:	76 f9       	and.b	@r9+,	r6	;
+     5e6:	00 00       	beq			
+     5e8:	8d 0a       	.word	0x0a8d;	????
+     5ea:	00 00       	beq			
+     5ec:	40 00       	.word	0x0040;	????
+     5ee:	5f 00       	.word	0x005f;	????
+     5f0:	0f 00       	.word	0x000f;	????
+     5f2:	00 00       	beq			
+     5f4:	00 00       	beq			
+     5f6:	00 00       	beq			
+     5f8:	44 00       	.word	0x0044;	????
+     5fa:	60 00       	.word	0x0060;	????
+	...
+     604:	44 00       	.word	0x0044;	????
+     606:	63 00       	.word	0x0063;	????
+	...
+     610:	44 00       	.word	0x0044;	????
+     612:	64 00       	.word	0x0064;	????
+     614:	0e 00       	.word	0x000e;	????
+     616:	00 00       	beq			
+     618:	9a 0a       	.word	0x0a9a;	????
+     61a:	00 00       	beq			
+     61c:	40 00       	.word	0x0040;	????
+     61e:	61 00       	.word	0x0061;	????
+     620:	0e 00       	.word	0x000e;	????
+     622:	00 00       	beq			
+     624:	00 00       	beq			
+     626:	00 00       	beq			
+     628:	c0 00       	.word	0x00c0;	????
+	...
+     632:	00 00       	beq			
+     634:	e0 00       	.word	0x00e0;	????
+     636:	00 00       	beq			
+     638:	10 00       	.word	0x0010;	????
+     63a:	00 00       	beq			
+     63c:	00 00       	beq			
+     63e:	00 00       	beq			
+     640:	24 00       	.word	0x0024;	????
+     642:	00 00       	beq			
+     644:	10 00       	.word	0x0010;	????
+     646:	00 00       	beq			
+     648:	a3 0a       	.word	0x0aa3;	????
+     64a:	00 00       	beq			
+     64c:	24 00       	.word	0x0024;	????
+     64e:	69 00       	.word	0x0069;	????
+     650:	86 f9 00 00 	and	r9,	0(r6)	;
+     654:	8d 0a       	.word	0x0a8d;	????
+     656:	00 00       	beq			
+     658:	40 00       	.word	0x0040;	????
+     65a:	68 00       	.word	0x0068;	????
+     65c:	0a 00       	.word	0x000a;	????
+     65e:	00 00       	beq			
+     660:	00 00       	beq			
+     662:	00 00       	beq			
+     664:	44 00       	.word	0x0044;	????
+     666:	69 00       	.word	0x0069;	????
+	...
+     670:	44 00       	.word	0x0044;	????
+     672:	6c 00       	.word	0x006c;	????
+     674:	06 00       	.word	0x0006;	????
+     676:	00 00       	beq			
+     678:	00 00       	beq			
+     67a:	00 00       	beq			
+     67c:	44 00       	.word	0x0044;	????
+     67e:	6d 00       	.word	0x006d;	????
+     680:	1a 00       	.word	0x001a;	????
+     682:	00 00       	beq			
+     684:	9a 0a       	.word	0x0a9a;	????
+     686:	00 00       	beq			
+     688:	40 00       	.word	0x0040;	????
+     68a:	6a 00       	.word	0x006a;	????
+     68c:	0b 00       	.word	0x000b;	????
+     68e:	00 00       	beq			
+     690:	00 00       	beq			
+     692:	00 00       	beq			
+     694:	c0 00       	.word	0x00c0;	????
+     696:	00 00       	beq			
+     698:	06 00       	.word	0x0006;	????
+     69a:	00 00       	beq			
+     69c:	00 00       	beq			
+     69e:	00 00       	beq			
+     6a0:	e0 00       	.word	0x00e0;	????
+     6a2:	00 00       	beq			
+     6a4:	1a 00       	.word	0x001a;	????
+     6a6:	00 00       	beq			
+     6a8:	00 00       	beq			
+     6aa:	00 00       	beq			
+     6ac:	24 00       	.word	0x0024;	????
+     6ae:	00 00       	beq			
+     6b0:	20 00       	.word	0x0020;	????
+     6b2:	00 00       	beq			
+     6b4:	b3 0a       	.word	0x0ab3;	????
+     6b6:	00 00       	beq			
+     6b8:	24 00       	.word	0x0024;	????
+     6ba:	73 00       	.word	0x0073;	????
+     6bc:	a6 f9 00 00 	and	@r9,	0(r6)	;
+     6c0:	00 00       	beq			
+     6c2:	00 00       	beq			
+     6c4:	44 00       	.word	0x0044;	????
+     6c6:	73 00       	.word	0x0073;	????
+	...
+     6d0:	44 00       	.word	0x0044;	????
+     6d2:	74 00       	.word	0x0074;	????
+	...
+     6dc:	44 00       	.word	0x0044;	????
+     6de:	75 00       	.word	0x0075;	????
+     6e0:	06 00       	.word	0x0006;	????
+     6e2:	00 00       	beq			
+     6e4:	00 00       	beq			
+     6e6:	00 00       	beq			
+     6e8:	44 00       	.word	0x0044;	????
+     6ea:	76 00       	.word	0x0076;	????
+     6ec:	0e 00       	.word	0x000e;	????
+     6ee:	00 00       	beq			
+     6f0:	00 00       	beq			
+     6f2:	00 00       	beq			
+     6f4:	44 00       	.word	0x0044;	????
+     6f6:	77 00       	.word	0x0077;	????
+     6f8:	12 00       	.word	0x0012;	????
+     6fa:	00 00       	beq			
+     6fc:	00 00       	beq			
+     6fe:	00 00       	beq			
+     700:	44 00       	.word	0x0044;	????
+     702:	78 00       	.word	0x0078;	????
+     704:	18 00       	.word	0x0018;	????
+     706:	00 00       	beq			
+     708:	00 00       	beq			
+     70a:	00 00       	beq			
+     70c:	24 00       	.word	0x0024;	????
+     70e:	00 00       	beq			
+     710:	1a 00       	.word	0x001a;	????
+     712:	00 00       	beq			
+     714:	c4 0a       	.word	0x0ac4;	????
+     716:	00 00       	beq			
+     718:	24 00       	.word	0x0024;	????
+     71a:	7b 00       	.word	0x007b;	????
+     71c:	c0 f9 00 00 	and.b	r9,	0x0000	; PC rel. 0x071e
+     720:	00 00       	beq			
+     722:	00 00       	beq			
+     724:	44 00       	.word	0x0044;	????
+     726:	7b 00       	.word	0x007b;	????
+	...
+     730:	44 00       	.word	0x0044;	????
+     732:	7c 00       	.word	0x007c;	????
+     734:	02 00       	.word	0x0002;	????
+     736:	00 00       	beq			
+     738:	00 00       	beq			
+     73a:	00 00       	beq			
+     73c:	44 00       	.word	0x0044;	????
+     73e:	7d 00       	.word	0x007d;	????
+     740:	0a 00       	.word	0x000a;	????
+     742:	00 00       	beq			
+     744:	00 00       	beq			
+     746:	00 00       	beq			
+     748:	44 00       	.word	0x0044;	????
+     74a:	7e 00       	.word	0x007e;	????
+     74c:	10 00       	.word	0x0010;	????
+     74e:	00 00       	beq			
+     750:	00 00       	beq			
+     752:	00 00       	beq			
+     754:	44 00       	.word	0x0044;	????
+     756:	7f 00       	.word	0x007f;	????
+     758:	14 00       	.word	0x0014;	????
+     75a:	00 00       	beq			
+     75c:	00 00       	beq			
+     75e:	00 00       	beq			
+     760:	44 00       	.word	0x0044;	????
+     762:	80 00       	.word	0x0080;	????
+     764:	1a 00       	.word	0x001a;	????
+     766:	00 00       	beq			
+     768:	00 00       	beq			
+     76a:	00 00       	beq			
+     76c:	24 00       	.word	0x0024;	????
+     76e:	00 00       	beq			
+     770:	1e 00       	.word	0x001e;	????
+     772:	00 00       	beq			
+     774:	d6 0a       	.word	0x0ad6;	????
+     776:	00 00       	beq			
+     778:	24 00       	.word	0x0024;	????
+     77a:	83 00       	.word	0x0083;	????
+     77c:	de f9 00 00 	and.b	0(r9),	0(r14)	;
+     780:	00 00 
+     782:	00 00       	beq			
+     784:	44 00       	.word	0x0044;	????
+     786:	83 00       	.word	0x0083;	????
+	...
+     790:	44 00       	.word	0x0044;	????
+     792:	84 00       	.word	0x0084;	????
+     794:	02 00       	.word	0x0002;	????
+     796:	00 00       	beq			
+     798:	00 00       	beq			
+     79a:	00 00       	beq			
+     79c:	44 00       	.word	0x0044;	????
+     79e:	85 00       	.word	0x0085;	????
+     7a0:	0a 00       	.word	0x000a;	????
+     7a2:	00 00       	beq			
+     7a4:	00 00       	beq			
+     7a6:	00 00       	beq			
+     7a8:	44 00       	.word	0x0044;	????
+     7aa:	86 00       	.word	0x0086;	????
+     7ac:	10 00       	.word	0x0010;	????
+     7ae:	00 00       	beq			
+     7b0:	00 00       	beq			
+     7b2:	00 00       	beq			
+     7b4:	44 00       	.word	0x0044;	????
+     7b6:	87 00       	.word	0x0087;	????
+     7b8:	14 00       	.word	0x0014;	????
+     7ba:	00 00       	beq			
+     7bc:	00 00       	beq			
+     7be:	00 00       	beq			
+     7c0:	44 00       	.word	0x0044;	????
+     7c2:	88 00       	.word	0x0088;	????
+     7c4:	1a 00       	.word	0x001a;	????
+     7c6:	00 00       	beq			
+     7c8:	00 00       	beq			
+     7ca:	00 00       	beq			
+     7cc:	24 00       	.word	0x0024;	????
+     7ce:	00 00       	beq			
+     7d0:	1e 00       	.word	0x001e;	????
+     7d2:	00 00       	beq			
+     7d4:	e7 0a       	.word	0x0ae7;	????
+     7d6:	00 00       	beq			
+     7d8:	24 00       	.word	0x0024;	????
+     7da:	8b 00       	.word	0x008b;	????
+     7dc:	fc f9 00 00 	and.b	@r9+,	0(r12)	;
+     7e0:	00 00       	beq			
+     7e2:	00 00       	beq			
+     7e4:	44 00       	.word	0x0044;	????
+     7e6:	8b 00       	.word	0x008b;	????
+	...
+     7f0:	44 00       	.word	0x0044;	????
+     7f2:	8c 00       	.word	0x008c;	????
+     7f4:	02 00       	.word	0x0002;	????
+     7f6:	00 00       	beq			
+     7f8:	00 00       	beq			
+     7fa:	00 00       	beq			
+     7fc:	44 00       	.word	0x0044;	????
+     7fe:	8d 00       	.word	0x008d;	????
+     800:	0a 00       	.word	0x000a;	????
+     802:	00 00       	beq			
+     804:	00 00       	beq			
+     806:	00 00       	beq			
+     808:	44 00       	.word	0x0044;	????
+     80a:	8e 00       	.word	0x008e;	????
+     80c:	10 00       	.word	0x0010;	????
+     80e:	00 00       	beq			
+     810:	00 00       	beq			
+     812:	00 00       	beq			
+     814:	44 00       	.word	0x0044;	????
+     816:	8f 00       	.word	0x008f;	????
+     818:	14 00       	.word	0x0014;	????
+     81a:	00 00       	beq			
+     81c:	00 00       	beq			
+     81e:	00 00       	beq			
+     820:	44 00       	.word	0x0044;	????
+     822:	90 00       	.word	0x0090;	????
+     824:	1a 00       	.word	0x001a;	????
+     826:	00 00       	beq			
+     828:	00 00       	beq			
+     82a:	00 00       	beq			
+     82c:	44 00       	.word	0x0044;	????
+     82e:	91 00       	.word	0x0091;	????
+     830:	1e 00       	.word	0x001e;	????
+     832:	00 00       	beq			
+     834:	00 00       	beq			
+     836:	00 00       	beq			
+     838:	44 00       	.word	0x0044;	????
+     83a:	92 00       	.word	0x0092;	????
+     83c:	24 00       	.word	0x0024;	????
+     83e:	00 00       	beq			
+     840:	00 00       	beq			
+     842:	00 00       	beq			
+     844:	24 00       	.word	0x0024;	????
+     846:	00 00       	beq			
+     848:	28 00       	.word	0x0028;	????
+     84a:	00 00       	beq			
+     84c:	f6 0a       	.word	0x0af6;	????
+     84e:	00 00       	beq			
+     850:	24 00       	.word	0x0024;	????
+     852:	95 00       	.word	0x0095;	????
+     854:	24 fa       	and	@r10,	r4	;
+     856:	00 00       	beq			
+     858:	00 00       	beq			
+     85a:	00 00       	beq			
+     85c:	44 00       	.word	0x0044;	????
+     85e:	95 00       	.word	0x0095;	????
+	...
+     868:	44 00       	.word	0x0044;	????
+     86a:	96 00       	.word	0x0096;	????
+     86c:	02 00       	.word	0x0002;	????
+     86e:	00 00       	beq			
+     870:	00 00       	beq			
+     872:	00 00       	beq			
+     874:	44 00       	.word	0x0044;	????
+     876:	97 00       	.word	0x0097;	????
+     878:	0a 00       	.word	0x000a;	????
+     87a:	00 00       	beq			
+     87c:	00 00       	beq			
+     87e:	00 00       	beq			
+     880:	44 00       	.word	0x0044;	????
+     882:	98 00       	.word	0x0098;	????
+     884:	10 00       	.word	0x0010;	????
+     886:	00 00       	beq			
+     888:	00 00       	beq			
+     88a:	00 00       	beq			
+     88c:	44 00       	.word	0x0044;	????
+     88e:	99 00       	.word	0x0099;	????
+     890:	14 00       	.word	0x0014;	????
+     892:	00 00       	beq			
+     894:	00 00       	beq			
+     896:	00 00       	beq			
+     898:	44 00       	.word	0x0044;	????
+     89a:	9a 00       	.word	0x009a;	????
+     89c:	1a 00       	.word	0x001a;	????
+     89e:	00 00       	beq			
+     8a0:	00 00       	beq			
+     8a2:	00 00       	beq			
+     8a4:	44 00       	.word	0x0044;	????
+     8a6:	9b 00       	.word	0x009b;	????
+     8a8:	1e 00       	.word	0x001e;	????
+     8aa:	00 00       	beq			
+     8ac:	00 00       	beq			
+     8ae:	00 00       	beq			
+     8b0:	44 00       	.word	0x0044;	????
+     8b2:	9c 00       	.word	0x009c;	????
+     8b4:	24 00       	.word	0x0024;	????
+     8b6:	00 00       	beq			
+     8b8:	00 00       	beq			
+     8ba:	00 00       	beq			
+     8bc:	44 00       	.word	0x0044;	????
+     8be:	9d 00       	.word	0x009d;	????
+     8c0:	28 00       	.word	0x0028;	????
+     8c2:	00 00       	beq			
+     8c4:	00 00       	beq			
+     8c6:	00 00       	beq			
+     8c8:	44 00       	.word	0x0044;	????
+     8ca:	9e 00       	.word	0x009e;	????
+     8cc:	2e 00       	.word	0x002e;	????
+     8ce:	00 00       	beq			
+     8d0:	00 00       	beq			
+     8d2:	00 00       	beq			
+     8d4:	24 00       	.word	0x0024;	????
+     8d6:	00 00       	beq			
+     8d8:	32 00       	.word	0x0032;	????
+     8da:	00 00       	beq			
+     8dc:	05 0b       	.word	0x0b05;	????
+     8de:	00 00       	beq			
+     8e0:	24 00       	.word	0x0024;	????
+     8e2:	a1 00       	.word	0x00a1;	????
+     8e4:	56 fa 00 00 	and.b	0(r10),	r6	;
+     8e8:	00 00       	beq			
+     8ea:	00 00       	beq			
+     8ec:	44 00       	.word	0x0044;	????
+     8ee:	a1 00       	.word	0x00a1;	????
+	...
+     8f8:	44 00       	.word	0x0044;	????
+     8fa:	a4 00       	.word	0x00a4;	????
+     8fc:	02 00       	.word	0x0002;	????
+     8fe:	00 00       	beq			
+     900:	00 00       	beq			
+     902:	00 00       	beq			
+     904:	44 00       	.word	0x0044;	????
+     906:	a5 00       	.word	0x00a5;	????
+     908:	06 00       	.word	0x0006;	????
+     90a:	00 00       	beq			
+     90c:	00 00       	beq			
+     90e:	00 00       	beq			
+     910:	44 00       	.word	0x0044;	????
+     912:	a6 00       	.word	0x00a6;	????
+     914:	0c 00       	.word	0x000c;	????
+     916:	00 00       	beq			
+     918:	00 00       	beq			
+     91a:	00 00       	beq			
+     91c:	44 00       	.word	0x0044;	????
+     91e:	a7 00       	.word	0x00a7;	????
+     920:	18 00       	.word	0x0018;	????
+     922:	00 00       	beq			
+     924:	00 00       	beq			
+     926:	00 00       	beq			
+     928:	44 00       	.word	0x0044;	????
+     92a:	a8 00       	.word	0x00a8;	????
+     92c:	1e 00       	.word	0x001e;	????
+     92e:	00 00       	beq			
+     930:	00 00       	beq			
+     932:	00 00       	beq			
+     934:	44 00       	.word	0x0044;	????
+     936:	a9 00       	.word	0x00a9;	????
+     938:	22 00       	.word	0x0022;	????
+     93a:	00 00       	beq			
+     93c:	00 00       	beq			
+     93e:	00 00       	beq			
+     940:	44 00       	.word	0x0044;	????
+     942:	ab 00       	.word	0x00ab;	????
+     944:	28 00       	.word	0x0028;	????
+     946:	00 00       	beq			
+     948:	00 00       	beq			
+     94a:	00 00       	beq			
+     94c:	44 00       	.word	0x0044;	????
+     94e:	ac 00       	.word	0x00ac;	????
+     950:	2a 00       	.word	0x002a;	????
+     952:	00 00       	beq			
+     954:	13 0b       	.word	0x0b13;	????
+     956:	00 00       	beq			
+     958:	40 00       	.word	0x0040;	????
+     95a:	a2 00       	.word	0x00a2;	????
+     95c:	0b 00       	.word	0x000b;	????
+     95e:	00 00       	beq			
+     960:	00 00       	beq			
+     962:	00 00       	beq			
+     964:	c0 00       	.word	0x00c0;	????
+     966:	00 00       	beq			
+     968:	02 00       	.word	0x0002;	????
+     96a:	00 00       	beq			
+     96c:	00 00       	beq			
+     96e:	00 00       	beq			
+     970:	e0 00       	.word	0x00e0;	????
+     972:	00 00       	beq			
+     974:	2a 00       	.word	0x002a;	????
+     976:	00 00       	beq			
+     978:	00 00       	beq			
+     97a:	00 00       	beq			
+     97c:	24 00       	.word	0x0024;	????
+     97e:	00 00       	beq			
+     980:	2e 00       	.word	0x002e;	????
+     982:	00 00       	beq			
+     984:	1d 0b       	.word	0x0b1d;	????
+     986:	00 00       	beq			
+     988:	24 00       	.word	0x0024;	????
+     98a:	af 00       	.word	0x00af;	????
+     98c:	84 fa 00 00 	and	r10,	0(r4)	;
+     990:	2c 0b       	.word	0x0b2c;	????
+     992:	00 00       	beq			
+     994:	40 00       	.word	0x0040;	????
+     996:	ae 00       	.word	0x00ae;	????
+     998:	09 00       	.word	0x0009;	????
+     99a:	00 00       	beq			
+     99c:	00 00       	beq			
+     99e:	00 00       	beq			
+     9a0:	44 00       	.word	0x0044;	????
+     9a2:	af 00       	.word	0x00af;	????
+	...
+     9ac:	44 00       	.word	0x0044;	????
+     9ae:	b0 00       	.word	0x00b0;	????
+     9b0:	08 00       	.word	0x0008;	????
+     9b2:	00 00       	beq			
+     9b4:	00 00       	beq			
+     9b6:	00 00       	beq			
+     9b8:	44 00       	.word	0x0044;	????
+     9ba:	b2 00       	.word	0x00b2;	????
+     9bc:	0a 00       	.word	0x000a;	????
+     9be:	00 00       	beq			
+     9c0:	00 00       	beq			
+     9c2:	00 00       	beq			
+     9c4:	44 00       	.word	0x0044;	????
+     9c6:	b3 00       	.word	0x00b3;	????
+     9c8:	10 00       	.word	0x0010;	????
+     9ca:	00 00       	beq			
+     9cc:	00 00       	beq			
+     9ce:	00 00       	beq			
+     9d0:	44 00       	.word	0x0044;	????
+     9d2:	b5 00       	.word	0x00b5;	????
+     9d4:	12 00       	.word	0x0012;	????
+     9d6:	00 00       	beq			
+     9d8:	00 00       	beq			
+     9da:	00 00       	beq			
+     9dc:	44 00       	.word	0x0044;	????
+     9de:	b6 00       	.word	0x00b6;	????
+     9e0:	14 00       	.word	0x0014;	????
+     9e2:	00 00       	beq			
+     9e4:	00 00       	beq			
+     9e6:	00 00       	beq			
+     9e8:	44 00       	.word	0x0044;	????
+     9ea:	b3 00       	.word	0x00b3;	????
+     9ec:	1e 00       	.word	0x001e;	????
+     9ee:	00 00       	beq			
+     9f0:	00 00       	beq			
+     9f2:	00 00       	beq			
+     9f4:	44 00       	.word	0x0044;	????
+     9f6:	b8 00       	.word	0x00b8;	????
+     9f8:	24 00       	.word	0x0024;	????
+     9fa:	00 00       	beq			
+     9fc:	00 00       	beq			
+     9fe:	00 00       	beq			
+     a00:	44 00       	.word	0x0044;	????
+     a02:	b9 00       	.word	0x00b9;	????
+     a04:	2a 00       	.word	0x002a;	????
+     a06:	00 00       	beq			
+     a08:	00 00       	beq			
+     a0a:	00 00       	beq			
+     a0c:	44 00       	.word	0x0044;	????
+     a0e:	bb 00       	.word	0x00bb;	????
+     a10:	38 00       	.word	0x0038;	????
+     a12:	00 00       	beq			
+     a14:	00 00       	beq			
+     a16:	00 00       	beq			
+     a18:	44 00       	.word	0x0044;	????
+     a1a:	bc 00       	.word	0x00bc;	????
+     a1c:	3a 00       	.word	0x003a;	????
+     a1e:	00 00       	beq			
+     a20:	40 0b       	.word	0x0b40;	????
+     a22:	00 00       	beq			
+     a24:	40 00       	.word	0x0040;	????
+     a26:	b0 00       	.word	0x00b0;	????
+     a28:	0b 00       	.word	0x000b;	????
+     a2a:	00 00       	beq			
+     a2c:	4a 0b       	.word	0x0b4a;	????
+     a2e:	00 00       	beq			
+     a30:	40 00       	.word	0x0040;	????
+     a32:	b0 00       	.word	0x00b0;	????
+     a34:	0a 00       	.word	0x000a;	????
+     a36:	00 00       	beq			
+     a38:	00 00       	beq			
+     a3a:	00 00       	beq			
+     a3c:	c0 00       	.word	0x00c0;	????
+     a3e:	00 00       	beq			
+     a40:	08 00       	.word	0x0008;	????
+     a42:	00 00       	beq			
+     a44:	00 00       	beq			
+     a46:	00 00       	beq			
+     a48:	e0 00       	.word	0x00e0;	????
+     a4a:	00 00       	beq			
+     a4c:	3a 00       	.word	0x003a;	????
+     a4e:	00 00       	beq			
+     a50:	00 00       	beq			
+     a52:	00 00       	beq			
+     a54:	24 00       	.word	0x0024;	????
+     a56:	00 00       	beq			
+     a58:	42 00       	.word	0x0042;	????
+     a5a:	00 00       	beq			
+     a5c:	54 0b       	.word	0x0b54;	????
+     a5e:	00 00       	beq			
+     a60:	24 00       	.word	0x0024;	????
+     a62:	bf 00       	.word	0x00bf;	????
+     a64:	c6 fa 00 00 	and.b	r10,	0(r6)	;
+     a68:	68 0b       	.word	0x0b68;	????
+     a6a:	00 00       	beq			
+     a6c:	40 00       	.word	0x0040;	????
+     a6e:	be 00       	.word	0x00be;	????
+     a70:	09 00       	.word	0x0009;	????
+     a72:	00 00       	beq			
+     a74:	00 00       	beq			
+     a76:	00 00       	beq			
+     a78:	44 00       	.word	0x0044;	????
+     a7a:	bf 00       	.word	0x00bf;	????
+	...
+     a84:	44 00       	.word	0x0044;	????
+     a86:	c0 00       	.word	0x00c0;	????
+     a88:	08 00       	.word	0x0008;	????
+     a8a:	00 00       	beq			
+     a8c:	00 00       	beq			
+     a8e:	00 00       	beq			
+     a90:	44 00       	.word	0x0044;	????
+     a92:	c2 00       	.word	0x00c2;	????
+     a94:	0c 00       	.word	0x000c;	????
+     a96:	00 00       	beq			
+     a98:	00 00       	beq			
+     a9a:	00 00       	beq			
+     a9c:	44 00       	.word	0x0044;	????
+     a9e:	c4 00       	.word	0x00c4;	????
+     aa0:	0e 00       	.word	0x000e;	????
+     aa2:	00 00       	beq			
+     aa4:	00 00       	beq			
+     aa6:	00 00       	beq			
+     aa8:	44 00       	.word	0x0044;	????
+     aaa:	c5 00       	.word	0x00c5;	????
+     aac:	18 00       	.word	0x0018;	????
+     aae:	00 00       	beq			
+     ab0:	00 00       	beq			
+     ab2:	00 00       	beq			
+     ab4:	44 00       	.word	0x0044;	????
+     ab6:	c2 00       	.word	0x00c2;	????
+     ab8:	1c 00       	.word	0x001c;	????
+     aba:	00 00       	beq			
+     abc:	00 00       	beq			
+     abe:	00 00       	beq			
+     ac0:	44 00       	.word	0x0044;	????
+     ac2:	c7 00       	.word	0x00c7;	????
+     ac4:	2a 00       	.word	0x002a;	????
+     ac6:	00 00       	beq			
+     ac8:	00 00       	beq			
+     aca:	00 00       	beq			
+     acc:	44 00       	.word	0x0044;	????
+     ace:	c8 00       	.word	0x00c8;	????
+     ad0:	30 00       	.word	0x0030;	????
+     ad2:	00 00       	beq			
+     ad4:	00 00       	beq			
+     ad6:	00 00       	beq			
+     ad8:	44 00       	.word	0x0044;	????
+     ada:	c9 00       	.word	0x00c9;	????
+     adc:	34 00       	.word	0x0034;	????
+     ade:	00 00       	beq			
+     ae0:	00 00       	beq			
+     ae2:	00 00       	beq			
+     ae4:	44 00       	.word	0x0044;	????
+     ae6:	ca 00       	.word	0x00ca;	????
+     ae8:	3a 00       	.word	0x003a;	????
+     aea:	00 00       	beq			
+     aec:	00 00       	beq			
+     aee:	00 00       	beq			
+     af0:	44 00       	.word	0x0044;	????
+     af2:	cc 00       	.word	0x00cc;	????
+     af4:	3e 00       	.word	0x003e;	????
+     af6:	00 00       	beq			
+     af8:	00 00       	beq			
+     afa:	00 00       	beq			
+     afc:	44 00       	.word	0x0044;	????
+     afe:	cd 00       	.word	0x00cd;	????
+     b00:	40 00       	.word	0x0040;	????
+     b02:	00 00       	beq			
+     b04:	40 0b       	.word	0x0b40;	????
+     b06:	00 00       	beq			
+     b08:	40 00       	.word	0x0040;	????
+     b0a:	c0 00       	.word	0x00c0;	????
+     b0c:	0a 00       	.word	0x000a;	????
+     b0e:	00 00       	beq			
+     b10:	75 0b       	.word	0x0b75;	????
+     b12:	00 00       	beq			
+     b14:	40 00       	.word	0x0040;	????
+     b16:	c0 00       	.word	0x00c0;	????
+     b18:	0b 00       	.word	0x000b;	????
+     b1a:	00 00       	beq			
+     b1c:	00 00       	beq			
+     b1e:	00 00       	beq			
+     b20:	c0 00       	.word	0x00c0;	????
+     b22:	00 00       	beq			
+     b24:	08 00       	.word	0x0008;	????
+     b26:	00 00       	beq			
+     b28:	00 00       	beq			
+     b2a:	00 00       	beq			
+     b2c:	e0 00       	.word	0x00e0;	????
+     b2e:	00 00       	beq			
+     b30:	40 00       	.word	0x0040;	????
+     b32:	00 00       	beq			
+     b34:	00 00       	beq			
+     b36:	00 00       	beq			
+     b38:	24 00       	.word	0x0024;	????
+     b3a:	00 00       	beq			
+     b3c:	48 00       	.word	0x0048;	????
+     b3e:	00 00       	beq			
+     b40:	82 0b       	.word	0x0b82;	????
+     b42:	00 00       	beq			
+     b44:	24 00       	.word	0x0024;	????
+     b46:	d2 00       	.word	0x00d2;	????
+     b48:	0e fb       	and	r11,	r14	;
+     b4a:	00 00       	beq			
+     b4c:	94 0b       	.word	0x0b94;	????
+     b4e:	00 00       	beq			
+     b50:	40 00       	.word	0x0040;	????
+     b52:	d1 00       	.word	0x00d1;	????
+     b54:	0b 00       	.word	0x000b;	????
+     b56:	00 00       	beq			
+     b58:	00 00       	beq			
+     b5a:	00 00       	beq			
+     b5c:	44 00       	.word	0x0044;	????
+     b5e:	d2 00       	.word	0x00d2;	????
+	...
+     b68:	44 00       	.word	0x0044;	????
+     b6a:	d5 00       	.word	0x00d5;	????
+     b6c:	04 00       	.word	0x0004;	????
+     b6e:	00 00       	beq			
+     b70:	00 00       	beq			
+     b72:	00 00       	beq			
+     b74:	44 00       	.word	0x0044;	????
+     b76:	d6 00       	.word	0x00d6;	????
+     b78:	08 00       	.word	0x0008;	????
+     b7a:	00 00       	beq			
+     b7c:	00 00       	beq			
+     b7e:	00 00       	beq			
+     b80:	44 00       	.word	0x0044;	????
+     b82:	d7 00       	.word	0x00d7;	????
+     b84:	10 00       	.word	0x0010;	????
+     b86:	00 00       	beq			
+     b88:	00 00       	beq			
+     b8a:	00 00       	beq			
+     b8c:	44 00       	.word	0x0044;	????
+     b8e:	d9 00       	.word	0x00d9;	????
+     b90:	14 00       	.word	0x0014;	????
+     b92:	00 00       	beq			
+     b94:	00 00       	beq			
+     b96:	00 00       	beq			
+     b98:	44 00       	.word	0x0044;	????
+     b9a:	da 00       	.word	0x00da;	????
+     b9c:	16 00       	.word	0x0016;	????
+     b9e:	00 00       	beq			
+     ba0:	13 0b       	.word	0x0b13;	????
+     ba2:	00 00       	beq			
+     ba4:	40 00       	.word	0x0040;	????
+     ba6:	d3 00       	.word	0x00d3;	????
+     ba8:	0b 00       	.word	0x000b;	????
+     baa:	00 00       	beq			
+     bac:	00 00       	beq			
+     bae:	00 00       	beq			
+     bb0:	c0 00       	.word	0x00c0;	????
+     bb2:	00 00       	beq			
+     bb4:	04 00       	.word	0x0004;	????
+     bb6:	00 00       	beq			
+     bb8:	00 00       	beq			
+     bba:	00 00       	beq			
+     bbc:	e0 00       	.word	0x00e0;	????
+     bbe:	00 00       	beq			
+     bc0:	16 00       	.word	0x0016;	????
+     bc2:	00 00       	beq			
+     bc4:	00 00       	beq			
+     bc6:	00 00       	beq			
+     bc8:	24 00       	.word	0x0024;	????
+     bca:	00 00       	beq			
+     bcc:	1a 00       	.word	0x001a;	????
+     bce:	00 00       	beq			
+     bd0:	aa 0b       	.word	0x0baa;	????
+     bd2:	00 00       	beq			
+     bd4:	24 00       	.word	0x0024;	????
+     bd6:	dd 00       	.word	0x00dd;	????
+     bd8:	28 fb       	and	@r11,	r8	;
+     bda:	00 00       	beq			
+     bdc:	94 0b       	.word	0x0b94;	????
+     bde:	00 00       	beq			
+     be0:	40 00       	.word	0x0040;	????
+     be2:	dc 00       	.word	0x00dc;	????
+     be4:	0a 00       	.word	0x000a;	????
+     be6:	00 00       	beq			
+     be8:	bc 0b       	.word	0x0bbc;	????
+     bea:	00 00       	beq			
+     bec:	40 00       	.word	0x0040;	????
+     bee:	dc 00       	.word	0x00dc;	????
+     bf0:	0b 00       	.word	0x000b;	????
+     bf2:	00 00       	beq			
+     bf4:	cb 0b       	.word	0x0bcb;	????
+     bf6:	00 00       	beq			
+     bf8:	40 00       	.word	0x0040;	????
+     bfa:	dc 00       	.word	0x00dc;	????
+     bfc:	08 00       	.word	0x0008;	????
+     bfe:	00 00       	beq			
+     c00:	de 0b       	.word	0x0bde;	????
+     c02:	00 00       	beq			
+     c04:	40 00       	.word	0x0040;	????
+     c06:	dc 00       	.word	0x00dc;	????
+     c08:	09 00       	.word	0x0009;	????
+     c0a:	00 00       	beq			
+     c0c:	00 00       	beq			
+     c0e:	00 00       	beq			
+     c10:	44 00       	.word	0x0044;	????
+     c12:	dd 00       	.word	0x00dd;	????
+	...
+     c1c:	44 00       	.word	0x0044;	????
+     c1e:	e0 00       	.word	0x00e0;	????
+     c20:	10 00       	.word	0x0010;	????
+     c22:	00 00       	beq			
+     c24:	00 00       	beq			
+     c26:	00 00       	beq			
+     c28:	44 00       	.word	0x0044;	????
+     c2a:	e1 00       	.word	0x00e1;	????
+     c2c:	14 00       	.word	0x0014;	????
+     c2e:	00 00       	beq			
+     c30:	00 00       	beq			
+     c32:	00 00       	beq			
+     c34:	44 00       	.word	0x0044;	????
+     c36:	e2 00       	.word	0x00e2;	????
+     c38:	1c 00       	.word	0x001c;	????
+     c3a:	00 00       	beq			
+     c3c:	00 00       	beq			
+     c3e:	00 00       	beq			
+     c40:	44 00       	.word	0x0044;	????
+     c42:	e3 00       	.word	0x00e3;	????
+     c44:	28 00       	.word	0x0028;	????
+     c46:	00 00       	beq			
+     c48:	00 00       	beq			
+     c4a:	00 00       	beq			
+     c4c:	44 00       	.word	0x0044;	????
+     c4e:	e4 00       	.word	0x00e4;	????
+     c50:	32 00       	.word	0x0032;	????
+     c52:	00 00       	beq			
+     c54:	00 00       	beq			
+     c56:	00 00       	beq			
+     c58:	44 00       	.word	0x0044;	????
+     c5a:	e5 00       	.word	0x00e5;	????
+     c5c:	4a 00       	.word	0x004a;	????
+     c5e:	00 00       	beq			
+     c60:	00 00       	beq			
+     c62:	00 00       	beq			
+     c64:	44 00       	.word	0x0044;	????
+     c66:	e6 00       	.word	0x00e6;	????
+     c68:	4e 00       	.word	0x004e;	????
+     c6a:	00 00       	beq			
+     c6c:	00 00       	beq			
+     c6e:	00 00       	beq			
+     c70:	44 00       	.word	0x0044;	????
+     c72:	e8 00       	.word	0x00e8;	????
+     c74:	56 00       	.word	0x0056;	????
+     c76:	00 00       	beq			
+     c78:	00 00       	beq			
+     c7a:	00 00       	beq			
+     c7c:	44 00       	.word	0x0044;	????
+     c7e:	e9 00       	.word	0x00e9;	????
+     c80:	58 00       	.word	0x0058;	????
+     c82:	00 00       	beq			
+     c84:	40 0b       	.word	0x0b40;	????
+     c86:	00 00       	beq			
+     c88:	40 00       	.word	0x0040;	????
+     c8a:	de 00       	.word	0x00de;	????
+     c8c:	0b 00       	.word	0x000b;	????
+     c8e:	00 00       	beq			
+     c90:	13 0b       	.word	0x0b13;	????
+     c92:	00 00       	beq			
+     c94:	40 00       	.word	0x0040;	????
+     c96:	de 00       	.word	0x00de;	????
+     c98:	0a 00       	.word	0x000a;	????
+     c9a:	00 00       	beq			
+     c9c:	00 00       	beq			
+     c9e:	00 00       	beq			
+     ca0:	c0 00       	.word	0x00c0;	????
+     ca2:	00 00       	beq			
+     ca4:	10 00       	.word	0x0010;	????
+     ca6:	00 00       	beq			
+     ca8:	00 00       	beq			
+     caa:	00 00       	beq			
+     cac:	e0 00       	.word	0x00e0;	????
+     cae:	00 00       	beq			
+     cb0:	58 00       	.word	0x0058;	????
+     cb2:	00 00       	beq			
+     cb4:	00 00       	beq			
+     cb6:	00 00       	beq			
+     cb8:	24 00       	.word	0x0024;	????
+     cba:	00 00       	beq			
+     cbc:	62 00       	.word	0x0062;	????
+     cbe:	00 00       	beq			
+     cc0:	ea 0b       	.word	0x0bea;	????
+     cc2:	00 00       	beq			
+     cc4:	24 00       	.word	0x0024;	????
+     cc6:	ec 00       	.word	0x00ec;	????
+     cc8:	8a fb 00 00 	and	r11,	0(r10)	;
+     ccc:	94 0b       	.word	0x0b94;	????
+     cce:	00 00       	beq			
+     cd0:	40 00       	.word	0x0040;	????
+     cd2:	eb 00       	.word	0x00eb;	????
+     cd4:	0a 00       	.word	0x000a;	????
+     cd6:	00 00       	beq			
+     cd8:	bc 0b       	.word	0x0bbc;	????
+     cda:	00 00       	beq			
+     cdc:	40 00       	.word	0x0040;	????
+     cde:	eb 00       	.word	0x00eb;	????
+     ce0:	0b 00       	.word	0x000b;	????
+     ce2:	00 00       	beq			
+     ce4:	fb 0b       	.word	0x0bfb;	????
+     ce6:	00 00       	beq			
+     ce8:	40 00       	.word	0x0040;	????
+     cea:	eb 00       	.word	0x00eb;	????
+     cec:	08 00       	.word	0x0008;	????
+     cee:	00 00       	beq			
+     cf0:	de 0b       	.word	0x0bde;	????
+     cf2:	00 00       	beq			
+     cf4:	40 00       	.word	0x0040;	????
+     cf6:	eb 00       	.word	0x00eb;	????
+     cf8:	09 00       	.word	0x0009;	????
+     cfa:	00 00       	beq			
+     cfc:	00 00       	beq			
+     cfe:	00 00       	beq			
+     d00:	44 00       	.word	0x0044;	????
+     d02:	ec 00       	.word	0x00ec;	????
+	...
+     d0c:	44 00       	.word	0x0044;	????
+     d0e:	ef 00       	.word	0x00ef;	????
+     d10:	12 00       	.word	0x0012;	????
+     d12:	00 00       	beq			
+     d14:	00 00       	beq			
+     d16:	00 00       	beq			
+     d18:	44 00       	.word	0x0044;	????
+     d1a:	f0 00       	.word	0x00f0;	????
+     d1c:	16 00       	.word	0x0016;	????
+     d1e:	00 00       	beq			
+     d20:	00 00       	beq			
+     d22:	00 00       	beq			
+     d24:	44 00       	.word	0x0044;	????
+     d26:	f1 00       	.word	0x00f1;	????
+     d28:	1c 00       	.word	0x001c;	????
+     d2a:	00 00       	beq			
+     d2c:	00 00       	beq			
+     d2e:	00 00       	beq			
+     d30:	44 00       	.word	0x0044;	????
+     d32:	f2 00       	.word	0x00f2;	????
+     d34:	26 00       	.word	0x0026;	????
+     d36:	00 00       	beq			
+     d38:	00 00       	beq			
+     d3a:	00 00       	beq			
+     d3c:	44 00       	.word	0x0044;	????
+     d3e:	f3 00       	.word	0x00f3;	????
+     d40:	2e 00       	.word	0x002e;	????
+     d42:	00 00       	beq			
+     d44:	00 00       	beq			
+     d46:	00 00       	beq			
+     d48:	44 00       	.word	0x0044;	????
+     d4a:	f4 00       	.word	0x00f4;	????
+     d4c:	32 00       	.word	0x0032;	????
+     d4e:	00 00       	beq			
+     d50:	00 00       	beq			
+     d52:	00 00       	beq			
+     d54:	44 00       	.word	0x0044;	????
+     d56:	f5 00       	.word	0x00f5;	????
+     d58:	36 00       	.word	0x0036;	????
+     d5a:	00 00       	beq			
+     d5c:	00 00       	beq			
+     d5e:	00 00       	beq			
+     d60:	44 00       	.word	0x0044;	????
+     d62:	f6 00       	.word	0x00f6;	????
+     d64:	40 00       	.word	0x0040;	????
+     d66:	00 00       	beq			
+     d68:	00 00       	beq			
+     d6a:	00 00       	beq			
+     d6c:	44 00       	.word	0x0044;	????
+     d6e:	f7 00       	.word	0x00f7;	????
+     d70:	68 00       	.word	0x0068;	????
+     d72:	00 00       	beq			
+     d74:	00 00       	beq			
+     d76:	00 00       	beq			
+     d78:	44 00       	.word	0x0044;	????
+     d7a:	f8 00       	.word	0x00f8;	????
+     d7c:	74 00       	.word	0x0074;	????
+     d7e:	00 00       	beq			
+     d80:	00 00       	beq			
+     d82:	00 00       	beq			
+     d84:	44 00       	.word	0x0044;	????
+     d86:	fa 00       	.word	0x00fa;	????
+     d88:	78 00       	.word	0x0078;	????
+     d8a:	00 00       	beq			
+     d8c:	00 00       	beq			
+     d8e:	00 00       	beq			
+     d90:	44 00       	.word	0x0044;	????
+     d92:	fb 00       	.word	0x00fb;	????
+     d94:	7a 00       	.word	0x007a;	????
+     d96:	00 00       	beq			
+     d98:	40 0b       	.word	0x0b40;	????
+     d9a:	00 00       	beq			
+     d9c:	40 00       	.word	0x0040;	????
+     d9e:	ed 00       	.word	0x00ed;	????
+     da0:	0a 00       	.word	0x000a;	????
+     da2:	00 00       	beq			
+     da4:	13 0b       	.word	0x0b13;	????
+     da6:	00 00       	beq			
+     da8:	40 00       	.word	0x0040;	????
+     daa:	ed 00       	.word	0x00ed;	????
+     dac:	07 00       	.word	0x0007;	????
+     dae:	00 00       	beq			
+     db0:	00 00       	beq			
+     db2:	00 00       	beq			
+     db4:	c0 00       	.word	0x00c0;	????
+     db6:	00 00       	beq			
+     db8:	12 00       	.word	0x0012;	????
+     dba:	00 00       	beq			
+     dbc:	00 00       	beq			
+     dbe:	00 00       	beq			
+     dc0:	e0 00       	.word	0x00e0;	????
+     dc2:	00 00       	beq			
+     dc4:	7a 00       	.word	0x007a;	????
+     dc6:	00 00       	beq			
+     dc8:	00 00       	beq			
+     dca:	00 00       	beq			
+     dcc:	24 00       	.word	0x0024;	????
+     dce:	00 00       	beq			
+     dd0:	86 00       	.word	0x0086;	????
+     dd2:	00 00       	beq			
+     dd4:	06 0c       	.word	0x0c06;	????
+     dd6:	00 00       	beq			
+     dd8:	20 00       	.word	0x0020;	????
+     dda:	14 00       	.word	0x0014;	????
+     ddc:	00 00       	beq			
+     dde:	00 00       	beq			
+     de0:	1c 0c       	.word	0x0c1c;	????
+     de2:	00 00       	beq			
+     de4:	20 00       	.word	0x0020;	????
+     de6:	16 00       	.word	0x0016;	????
+     de8:	00 00       	beq			
+     dea:	00 00       	beq			
+     dec:	2b 0c       	.word	0x0c2b;	????
+     dee:	00 00       	beq			
+     df0:	20 00       	.word	0x0020;	????
+     df2:	18 00       	.word	0x0018;	????
+     df4:	00 00       	beq			
+     df6:	00 00       	beq			
+     df8:	3a 0c       	.word	0x0c3a;	????
+     dfa:	00 00       	beq			
+     dfc:	20 00       	.word	0x0020;	????
+     dfe:	1b 00       	.word	0x001b;	????
+     e00:	00 00       	beq			
+     e02:	00 00       	beq			
+     e04:	49 0c       	.word	0x0c49;	????
+     e06:	00 00       	beq			
+     e08:	20 00       	.word	0x0020;	????
+     e0a:	14 00       	.word	0x0014;	????
+     e0c:	00 00       	beq			
+     e0e:	00 00       	beq			
+     e10:	56 0c       	.word	0x0c56;	????
+     e12:	00 00       	beq			
+     e14:	20 00       	.word	0x0020;	????
+     e16:	16 00       	.word	0x0016;	????
+     e18:	00 00       	beq			
+     e1a:	00 00       	beq			
+     e1c:	63 0c       	.word	0x0c63;	????
+     e1e:	00 00       	beq			
+     e20:	20 00       	.word	0x0020;	????
+     e22:	18 00       	.word	0x0018;	????
+     e24:	00 00       	beq			
+     e26:	00 00       	beq			
+     e28:	70 0c       	.word	0x0c70;	????
+     e2a:	00 00       	beq			
+     e2c:	20 00       	.word	0x0020;	????
+     e2e:	13 00       	.word	0x0013;	????
+     e30:	00 00       	beq			
+     e32:	00 00       	beq			
+     e34:	7d 0c       	.word	0x0c7d;	????
+     e36:	00 00       	beq			
+     e38:	20 00       	.word	0x0020;	????
+     e3a:	19 00       	.word	0x0019;	????
+     e3c:	00 00       	beq			
+     e3e:	00 00       	beq			
+     e40:	8a 0c       	.word	0x0c8a;	????
+     e42:	00 00       	beq			
+     e44:	20 00       	.word	0x0020;	????
+     e46:	1b 00       	.word	0x001b;	????
+     e48:	00 00       	beq			
+     e4a:	00 00       	beq			
+     e4c:	98 0c       	.word	0x0c98;	????
+     e4e:	00 00       	beq			
+     e50:	20 00       	.word	0x0020;	????
+     e52:	1d 00       	.word	0x001d;	????
+     e54:	00 00       	beq			
+     e56:	00 00       	beq			
+     e58:	a4 0c       	.word	0x0ca4;	????
+     e5a:	00 00       	beq			
+     e5c:	20 00       	.word	0x0020;	????
+     e5e:	20 00       	.word	0x0020;	????
+     e60:	00 00       	beq			
+     e62:	00 00       	beq			
+     e64:	b4 0c       	.word	0x0cb4;	????
+     e66:	00 00       	beq			
+     e68:	20 00       	.word	0x0020;	????
+     e6a:	22 00       	.word	0x0022;	????
+     e6c:	00 00       	beq			
+     e6e:	00 00       	beq			
+     e70:	c4 0c       	.word	0x0cc4;	????
+     e72:	00 00       	beq			
+     e74:	20 00       	.word	0x0020;	????
+     e76:	24 00       	.word	0x0024;	????
+     e78:	00 00       	beq			
+     e7a:	00 00       	beq			
+     e7c:	d3 0c       	.word	0x0cd3;	????
+     e7e:	00 00       	beq			
+     e80:	20 00       	.word	0x0020;	????
+     e82:	26 00       	.word	0x0026;	????
+     e84:	00 00       	beq			
+     e86:	00 00       	beq			
+     e88:	e2 0c       	.word	0x0ce2;	????
+     e8a:	00 00       	beq			
+     e8c:	20 00       	.word	0x0020;	????
+     e8e:	a0 00       	.word	0x00a0;	????
+     e90:	00 00       	beq			
+     e92:	00 00       	beq			
+     e94:	f0 0c       	.word	0x0cf0;	????
+     e96:	00 00       	beq			
+     e98:	20 00       	.word	0x0020;	????
+     e9a:	88 00       	.word	0x0088;	????
+     e9c:	00 00       	beq			
+     e9e:	00 00       	beq			
+     ea0:	fe 0c       	.word	0x0cfe;	????
+     ea2:	00 00       	beq			
+     ea4:	20 00       	.word	0x0020;	????
+     ea6:	8c 00       	.word	0x008c;	????
+     ea8:	00 00       	beq			
+     eaa:	00 00       	beq			
+     eac:	0c 0d       	.word	0x0d0c;	????
+     eae:	00 00       	beq			
+     eb0:	20 00       	.word	0x0020;	????
+     eb2:	72 00       	.word	0x0072;	????
+     eb4:	00 00       	beq			
+     eb6:	00 00       	beq			
+     eb8:	18 0d       	.word	0x0d18;	????
+     eba:	00 00       	beq			
+     ebc:	20 00       	.word	0x0020;	????
+     ebe:	74 00       	.word	0x0074;	????
+     ec0:	00 00       	beq			
+     ec2:	00 00       	beq			
+     ec4:	25 0d       	.word	0x0d25;	????
+     ec6:	00 00       	beq			
+     ec8:	20 00       	.word	0x0020;	????
+     eca:	76 00       	.word	0x0076;	????
+     ecc:	00 00       	beq			
+     ece:	00 00       	beq			
+     ed0:	32 0d       	.word	0x0d32;	????
+     ed2:	00 00       	beq			
+     ed4:	20 00       	.word	0x0020;	????
+     ed6:	78 00       	.word	0x0078;	????
+     ed8:	00 00       	beq			
+     eda:	00 00       	beq			
+     edc:	3f 0d       	.word	0x0d3f;	????
+     ede:	00 00       	beq			
+     ee0:	20 00       	.word	0x0020;	????
+     ee2:	7a 00       	.word	0x007a;	????
+     ee4:	00 00       	beq			
+     ee6:	00 00       	beq			
+     ee8:	4c 0d       	.word	0x0d4c;	????
+     eea:	00 00       	beq			
+     eec:	20 00       	.word	0x0020;	????
+     eee:	7c 00       	.word	0x007c;	????
+     ef0:	00 00       	beq			
+     ef2:	00 00       	beq			
+     ef4:	58 0d       	.word	0x0d58;	????
+     ef6:	00 00       	beq			
+     ef8:	20 00       	.word	0x0020;	????
+     efa:	7e 00       	.word	0x007e;	????
+     efc:	00 00       	beq			
+     efe:	00 00       	beq			
+     f00:	65 0d       	.word	0x0d65;	????
+     f02:	00 00       	beq			
+     f04:	20 00       	.word	0x0020;	????
+     f06:	81 00       	.word	0x0081;	????
+     f08:	00 00       	beq			
+     f0a:	00 00       	beq			
+     f0c:	72 0d       	.word	0x0d72;	????
+     f0e:	00 00       	beq			
+     f10:	20 00       	.word	0x0020;	????
+     f12:	87 00       	.word	0x0087;	????
+     f14:	00 00       	beq			
+     f16:	00 00       	beq			
+     f18:	7e 0d       	.word	0x0d7e;	????
+     f1a:	00 00       	beq			
+     f1c:	20 00       	.word	0x0020;	????
+     f1e:	89 00       	.word	0x0089;	????
+     f20:	00 00       	beq			
+     f22:	00 00       	beq			
+     f24:	8b 0d       	.word	0x0d8b;	????
+     f26:	00 00       	beq			
+     f28:	20 00       	.word	0x0020;	????
+     f2a:	8b 00       	.word	0x008b;	????
+     f2c:	00 00       	beq			
+     f2e:	00 00       	beq			
+     f30:	98 0d       	.word	0x0d98;	????
+     f32:	00 00       	beq			
+     f34:	20 00       	.word	0x0020;	????
+     f36:	8d 00       	.word	0x008d;	????
+     f38:	00 00       	beq			
+     f3a:	00 00       	beq			
+     f3c:	a5 0d       	.word	0x0da5;	????
+     f3e:	00 00       	beq			
+     f40:	20 00       	.word	0x0020;	????
+     f42:	8f 00       	.word	0x008f;	????
+     f44:	00 00       	beq			
+     f46:	00 00       	beq			
+     f48:	b2 0d       	.word	0x0db2;	????
+     f4a:	00 00       	beq			
+     f4c:	20 00       	.word	0x0020;	????
+     f4e:	91 00       	.word	0x0091;	????
+     f50:	00 00       	beq			
+     f52:	00 00       	beq			
+     f54:	be 0d       	.word	0x0dbe;	????
+     f56:	00 00       	beq			
+     f58:	20 00       	.word	0x0020;	????
+     f5a:	93 00       	.word	0x0093;	????
+     f5c:	00 00       	beq			
+     f5e:	00 00       	beq			
+     f60:	cb 0d       	.word	0x0dcb;	????
+     f62:	00 00       	beq			
+     f64:	20 00       	.word	0x0020;	????
+     f66:	96 00       	.word	0x0096;	????
+     f68:	00 00       	beq			
+     f6a:	00 00       	beq			
+     f6c:	d8 0d       	.word	0x0dd8;	????
+     f6e:	00 00       	beq			
+     f70:	20 00       	.word	0x0020;	????
+     f72:	17 00       	.word	0x0017;	????
+     f74:	00 00       	beq			
+     f76:	00 00       	beq			
+     f78:	e7 0d       	.word	0x0de7;	????
+     f7a:	00 00       	beq			
+     f7c:	20 00       	.word	0x0020;	????
+     f7e:	19 00       	.word	0x0019;	????
+     f80:	00 00       	beq			
+     f82:	00 00       	beq			
+     f84:	f5 0d       	.word	0x0df5;	????
+     f86:	00 00       	beq			
+     f88:	20 00       	.word	0x0020;	????
+     f8a:	1d 00       	.word	0x001d;	????
+     f8c:	00 00       	beq			
+     f8e:	00 00       	beq			
+     f90:	03 0e       	.word	0x0e03;	????
+     f92:	00 00       	beq			
+     f94:	20 00       	.word	0x0020;	????
+     f96:	27 00       	.word	0x0027;	????
+     f98:	00 00       	beq			
+     f9a:	00 00       	beq			
+     f9c:	15 0e       	.word	0x0e15;	????
+     f9e:	00 00       	beq			
+     fa0:	20 00       	.word	0x0020;	????
+     fa2:	29 00       	.word	0x0029;	????
+     fa4:	00 00       	beq			
+     fa6:	00 00       	beq			
+     fa8:	25 0e       	.word	0x0e25;	????
+     faa:	00 00       	beq			
+     fac:	20 00       	.word	0x0020;	????
+     fae:	2b 00       	.word	0x002b;	????
+     fb0:	00 00       	beq			
+     fb2:	00 00       	beq			
+     fb4:	36 0e       	.word	0x0e36;	????
+     fb6:	00 00       	beq			
+     fb8:	20 00       	.word	0x0020;	????
+     fba:	2d 00       	.word	0x002d;	????
+     fbc:	00 00       	beq			
+     fbe:	00 00       	beq			
+     fc0:	46 0e       	.word	0x0e46;	????
+     fc2:	00 00       	beq			
+     fc4:	20 00       	.word	0x0020;	????
+     fc6:	14 00       	.word	0x0014;	????
+     fc8:	00 00       	beq			
+     fca:	00 00       	beq			
+     fcc:	55 0e       	.word	0x0e55;	????
+     fce:	00 00       	beq			
+     fd0:	20 00       	.word	0x0020;	????
+     fd2:	16 00       	.word	0x0016;	????
+     fd4:	00 00       	beq			
+     fd6:	00 00       	beq			
+     fd8:	64 0e       	.word	0x0e64;	????
+     fda:	00 00       	beq			
+     fdc:	20 00       	.word	0x0020;	????
+     fde:	18 00       	.word	0x0018;	????
+     fe0:	00 00       	beq			
+     fe2:	00 00       	beq			
+     fe4:	74 0e       	.word	0x0e74;	????
+     fe6:	00 00       	beq			
+     fe8:	20 00       	.word	0x0020;	????
+     fea:	1a 00       	.word	0x001a;	????
+     fec:	00 00       	beq			
+     fee:	00 00       	beq			
+     ff0:	82 0e       	.word	0x0e82;	????
+     ff2:	00 00       	beq			
+     ff4:	20 00       	.word	0x0020;	????
+     ff6:	1c 00       	.word	0x001c;	????
+     ff8:	00 00       	beq			
+     ffa:	00 00       	beq			
+     ffc:	90 0e       	.word	0x0e90;	????
+     ffe:	00 00       	beq			
+    1000:	20 00       	.word	0x0020;	????
+    1002:	1e 00       	.word	0x001e;	????
+    1004:	00 00       	beq			
+    1006:	00 00       	beq			
+    1008:	9e 0e       	.word	0x0e9e;	????
+    100a:	00 00       	beq			
+    100c:	20 00       	.word	0x0020;	????
+    100e:	20 00       	.word	0x0020;	????
+    1010:	00 00       	beq			
+    1012:	00 00       	beq			
+    1014:	ac 0e       	.word	0x0eac;	????
+    1016:	00 00       	beq			
+    1018:	20 00       	.word	0x0020;	????
+    101a:	23 00       	.word	0x0023;	????
+    101c:	00 00       	beq			
+    101e:	00 00       	beq			
+    1020:	bb 0e       	.word	0x0ebb;	????
+    1022:	00 00       	beq			
+    1024:	20 00       	.word	0x0020;	????
+    1026:	26 00       	.word	0x0026;	????
+    1028:	00 00       	beq			
+    102a:	00 00       	beq			
+    102c:	c8 0e       	.word	0x0ec8;	????
+    102e:	00 00       	beq			
+    1030:	20 00       	.word	0x0020;	????
+    1032:	47 00       	.word	0x0047;	????
+    1034:	00 00       	beq			
+    1036:	00 00       	beq			
+    1038:	d6 0e       	.word	0x0ed6;	????
+    103a:	00 00       	beq			
+    103c:	20 00       	.word	0x0020;	????
+    103e:	27 00       	.word	0x0027;	????
+    1040:	00 00       	beq			
+    1042:	00 00       	beq			
+    1044:	e1 0e       	.word	0x0ee1;	????
+    1046:	00 00       	beq			
+    1048:	20 00       	.word	0x0020;	????
+    104a:	2e 00       	.word	0x002e;	????
+    104c:	00 00       	beq			
+    104e:	00 00       	beq			
+    1050:	ed 0e       	.word	0x0eed;	????
+    1052:	00 00       	beq			
+    1054:	20 00       	.word	0x0020;	????
+    1056:	3a 00       	.word	0x003a;	????
+    1058:	00 00       	beq			
+    105a:	00 00       	beq			
+    105c:	01 0f       	.word	0x0f01;	????
+    105e:	00 00       	beq			
+    1060:	20 00       	.word	0x0020;	????
+    1062:	3c 00       	.word	0x003c;	????
+    1064:	00 00       	beq			
+    1066:	00 00       	beq			
+    1068:	15 0f       	.word	0x0f15;	????
+    106a:	00 00       	beq			
+    106c:	20 00       	.word	0x0020;	????
+    106e:	3e 00       	.word	0x003e;	????
+    1070:	00 00       	beq			
+    1072:	00 00       	beq			
+    1074:	29 0f       	.word	0x0f29;	????
+    1076:	00 00       	beq			
+    1078:	20 00       	.word	0x0020;	????
+    107a:	40 00       	.word	0x0040;	????
+    107c:	00 00       	beq			
+    107e:	00 00       	beq			
+    1080:	3d 0f       	.word	0x0f3d;	????
+    1082:	00 00       	beq			
+    1084:	20 00       	.word	0x0020;	????
+    1086:	42 00       	.word	0x0042;	????
+    1088:	00 00       	beq			
+    108a:	00 00       	beq			
+    108c:	50 0f       	.word	0x0f50;	????
+    108e:	00 00       	beq			
+    1090:	20 00       	.word	0x0020;	????
+    1092:	44 00       	.word	0x0044;	????
+    1094:	00 00       	beq			
+    1096:	00 00       	beq			
+    1098:	63 0f       	.word	0x0f63;	????
+    109a:	00 00       	beq			
+    109c:	20 00       	.word	0x0020;	????
+    109e:	46 00       	.word	0x0046;	????
+    10a0:	00 00       	beq			
+    10a2:	00 00       	beq			
+    10a4:	76 0f       	.word	0x0f76;	????
+    10a6:	00 00       	beq			
+    10a8:	20 00       	.word	0x0020;	????
+    10aa:	48 00       	.word	0x0048;	????
+    10ac:	00 00       	beq			
+    10ae:	00 00       	beq			
+    10b0:	89 0f       	.word	0x0f89;	????
+    10b2:	00 00       	beq			
+    10b4:	20 00       	.word	0x0020;	????
+    10b6:	10 00       	.word	0x0010;	????
+	...
+    10c0:	64 00       	.word	0x0064;	????
+    10c2:	00 00       	beq			
+    10c4:	10 fc 00 00 	and	0(r12),	r0	;
+Disassembly of section .stabstr:
+
+00000000 <.stabstr>:
+   0:	00 43       	clr	r0		;
+   2:	3a 2f       	jc	$-394    	;abs 0xfe78
+   4:	44 4f       	mov.b	r15,	r4	;
+   6:	4b 55       	add.b	r5,	r11	;
+   8:	4d 45       	mov.b	r5,	r13	;
+   a:	7e 31       	jn	$+766    	;abs 0x308
+   c:	2f 77       	subc	@r7,	r15	;
+   e:	6f 72       	subc.b	#4,	r15	;r2 As==10
+  10:	6b 2f       	jc	$-296    	;abs 0xfee8
+  12:	4c 4f       	mov.b	r15,	r12	;
+  14:	4b 41       	mov.b	r1,	r11	;
+  16:	4c 45       	mov.b	r5,	r12	;
+  18:	7e 31       	jn	$+766    	;abs 0x316
+  1a:	2f 54       	add	@r4,	r15	;
+  1c:	65 6d       	addc.b	@r13,	r5	;
+  1e:	70 2f       	jc	$-286    	;abs 0xff00
+  20:	63 63       	.word	0x6363;	????
+  22:	32 6c       	addc	@r12+,	r2	;
+  24:	59 5a 6a 58 	add.b	22634(r10),r9	;
+  28:	2e 73       	subc	#2,	r14	;r3 As==10
+  2a:	00 67       	addc	r7,	r0	;
+  2c:	63 72       	.word	0x7263;	????
+  2e:	74 30       	jn	$+234    	;abs 0x118
+  30:	2e 53       	incd	r14		;
+  32:	00 43       	clr	r0		;
+  34:	3a 5c       	add	@r12+,	r10	;
+  36:	6d 73       	subc.b	#2,	r13	;r3 As==10
+  38:	70 67       	addc.b	@r7+,	r0	;
+  3a:	63 63       	.word	0x6363;	????
+  3c:	5c 50 72 6f 	add.b	0x6f72,	r12	;PC rel. 0x6fb0
+  40:	6a 65       	addc.b	@r5,	r10	;
+  42:	74 6f       	addc.b	@r15+,	r4	;
+  44:	73 5c       	.word	0x5c73;	????
+  46:	41 6e       	addc.b	r14,	r1	;
+  48:	64 65       	addc.b	@r5,	r4	;
+  4a:	72 73       	subc.b	#-1,	r2	;r3 As==11
+  4c:	6f 6e       	addc.b	@r14,	r15	;
+  4e:	2f 00       	.word	0x002f;	????
+  50:	69 32       	jn	$-812    	;abs 0xfd24
+  52:	63 5f       	.word	0x5f63;	????
+  54:	74 65       	addc.b	@r5+,	r4	;
+  56:	73 74       	.word	0x7473;	????
+  58:	2e 63       	addc	#2,	r14	;r3 As==10
+  5a:	00 67       	addc	r7,	r0	;
+  5c:	63 63       	.word	0x6363;	????
+  5e:	32 5f       	add	@r15+,	r2	;
+  60:	63 6f       	.word	0x6f63;	????
+  62:	6d 70       	subc.b	@r0,	r13	;
+  64:	69 6c       	addc.b	@r12,	r9	;
+  66:	65 64       	addc.b	@r4,	r5	;
+  68:	2e 00       	.word	0x002e;	????
+  6a:	69 6e       	addc.b	@r14,	r9	;
+  6c:	74 3a       	jl	$-790    	;abs 0xfd56
+  6e:	74 28       	jnc	$+234    	;abs 0x158
+  70:	30 2c       	jc	$+98     	;abs 0xd2
+  72:	31 29       	jnc	$+612    	;abs 0x2d6
+  74:	3d 72       	subc	#8,	r13	;r2 As==11
+  76:	28 30       	jn	$+82     	;abs 0xc8
+  78:	2c 31       	jn	$+602    	;abs 0x2d2
+  7a:	29 3b       	jl	$-428    	;abs 0xfece
+  7c:	2d 33       	jn	$-420    	;abs 0xfed8
+  7e:	32 37       	jge	$-410    	;abs 0xfee4
+  80:	36 38       	jl	$+110    	;abs 0xee
+  82:	3b 33       	jn	$-392    	;abs 0xfefa
+  84:	32 37       	jge	$-410    	;abs 0xfeea
+  86:	36 37       	jge	$-402    	;abs 0xfef4
+  88:	3b 00       	.word	0x003b;	????
+  8a:	63 68       	.word	0x6863;	????
+  8c:	61 72       	subc.b	#4,	r1	;r2 As==10
+  8e:	3a 74       	subc	@r4+,	r10	;
+  90:	28 30       	jn	$+82     	;abs 0xe2
+  92:	2c 32       	jn	$-934    	;abs 0xfcec
+  94:	29 3d       	jmp	$+596    	;abs 0x2e8
+  96:	72 28       	jnc	$+230    	;abs 0x17c
+  98:	30 2c       	jc	$+98     	;abs 0xfa
+  9a:	32 29       	jnc	$+614    	;abs 0x300
+  9c:	3b 30       	jn	$+120    	;abs 0x114
+  9e:	3b 31       	jn	$+632    	;abs 0x316
+  a0:	32 37       	jge	$-410    	;abs 0xff06
+  a2:	3b 00       	.word	0x003b;	????
+  a4:	6c 6f       	addc.b	@r15,	r12	;
+  a6:	6e 67       	addc.b	@r7,	r14	;
+  a8:	20 69       	addc	@r9,	r0	;
+  aa:	6e 74       	subc.b	@r4,	r14	;
+  ac:	3a 74       	subc	@r4+,	r10	;
+  ae:	28 30       	jn	$+82     	;abs 0x100
+  b0:	2c 33       	jn	$-422    	;abs 0xff0a
+  b2:	29 3d       	jmp	$+596    	;abs 0x306
+  b4:	40 73       	sbc.b	r0		;
+  b6:	33 32       	jn	$-920    	;abs 0xfd1e
+  b8:	3b 72       	subc	#8,	r11	;r2 As==11
+  ba:	28 30       	jn	$+82     	;abs 0x10c
+  bc:	2c 33       	jn	$-422    	;abs 0xff16
+  be:	29 3b       	jl	$-428    	;abs 0xff12
+  c0:	30 30       	jn	$+98     	;abs 0x122
+  c2:	32 30       	jn	$+102    	;abs 0x128
+  c4:	30 30       	jn	$+98     	;abs 0x126
+  c6:	30 30       	jn	$+98     	;abs 0x128
+  c8:	30 30       	jn	$+98     	;abs 0x12a
+  ca:	30 30       	jn	$+98     	;abs 0x12c
+  cc:	30 3b       	jl	$-414    	;abs 0xff2e
+  ce:	30 30       	jn	$+98     	;abs 0x130
+  d0:	31 37       	jge	$-412    	;abs 0xff34
+  d2:	37 37       	jge	$-400    	;abs 0xff42
+  d4:	37 37       	jge	$-400    	;abs 0xff44
+  d6:	37 37       	jge	$-400    	;abs 0xff46
+  d8:	37 37       	jge	$-400    	;abs 0xff48
+  da:	37 3b       	jl	$-400    	;abs 0xff4a
+  dc:	00 75       	subc	r5,	r0	;
+  de:	6e 73       	subc.b	#2,	r14	;r3 As==10
+  e0:	69 67       	addc.b	@r7,	r9	;
+  e2:	6e 65       	addc.b	@r5,	r14	;
+  e4:	64 20       	jnz	$+202    	;abs 0x1ae
+  e6:	69 6e       	addc.b	@r14,	r9	;
+  e8:	74 3a       	jl	$-790    	;abs 0xfdd2
+  ea:	74 28       	jnc	$+234    	;abs 0x1d4
+  ec:	30 2c       	jc	$+98     	;abs 0x14e
+  ee:	34 29       	jnc	$+618    	;abs 0x358
+  f0:	3d 72       	subc	#8,	r13	;r2 As==11
+  f2:	28 30       	jn	$+82     	;abs 0x144
+  f4:	2c 34       	jge	$+90     	;abs 0x14e
+  f6:	29 3b       	jl	$-428    	;abs 0xff4a
+  f8:	30 30       	jn	$+98     	;abs 0x15a
+  fa:	30 30       	jn	$+98     	;abs 0x15c
+  fc:	30 30       	jn	$+98     	;abs 0x15e
+  fe:	30 30       	jn	$+98     	;abs 0x160
+ 100:	30 30       	jn	$+98     	;abs 0x162
+ 102:	30 30       	jn	$+98     	;abs 0x164
+ 104:	30 3b       	jl	$-414    	;abs 0xff66
+ 106:	30 30       	jn	$+98     	;abs 0x168
+ 108:	30 30       	jn	$+98     	;abs 0x16a
+ 10a:	30 30       	jn	$+98     	;abs 0x16c
+ 10c:	30 31       	jn	$+610    	;abs 0x36e
+ 10e:	37 37       	jge	$-400    	;abs 0xff7e
+ 110:	37 37       	jge	$-400    	;abs 0xff80
+ 112:	37 3b       	jl	$-400    	;abs 0xff82
+ 114:	00 6c       	addc	r12,	r0	;
+ 116:	6f 6e       	addc.b	@r14,	r15	;
+ 118:	67 20       	jnz	$+208    	;abs 0x1e8
+ 11a:	75 6e       	addc.b	@r14+,	r5	;
+ 11c:	73 69       	.word	0x6973;	????
+ 11e:	67 6e       	addc.b	@r14,	r7	;
+ 120:	65 64       	addc.b	@r4,	r5	;
+ 122:	20 69       	addc	@r9,	r0	;
+ 124:	6e 74       	subc.b	@r4,	r14	;
+ 126:	3a 74       	subc	@r4+,	r10	;
+ 128:	28 30       	jn	$+82     	;abs 0x17a
+ 12a:	2c 35       	jge	$+602    	;abs 0x384
+ 12c:	29 3d       	jmp	$+596    	;abs 0x380
+ 12e:	40 73       	sbc.b	r0		;
+ 130:	33 32       	jn	$-920    	;abs 0xfd98
+ 132:	3b 72       	subc	#8,	r11	;r2 As==11
+ 134:	28 30       	jn	$+82     	;abs 0x186
+ 136:	2c 35       	jge	$+602    	;abs 0x390
+ 138:	29 3b       	jl	$-428    	;abs 0xff8c
+ 13a:	30 30       	jn	$+98     	;abs 0x19c
+ 13c:	30 30       	jn	$+98     	;abs 0x19e
+ 13e:	30 30       	jn	$+98     	;abs 0x1a0
+ 140:	30 30       	jn	$+98     	;abs 0x1a2
+ 142:	30 30       	jn	$+98     	;abs 0x1a4
+ 144:	30 30       	jn	$+98     	;abs 0x1a6
+ 146:	30 3b       	jl	$-414    	;abs 0xffa8
+ 148:	30 30       	jn	$+98     	;abs 0x1aa
+ 14a:	33 37       	jge	$-408    	;abs 0xffb2
+ 14c:	37 37       	jge	$-400    	;abs 0xffbc
+ 14e:	37 37       	jge	$-400    	;abs 0xffbe
+ 150:	37 37       	jge	$-400    	;abs 0xffc0
+ 152:	37 37       	jge	$-400    	;abs 0xffc2
+ 154:	37 3b       	jl	$-400    	;abs 0xffc4
+ 156:	00 6c       	addc	r12,	r0	;
+ 158:	6f 6e       	addc.b	@r14,	r15	;
+ 15a:	67 20       	jnz	$+208    	;abs 0x22a
+ 15c:	6c 6f       	addc.b	@r15,	r12	;
+ 15e:	6e 67       	addc.b	@r7,	r14	;
+ 160:	20 69       	addc	@r9,	r0	;
+ 162:	6e 74       	subc.b	@r4,	r14	;
+ 164:	3a 74       	subc	@r4+,	r10	;
+ 166:	28 30       	jn	$+82     	;abs 0x1b8
+ 168:	2c 36       	jge	$-934    	;abs 0xfdc2
+ 16a:	29 3d       	jmp	$+596    	;abs 0x3be
+ 16c:	40 73       	sbc.b	r0		;
+ 16e:	36 34       	jge	$+110    	;abs 0x1dc
+ 170:	3b 72       	subc	#8,	r11	;r2 As==11
+ 172:	28 30       	jn	$+82     	;abs 0x1c4
+ 174:	2c 36       	jge	$-934    	;abs 0xfdce
+ 176:	29 3b       	jl	$-428    	;abs 0xffca
+ 178:	30 31       	jn	$+610    	;abs 0x3da
+ 17a:	30 30       	jn	$+98     	;abs 0x1dc
+ 17c:	30 30       	jn	$+98     	;abs 0x1de
+ 17e:	30 30       	jn	$+98     	;abs 0x1e0
+ 180:	30 30       	jn	$+98     	;abs 0x1e2
+ 182:	30 30       	jn	$+98     	;abs 0x1e4
+ 184:	30 30       	jn	$+98     	;abs 0x1e6
+ 186:	30 30       	jn	$+98     	;abs 0x1e8
+ 188:	30 30       	jn	$+98     	;abs 0x1ea
+ 18a:	30 30       	jn	$+98     	;abs 0x1ec
+ 18c:	30 30       	jn	$+98     	;abs 0x1ee
+ 18e:	30 3b       	jl	$-414    	;abs 0xfff0
+ 190:	30 37       	jge	$-414    	;abs 0xfff2
+ 192:	37 37       	jge	$-400    	;abs 0x2
+ 194:	37 37       	jge	$-400    	;abs 0x4
+ 196:	37 37       	jge	$-400    	;abs 0x6
+ 198:	37 37       	jge	$-400    	;abs 0x8
+ 19a:	37 37       	jge	$-400    	;abs 0xa
+ 19c:	37 37       	jge	$-400    	;abs 0xc
+ 19e:	37 37       	jge	$-400    	;abs 0xe
+ 1a0:	37 37       	jge	$-400    	;abs 0x10
+ 1a2:	37 37       	jge	$-400    	;abs 0x12
+ 1a4:	37 37       	jge	$-400    	;abs 0x14
+ 1a6:	3b 00       	.word	0x003b;	????
+ 1a8:	6c 6f       	addc.b	@r15,	r12	;
+ 1aa:	6e 67       	addc.b	@r7,	r14	;
+ 1ac:	20 6c       	addc	@r12,	r0	;
+ 1ae:	6f 6e       	addc.b	@r14,	r15	;
+ 1b0:	67 20       	jnz	$+208    	;abs 0x280
+ 1b2:	75 6e       	addc.b	@r14+,	r5	;
+ 1b4:	73 69       	.word	0x6973;	????
+ 1b6:	67 6e       	addc.b	@r14,	r7	;
+ 1b8:	65 64       	addc.b	@r4,	r5	;
+ 1ba:	20 69       	addc	@r9,	r0	;
+ 1bc:	6e 74       	subc.b	@r4,	r14	;
+ 1be:	3a 74       	subc	@r4+,	r10	;
+ 1c0:	28 30       	jn	$+82     	;abs 0x212
+ 1c2:	2c 37       	jge	$-422    	;abs 0x1c
+ 1c4:	29 3d       	jmp	$+596    	;abs 0x418
+ 1c6:	40 73       	sbc.b	r0		;
+ 1c8:	36 34       	jge	$+110    	;abs 0x236
+ 1ca:	3b 72       	subc	#8,	r11	;r2 As==11
+ 1cc:	28 30       	jn	$+82     	;abs 0x21e
+ 1ce:	2c 37       	jge	$-422    	;abs 0x28
+ 1d0:	29 3b       	jl	$-428    	;abs 0x24
+ 1d2:	30 30       	jn	$+98     	;abs 0x234
+ 1d4:	30 30       	jn	$+98     	;abs 0x236
+ 1d6:	30 30       	jn	$+98     	;abs 0x238
+ 1d8:	30 30       	jn	$+98     	;abs 0x23a
+ 1da:	30 30       	jn	$+98     	;abs 0x23c
+ 1dc:	30 30       	jn	$+98     	;abs 0x23e
+ 1de:	30 3b       	jl	$-414    	;abs 0x40
+ 1e0:	30 31       	jn	$+610    	;abs 0x442
+ 1e2:	37 37       	jge	$-400    	;abs 0x52
+ 1e4:	37 37       	jge	$-400    	;abs 0x54
+ 1e6:	37 37       	jge	$-400    	;abs 0x56
+ 1e8:	37 37       	jge	$-400    	;abs 0x58
+ 1ea:	37 37       	jge	$-400    	;abs 0x5a
+ 1ec:	37 37       	jge	$-400    	;abs 0x5c
+ 1ee:	37 37       	jge	$-400    	;abs 0x5e
+ 1f0:	37 37       	jge	$-400    	;abs 0x60
+ 1f2:	37 37       	jge	$-400    	;abs 0x62
+ 1f4:	37 37       	jge	$-400    	;abs 0x64
+ 1f6:	37 3b       	jl	$-400    	;abs 0x66
+ 1f8:	00 73       	sbc	r0		;
+ 1fa:	68 6f       	addc.b	@r15,	r8	;
+ 1fc:	72 74       	subc.b	@r4+,	r2	;
+ 1fe:	20 69       	addc	@r9,	r0	;
+ 200:	6e 74       	subc.b	@r4,	r14	;
+ 202:	3a 74       	subc	@r4+,	r10	;
+ 204:	28 30       	jn	$+82     	;abs 0x256
+ 206:	2c 38       	jl	$+90     	;abs 0x260
+ 208:	29 3d       	jmp	$+596    	;abs 0x45c
+ 20a:	72 28       	jnc	$+230    	;abs 0x2f0
+ 20c:	30 2c       	jc	$+98     	;abs 0x26e
+ 20e:	38 29       	jnc	$+626    	;abs 0x480
+ 210:	3b 2d       	jc	$+632    	;abs 0x488
+ 212:	33 32       	jn	$-920    	;abs 0xfe7a
+ 214:	37 36       	jge	$-912    	;abs 0xfe84
+ 216:	38 3b       	jl	$-398    	;abs 0x88
+ 218:	33 32       	jn	$-920    	;abs 0xfe80
+ 21a:	37 36       	jge	$-912    	;abs 0xfe8a
+ 21c:	37 3b       	jl	$-400    	;abs 0x8c
+ 21e:	00 73       	sbc	r0		;
+ 220:	68 6f       	addc.b	@r15,	r8	;
+ 222:	72 74       	subc.b	@r4+,	r2	;
+ 224:	20 75       	subc	@r5,	r0	;
+ 226:	6e 73       	subc.b	#2,	r14	;r3 As==10
+ 228:	69 67       	addc.b	@r7,	r9	;
+ 22a:	6e 65       	addc.b	@r5,	r14	;
+ 22c:	64 20       	jnz	$+202    	;abs 0x2f6
+ 22e:	69 6e       	addc.b	@r14,	r9	;
+ 230:	74 3a       	jl	$-790    	;abs 0xff1a
+ 232:	74 28       	jnc	$+234    	;abs 0x31c
+ 234:	30 2c       	jc	$+98     	;abs 0x296
+ 236:	39 29       	jnc	$+628    	;abs 0x4aa
+ 238:	3d 72       	subc	#8,	r13	;r2 As==11
+ 23a:	28 30       	jn	$+82     	;abs 0x28c
+ 23c:	2c 39       	jl	$+602    	;abs 0x496
+ 23e:	29 3b       	jl	$-428    	;abs 0x92
+ 240:	30 30       	jn	$+98     	;abs 0x2a2
+ 242:	30 30       	jn	$+98     	;abs 0x2a4
+ 244:	30 30       	jn	$+98     	;abs 0x2a6
+ 246:	30 30       	jn	$+98     	;abs 0x2a8
+ 248:	30 30       	jn	$+98     	;abs 0x2aa
+ 24a:	30 30       	jn	$+98     	;abs 0x2ac
+ 24c:	30 3b       	jl	$-414    	;abs 0xae
+ 24e:	30 30       	jn	$+98     	;abs 0x2b0
+ 250:	30 30       	jn	$+98     	;abs 0x2b2
+ 252:	30 30       	jn	$+98     	;abs 0x2b4
+ 254:	30 31       	jn	$+610    	;abs 0x4b6
+ 256:	37 37       	jge	$-400    	;abs 0xc6
+ 258:	37 37       	jge	$-400    	;abs 0xc8
+ 25a:	37 3b       	jl	$-400    	;abs 0xca
+ 25c:	00 73       	sbc	r0		;
+ 25e:	69 67       	addc.b	@r7,	r9	;
+ 260:	6e 65       	addc.b	@r5,	r14	;
+ 262:	64 20       	jnz	$+202    	;abs 0x32c
+ 264:	63 68       	.word	0x6863;	????
+ 266:	61 72       	subc.b	#4,	r1	;r2 As==10
+ 268:	3a 74       	subc	@r4+,	r10	;
+ 26a:	28 30       	jn	$+82     	;abs 0x2bc
+ 26c:	2c 31       	jn	$+602    	;abs 0x4c6
+ 26e:	30 29       	jnc	$+610    	;abs 0x4d0
+ 270:	3d 40 73 38 	mov	#14451,	r13	;#0x3873
+ 274:	3b 72       	subc	#8,	r11	;r2 As==11
+ 276:	28 30       	jn	$+82     	;abs 0x2c8
+ 278:	2c 31       	jn	$+602    	;abs 0x4d2
+ 27a:	30 29       	jnc	$+610    	;abs 0x4dc
+ 27c:	3b 2d       	jc	$+632    	;abs 0x4f4
+ 27e:	31 32       	jn	$-924    	;abs 0xfee2
+ 280:	38 3b       	jl	$-398    	;abs 0xf2
+ 282:	31 32       	jn	$-924    	;abs 0xfee6
+ 284:	37 3b       	jl	$-400    	;abs 0xf4
+ 286:	00 75       	subc	r5,	r0	;
+ 288:	6e 73       	subc.b	#2,	r14	;r3 As==10
+ 28a:	69 67       	addc.b	@r7,	r9	;
+ 28c:	6e 65       	addc.b	@r5,	r14	;
+ 28e:	64 20       	jnz	$+202    	;abs 0x358
+ 290:	63 68       	.word	0x6863;	????
+ 292:	61 72       	subc.b	#4,	r1	;r2 As==10
+ 294:	3a 74       	subc	@r4+,	r10	;
+ 296:	28 30       	jn	$+82     	;abs 0x2e8
+ 298:	2c 31       	jn	$+602    	;abs 0x4f2
+ 29a:	31 29       	jnc	$+612    	;abs 0x4fe
+ 29c:	3d 40 73 38 	mov	#14451,	r13	;#0x3873
+ 2a0:	3b 72       	subc	#8,	r11	;r2 As==11
+ 2a2:	28 30       	jn	$+82     	;abs 0x2f4
+ 2a4:	2c 31       	jn	$+602    	;abs 0x4fe
+ 2a6:	31 29       	jnc	$+612    	;abs 0x50a
+ 2a8:	3b 30       	jn	$+120    	;abs 0x320
+ 2aa:	3b 32       	jn	$-904    	;abs 0xff22
+ 2ac:	35 35       	jge	$+620    	;abs 0x518
+ 2ae:	3b 00       	.word	0x003b;	????
+ 2b0:	66 6c       	addc.b	@r12,	r6	;
+ 2b2:	6f 61       	addc.b	@r1,	r15	;
+ 2b4:	74 3a       	jl	$-790    	;abs 0xff9e
+ 2b6:	74 28       	jnc	$+234    	;abs 0x3a0
+ 2b8:	30 2c       	jc	$+98     	;abs 0x31a
+ 2ba:	31 32       	jn	$-924    	;abs 0xff1e
+ 2bc:	29 3d       	jmp	$+596    	;abs 0x510
+ 2be:	72 28       	jnc	$+230    	;abs 0x3a4
+ 2c0:	30 2c       	jc	$+98     	;abs 0x322
+ 2c2:	31 29       	jnc	$+612    	;abs 0x526
+ 2c4:	3b 34       	jge	$+120    	;abs 0x33c
+ 2c6:	3b 30       	jn	$+120    	;abs 0x33e
+ 2c8:	3b 00       	.word	0x003b;	????
+ 2ca:	64 6f       	addc.b	@r15,	r4	;
+ 2cc:	75 62       	addc.b	#8,	r5	;r2 As==11
+ 2ce:	6c 65       	addc.b	@r5,	r12	;
+ 2d0:	3a 74       	subc	@r4+,	r10	;
+ 2d2:	28 30       	jn	$+82     	;abs 0x324
+ 2d4:	2c 31       	jn	$+602    	;abs 0x52e
+ 2d6:	33 29       	jnc	$+616    	;abs 0x53e
+ 2d8:	3d 72       	subc	#8,	r13	;r2 As==11
+ 2da:	28 30       	jn	$+82     	;abs 0x32c
+ 2dc:	2c 31       	jn	$+602    	;abs 0x536
+ 2de:	29 3b       	jl	$-428    	;abs 0x132
+ 2e0:	34 3b       	jl	$-406    	;abs 0x14a
+ 2e2:	30 3b       	jl	$-414    	;abs 0x144
+ 2e4:	00 6c       	addc	r12,	r0	;
+ 2e6:	6f 6e       	addc.b	@r14,	r15	;
+ 2e8:	67 20       	jnz	$+208    	;abs 0x3b8
+ 2ea:	64 6f       	addc.b	@r15,	r4	;
+ 2ec:	75 62       	addc.b	#8,	r5	;r2 As==11
+ 2ee:	6c 65       	addc.b	@r5,	r12	;
+ 2f0:	3a 74       	subc	@r4+,	r10	;
+ 2f2:	28 30       	jn	$+82     	;abs 0x344
+ 2f4:	2c 31       	jn	$+602    	;abs 0x54e
+ 2f6:	34 29       	jnc	$+618    	;abs 0x560
+ 2f8:	3d 72       	subc	#8,	r13	;r2 As==11
+ 2fa:	28 30       	jn	$+82     	;abs 0x34c
+ 2fc:	2c 31       	jn	$+602    	;abs 0x556
+ 2fe:	29 3b       	jl	$-428    	;abs 0x152
+ 300:	34 3b       	jl	$-406    	;abs 0x16a
+ 302:	30 3b       	jl	$-414    	;abs 0x164
+ 304:	00 63       	adc	r0		;
+ 306:	6f 6d       	addc.b	@r13,	r15	;
+ 308:	70 6c       	addc.b	@r12+,	r0	;
+ 30a:	65 78       	subc.b	@r8,	r5	;
+ 30c:	20 69       	addc	@r9,	r0	;
+ 30e:	6e 74       	subc.b	@r4,	r14	;
+ 310:	3a 74       	subc	@r4+,	r10	;
+ 312:	28 30       	jn	$+82     	;abs 0x364
+ 314:	2c 31       	jn	$+602    	;abs 0x56e
+ 316:	35 29       	jnc	$+620    	;abs 0x582
+ 318:	3d 73       	subc	#-1,	r13	;r3 As==11
+ 31a:	34 72       	subc	#8,	r4	;r2 As==11
+ 31c:	65 61       	addc.b	@r1,	r5	;
+ 31e:	6c 3a       	jl	$-806    	;abs 0xfff8
+ 320:	28 30       	jn	$+82     	;abs 0x372
+ 322:	2c 31       	jn	$+602    	;abs 0x57c
+ 324:	29 2c       	jc	$+84     	;abs 0x378
+ 326:	30 2c       	jc	$+98     	;abs 0x388
+ 328:	31 36       	jge	$-924    	;abs 0xff8c
+ 32a:	3b 69       	addc	@r9+,	r11	;
+ 32c:	6d 61       	addc.b	@r1,	r13	;
+ 32e:	67 3a       	jl	$-816    	;abs 0xfffe
+ 330:	28 30       	jn	$+82     	;abs 0x382
+ 332:	2c 31       	jn	$+602    	;abs 0x58c
+ 334:	29 2c       	jc	$+84     	;abs 0x388
+ 336:	31 36       	jge	$-924    	;abs 0xff9a
+ 338:	2c 31       	jn	$+602    	;abs 0x592
+ 33a:	36 3b       	jl	$-402    	;abs 0x1a8
+ 33c:	3b 00       	.word	0x003b;	????
+ 33e:	63 6f       	.word	0x6f63;	????
+ 340:	6d 70       	subc.b	@r0,	r13	;
+ 342:	6c 65       	addc.b	@r5,	r12	;
+ 344:	78 20       	jnz	$+242    	;abs 0x436
+ 346:	66 6c       	addc.b	@r12,	r6	;
+ 348:	6f 61       	addc.b	@r1,	r15	;
+ 34a:	74 3a       	jl	$-790    	;abs 0x34
+ 34c:	74 28       	jnc	$+234    	;abs 0x436
+ 34e:	30 2c       	jc	$+98     	;abs 0x3b0
+ 350:	31 36       	jge	$-924    	;abs 0xffb4
+ 352:	29 3d       	jmp	$+596    	;abs 0x5a6
+ 354:	52 33       	jn	$-346    	;abs 0x1fa
+ 356:	3b 38       	jl	$+120    	;abs 0x3ce
+ 358:	3b 30       	jn	$+120    	;abs 0x3d0
+ 35a:	3b 00       	.word	0x003b;	????
+ 35c:	63 6f       	.word	0x6f63;	????
+ 35e:	6d 70       	subc.b	@r0,	r13	;
+ 360:	6c 65       	addc.b	@r5,	r12	;
+ 362:	78 20       	jnz	$+242    	;abs 0x454
+ 364:	64 6f       	addc.b	@r15,	r4	;
+ 366:	75 62       	addc.b	#8,	r5	;r2 As==11
+ 368:	6c 65       	addc.b	@r5,	r12	;
+ 36a:	3a 74       	subc	@r4+,	r10	;
+ 36c:	28 30       	jn	$+82     	;abs 0x3be
+ 36e:	2c 31       	jn	$+602    	;abs 0x5c8
+ 370:	37 29       	jnc	$+624    	;abs 0x5e0
+ 372:	3d 52       	add	#8,	r13	;r2 As==11
+ 374:	33 3b       	jl	$-408    	;abs 0x1dc
+ 376:	38 3b       	jl	$-398    	;abs 0x1e8
+ 378:	30 3b       	jl	$-414    	;abs 0x1da
+ 37a:	00 63       	adc	r0		;
+ 37c:	6f 6d       	addc.b	@r13,	r15	;
+ 37e:	70 6c       	addc.b	@r12+,	r0	;
+ 380:	65 78       	subc.b	@r8,	r5	;
+ 382:	20 6c       	addc	@r12,	r0	;
+ 384:	6f 6e       	addc.b	@r14,	r15	;
+ 386:	67 20       	jnz	$+208    	;abs 0x456
+ 388:	64 6f       	addc.b	@r15,	r4	;
+ 38a:	75 62       	addc.b	#8,	r5	;r2 As==11
+ 38c:	6c 65       	addc.b	@r5,	r12	;
+ 38e:	3a 74       	subc	@r4+,	r10	;
+ 390:	28 30       	jn	$+82     	;abs 0x3e2
+ 392:	2c 31       	jn	$+602    	;abs 0x5ec
+ 394:	38 29       	jnc	$+626    	;abs 0x606
+ 396:	3d 52       	add	#8,	r13	;r2 As==11
+ 398:	33 3b       	jl	$-408    	;abs 0x200
+ 39a:	38 3b       	jl	$-398    	;abs 0x20c
+ 39c:	30 3b       	jl	$-414    	;abs 0x1fe
+ 39e:	00 5f       	add	r15,	r0	;
+ 3a0:	5f 62 75 69 	addc.b	&0x6975,r15	;0x6975
+ 3a4:	6c 74       	subc.b	@r4,	r12	;
+ 3a6:	69 6e       	addc.b	@r14,	r9	;
+ 3a8:	5f 76 61 5f 	subc.b	24417(r6),r15	;
+ 3ac:	6c 69       	addc.b	@r9,	r12	;
+ 3ae:	73 74       	.word	0x7473;	????
+ 3b0:	3a 74       	subc	@r4+,	r10	;
+ 3b2:	28 30       	jn	$+82     	;abs 0x404
+ 3b4:	2c 31       	jn	$+602    	;abs 0x60e
+ 3b6:	39 29       	jnc	$+628    	;abs 0x62a
+ 3b8:	3d 2a       	jnc	$-900    	;abs 0x34
+ 3ba:	28 30       	jn	$+82     	;abs 0x40c
+ 3bc:	2c 32       	jn	$-934    	;abs 0x16
+ 3be:	30 29       	jnc	$+610    	;abs 0x620
+ 3c0:	3d 28       	jnc	$+124    	;abs 0x43c
+ 3c2:	30 2c       	jc	$+98     	;abs 0x424
+ 3c4:	32 30       	jn	$+102    	;abs 0x42a
+ 3c6:	29 00       	.word	0x0029;	????
+ 3c8:	5f 42 6f 6f 	mov.b	&0x6f6f,r15	;0x6f6f
+ 3cc:	6c 3a       	jl	$-806    	;abs 0xa6
+ 3ce:	74 28       	jnc	$+234    	;abs 0x4b8
+ 3d0:	30 2c       	jc	$+98     	;abs 0x432
+ 3d2:	32 31       	jn	$+614    	;abs 0x638
+ 3d4:	29 3d       	jmp	$+596    	;abs 0x628
+ 3d6:	40 73       	sbc.b	r0		;
+ 3d8:	38 3b       	jl	$-398    	;abs 0x24a
+ 3da:	2d 31       	jn	$+604    	;abs 0x636
+ 3dc:	36 3b       	jl	$-402    	;abs 0x24a
+ 3de:	00 63       	adc	r0		;
+ 3e0:	3a 2f       	jc	$-394    	;abs 0x256
+ 3e2:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 3e4:	70 67       	addc.b	@r7+,	r0	;
+ 3e6:	63 63       	.word	0x6363;	????
+ 3e8:	2f 6d       	addc	@r13,	r15	;
+ 3ea:	73 70       	.word	0x7073;	????
+ 3ec:	34 33       	jn	$-406    	;abs 0x256
+ 3ee:	30 2f       	jc	$-414    	;abs 0x250
+ 3f0:	69 6e       	addc.b	@r14,	r9	;
+ 3f2:	63 6c       	.word	0x6c63;	????
+ 3f4:	75 64       	addc.b	@r4+,	r5	;
+ 3f6:	65 2f       	jc	$-308    	;abs 0x2c2
+ 3f8:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 3fa:	70 34       	jge	$+226    	;abs 0x4dc
+ 3fc:	33 30       	jn	$+104    	;abs 0x464
+ 3fe:	78 32       	jn	$-782    	;abs 0xf0
+ 400:	30 78       	subc	@r8+,	r0	;
+ 402:	33 2e       	jc	$-920    	;abs 0x6a
+ 404:	68 00       	.word	0x0068;	????
+ 406:	63 3a       	jl	$-824    	;abs 0xce
+ 408:	2f 6d       	addc	@r13,	r15	;
+ 40a:	73 70       	.word	0x7073;	????
+ 40c:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 40e:	63 2f       	jc	$-312    	;abs 0x2d6
+ 410:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 412:	70 34       	jge	$+226    	;abs 0x4f4
+ 414:	33 30       	jn	$+104    	;abs 0x47c
+ 416:	2f 69       	addc	@r9,	r15	;
+ 418:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 41a:	6c 75       	subc.b	@r5,	r12	;
+ 41c:	64 65       	addc.b	@r5,	r4	;
+ 41e:	2f 69       	addc	@r9,	r15	;
+ 420:	6f 6d       	addc.b	@r13,	r15	;
+ 422:	61 63       	addc.b	#2,	r1	;r3 As==10
+ 424:	72 6f       	addc.b	@r15+,	r2	;
+ 426:	73 2e       	jc	$-792    	;abs 0x10e
+ 428:	68 00       	.word	0x0068;	????
+ 42a:	63 3a       	jl	$-824    	;abs 0xf2
+ 42c:	2f 6d       	addc	@r13,	r15	;
+ 42e:	73 70       	.word	0x7073;	????
+ 430:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 432:	63 2f       	jc	$-312    	;abs 0x2fa
+ 434:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 436:	70 34       	jge	$+226    	;abs 0x518
+ 438:	33 30       	jn	$+104    	;abs 0x4a0
+ 43a:	2f 69       	addc	@r9,	r15	;
+ 43c:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 43e:	6c 75       	subc.b	@r5,	r12	;
+ 440:	64 65       	addc.b	@r5,	r4	;
+ 442:	2f 73       	subc	#2,	r15	;r3 As==10
+ 444:	79 73       	subc.b	#-1,	r9	;r3 As==11
+ 446:	2f 69       	addc	@r9,	r15	;
+ 448:	6e 74       	subc.b	@r4,	r14	;
+ 44a:	74 79       	subc.b	@r9+,	r4	;
+ 44c:	70 65       	addc.b	@r5+,	r0	;
+ 44e:	73 2e       	jc	$-792    	;abs 0x136
+ 450:	68 00       	.word	0x0068;	????
+ 452:	69 6e       	addc.b	@r14,	r9	;
+ 454:	74 38       	jl	$+234    	;abs 0x53e
+ 456:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 45a:	28 34       	jge	$+82     	;abs 0x4ac
+ 45c:	2c 31       	jn	$+602    	;abs 0x6b6
+ 45e:	29 3d       	jmp	$+596    	;abs 0x6b2
+ 460:	28 30       	jn	$+82     	;abs 0x4b2
+ 462:	2c 31       	jn	$+602    	;abs 0x6bc
+ 464:	30 29       	jnc	$+610    	;abs 0x6c6
+ 466:	00 75       	subc	r5,	r0	;
+ 468:	69 6e       	addc.b	@r14,	r9	;
+ 46a:	74 38       	jl	$+234    	;abs 0x554
+ 46c:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 470:	28 34       	jge	$+82     	;abs 0x4c2
+ 472:	2c 32       	jn	$-934    	;abs 0xcc
+ 474:	29 3d       	jmp	$+596    	;abs 0x6c8
+ 476:	28 30       	jn	$+82     	;abs 0x4c8
+ 478:	2c 31       	jn	$+602    	;abs 0x6d2
+ 47a:	31 29       	jnc	$+612    	;abs 0x6de
+ 47c:	00 69       	addc	r9,	r0	;
+ 47e:	6e 74       	subc.b	@r4,	r14	;
+ 480:	31 36       	jge	$-924    	;abs 0xe4
+ 482:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 486:	28 34       	jge	$+82     	;abs 0x4d8
+ 488:	2c 33       	jn	$-422    	;abs 0x2e2
+ 48a:	29 3d       	jmp	$+596    	;abs 0x6de
+ 48c:	28 30       	jn	$+82     	;abs 0x4de
+ 48e:	2c 31       	jn	$+602    	;abs 0x6e8
+ 490:	29 00       	.word	0x0029;	????
+ 492:	75 69       	addc.b	@r9+,	r5	;
+ 494:	6e 74       	subc.b	@r4,	r14	;
+ 496:	31 36       	jge	$-924    	;abs 0xfa
+ 498:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 49c:	28 34       	jge	$+82     	;abs 0x4ee
+ 49e:	2c 34       	jge	$+90     	;abs 0x4f8
+ 4a0:	29 3d       	jmp	$+596    	;abs 0x6f4
+ 4a2:	28 30       	jn	$+82     	;abs 0x4f4
+ 4a4:	2c 34       	jge	$+90     	;abs 0x4fe
+ 4a6:	29 00       	.word	0x0029;	????
+ 4a8:	69 6e       	addc.b	@r14,	r9	;
+ 4aa:	74 33       	jn	$-278    	;abs 0x394
+ 4ac:	32 5f       	add	@r15+,	r2	;
+ 4ae:	74 3a       	jl	$-790    	;abs 0x198
+ 4b0:	74 28       	jnc	$+234    	;abs 0x59a
+ 4b2:	34 2c       	jc	$+106    	;abs 0x51c
+ 4b4:	35 29       	jnc	$+620    	;abs 0x720
+ 4b6:	3d 28       	jnc	$+124    	;abs 0x532
+ 4b8:	30 2c       	jc	$+98     	;abs 0x51a
+ 4ba:	33 29       	jnc	$+616    	;abs 0x722
+ 4bc:	00 75       	subc	r5,	r0	;
+ 4be:	69 6e       	addc.b	@r14,	r9	;
+ 4c0:	74 33       	jn	$-278    	;abs 0x3aa
+ 4c2:	32 5f       	add	@r15+,	r2	;
+ 4c4:	74 3a       	jl	$-790    	;abs 0x1ae
+ 4c6:	74 28       	jnc	$+234    	;abs 0x5b0
+ 4c8:	34 2c       	jc	$+106    	;abs 0x532
+ 4ca:	36 29       	jnc	$+622    	;abs 0x738
+ 4cc:	3d 28       	jnc	$+124    	;abs 0x548
+ 4ce:	30 2c       	jc	$+98     	;abs 0x530
+ 4d0:	35 29       	jnc	$+620    	;abs 0x73c
+ 4d2:	00 69       	addc	r9,	r0	;
+ 4d4:	6e 74       	subc.b	@r4,	r14	;
+ 4d6:	36 34       	jge	$+110    	;abs 0x544
+ 4d8:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 4dc:	28 34       	jge	$+82     	;abs 0x52e
+ 4de:	2c 37       	jge	$-422    	;abs 0x338
+ 4e0:	29 3d       	jmp	$+596    	;abs 0x734
+ 4e2:	28 30       	jn	$+82     	;abs 0x534
+ 4e4:	2c 36       	jge	$-934    	;abs 0x13e
+ 4e6:	29 00       	.word	0x0029;	????
+ 4e8:	75 69       	addc.b	@r9+,	r5	;
+ 4ea:	6e 74       	subc.b	@r4,	r14	;
+ 4ec:	36 34       	jge	$+110    	;abs 0x55a
+ 4ee:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 4f2:	28 34       	jge	$+82     	;abs 0x544
+ 4f4:	2c 38       	jl	$+90     	;abs 0x54e
+ 4f6:	29 3d       	jmp	$+596    	;abs 0x74a
+ 4f8:	28 30       	jn	$+82     	;abs 0x54a
+ 4fa:	2c 37       	jge	$-422    	;abs 0x354
+ 4fc:	29 00       	.word	0x0029;	????
+ 4fe:	69 6e       	addc.b	@r14,	r9	;
+ 500:	74 70 74 72 	subc.b	#29300,	r4	;#0x7274
+ 504:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 508:	28 34       	jge	$+82     	;abs 0x55a
+ 50a:	2c 39       	jl	$+602    	;abs 0x764
+ 50c:	29 3d       	jmp	$+596    	;abs 0x760
+ 50e:	28 34       	jge	$+82     	;abs 0x560
+ 510:	2c 33       	jn	$-422    	;abs 0x36a
+ 512:	29 00       	.word	0x0029;	????
+ 514:	75 69       	addc.b	@r9+,	r5	;
+ 516:	6e 74       	subc.b	@r4,	r14	;
+ 518:	70 74       	subc.b	@r4+,	r0	;
+ 51a:	72 5f       	add.b	@r15+,	r2	;
+ 51c:	74 3a       	jl	$-790    	;abs 0x206
+ 51e:	74 28       	jnc	$+234    	;abs 0x608
+ 520:	34 2c       	jc	$+106    	;abs 0x58a
+ 522:	31 30       	jn	$+100    	;abs 0x586
+ 524:	29 3d       	jmp	$+596    	;abs 0x778
+ 526:	28 34       	jge	$+82     	;abs 0x578
+ 528:	2c 34       	jge	$+90     	;abs 0x582
+ 52a:	29 00       	.word	0x0029;	????
+ 52c:	63 3a       	jl	$-824    	;abs 0x1f4
+ 52e:	2f 6d       	addc	@r13,	r15	;
+ 530:	73 70       	.word	0x7073;	????
+ 532:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 534:	63 2f       	jc	$-312    	;abs 0x3fc
+ 536:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 538:	70 34       	jge	$+226    	;abs 0x61a
+ 53a:	33 30       	jn	$+104    	;abs 0x5a2
+ 53c:	2f 69       	addc	@r9,	r15	;
+ 53e:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 540:	6c 75       	subc.b	@r5,	r12	;
+ 542:	64 65       	addc.b	@r5,	r4	;
+ 544:	2f 6d       	addc	@r13,	r15	;
+ 546:	73 70       	.word	0x7073;	????
+ 548:	34 33       	jn	$-406    	;abs 0x3b2
+ 54a:	30 2f       	jc	$-414    	;abs 0x3ac
+ 54c:	62 61       	addc.b	@r1,	r2	;
+ 54e:	73 69       	.word	0x6973;	????
+ 550:	63 5f       	.word	0x5f63;	????
+ 552:	63 6c       	.word	0x6c63;	????
+ 554:	6f 63       	addc.b	#2,	r15	;r3 As==10
+ 556:	6b 2e       	jc	$-808    	;abs 0x22e
+ 558:	68 00       	.word	0x0068;	????
+ 55a:	63 3a       	jl	$-824    	;abs 0x222
+ 55c:	2f 6d       	addc	@r13,	r15	;
+ 55e:	73 70       	.word	0x7073;	????
+ 560:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 562:	63 2f       	jc	$-312    	;abs 0x42a
+ 564:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 566:	70 34       	jge	$+226    	;abs 0x648
+ 568:	33 30       	jn	$+104    	;abs 0x5d0
+ 56a:	2f 69       	addc	@r9,	r15	;
+ 56c:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 56e:	6c 75       	subc.b	@r5,	r12	;
+ 570:	64 65       	addc.b	@r5,	r4	;
+ 572:	2f 6d       	addc	@r13,	r15	;
+ 574:	73 70       	.word	0x7073;	????
+ 576:	34 33       	jn	$-406    	;abs 0x3e0
+ 578:	30 2f       	jc	$-414    	;abs 0x3da
+ 57a:	66 6c       	addc.b	@r12,	r6	;
+ 57c:	61 73       	subc.b	#2,	r1	;r3 As==10
+ 57e:	68 2e       	jc	$-814    	;abs 0x250
+ 580:	68 00       	.word	0x0068;	????
+ 582:	63 3a       	jl	$-824    	;abs 0x24a
+ 584:	2f 6d       	addc	@r13,	r15	;
+ 586:	73 70       	.word	0x7073;	????
+ 588:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 58a:	63 2f       	jc	$-312    	;abs 0x452
+ 58c:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 58e:	70 34       	jge	$+226    	;abs 0x670
+ 590:	33 30       	jn	$+104    	;abs 0x5f8
+ 592:	2f 69       	addc	@r9,	r15	;
+ 594:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 596:	6c 75       	subc.b	@r5,	r12	;
+ 598:	64 65       	addc.b	@r5,	r4	;
+ 59a:	2f 6d       	addc	@r13,	r15	;
+ 59c:	73 70       	.word	0x7073;	????
+ 59e:	34 33       	jn	$-406    	;abs 0x408
+ 5a0:	30 2f       	jc	$-414    	;abs 0x402
+ 5a2:	65 70       	subc.b	@r0,	r5	;
+ 5a4:	72 6f       	addc.b	@r15+,	r2	;
+ 5a6:	6d 2e       	jc	$-804    	;abs 0x282
+ 5a8:	68 00       	.word	0x0068;	????
+ 5aa:	63 3a       	jl	$-824    	;abs 0x272
+ 5ac:	2f 6d       	addc	@r13,	r15	;
+ 5ae:	73 70       	.word	0x7073;	????
+ 5b0:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 5b2:	63 2f       	jc	$-312    	;abs 0x47a
+ 5b4:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 5b6:	70 34       	jge	$+226    	;abs 0x698
+ 5b8:	33 30       	jn	$+104    	;abs 0x620
+ 5ba:	2f 69       	addc	@r9,	r15	;
+ 5bc:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 5be:	6c 75       	subc.b	@r5,	r12	;
+ 5c0:	64 65       	addc.b	@r5,	r4	;
+ 5c2:	2f 6d       	addc	@r13,	r15	;
+ 5c4:	73 70       	.word	0x7073;	????
+ 5c6:	34 33       	jn	$-406    	;abs 0x430
+ 5c8:	30 2f       	jc	$-414    	;abs 0x42a
+ 5ca:	74 69       	addc.b	@r9+,	r4	;
+ 5cc:	6d 65       	addc.b	@r5,	r13	;
+ 5ce:	72 61       	addc.b	@r1+,	r2	;
+ 5d0:	2e 68       	addc	@r8,	r14	;
+ 5d2:	00 74       	subc	r4,	r0	;
+ 5d4:	61 63       	addc.b	#2,	r1	;r3 As==10
+ 5d6:	74 6c       	addc.b	@r12+,	r4	;
+ 5d8:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 5dc:	28 38       	jl	$+82     	;abs 0x62e
+ 5de:	2c 31       	jn	$+602    	;abs 0x838
+ 5e0:	29 3d       	jmp	$+596    	;abs 0x834
+ 5e2:	28 38       	jl	$+82     	;abs 0x634
+ 5e4:	2c 32       	jn	$-934    	;abs 0x23e
+ 5e6:	29 3d       	jmp	$+596    	;abs 0x83a
+ 5e8:	73 32       	jn	$-792    	;abs 0x2d0
+ 5ea:	74 61       	addc.b	@r1+,	r4	;
+ 5ec:	69 66       	addc.b	@r6,	r9	;
+ 5ee:	67 3a       	jl	$-816    	;abs 0x2be
+ 5f0:	28 30       	jn	$+82     	;abs 0x642
+ 5f2:	2c 34       	jge	$+90     	;abs 0x64c
+ 5f4:	29 2c       	jc	$+84     	;abs 0x648
+ 5f6:	30 2c       	jc	$+98     	;abs 0x658
+ 5f8:	31 3b       	jl	$-412    	;abs 0x45c
+ 5fa:	74 61       	addc.b	@r1+,	r4	;
+ 5fc:	69 65       	addc.b	@r5,	r9	;
+ 5fe:	3a 28       	jnc	$+118    	;abs 0x674
+ 600:	30 2c       	jc	$+98     	;abs 0x662
+ 602:	34 29       	jnc	$+618    	;abs 0x86c
+ 604:	2c 31       	jn	$+602    	;abs 0x85e
+ 606:	2c 31       	jn	$+602    	;abs 0x860
+ 608:	3b 74       	subc	@r4+,	r11	;
+ 60a:	61 63       	addc.b	#2,	r1	;r3 As==10
+ 60c:	6c 72       	subc.b	#4,	r12	;r2 As==10
+ 60e:	3a 28       	jnc	$+118    	;abs 0x684
+ 610:	30 2c       	jc	$+98     	;abs 0x672
+ 612:	34 29       	jnc	$+618    	;abs 0x87c
+ 614:	2c 32       	jn	$-934    	;abs 0x26e
+ 616:	2c 31       	jn	$+602    	;abs 0x870
+ 618:	3b 64       	addc	@r4+,	r11	;
+ 61a:	75 6d       	addc.b	@r13+,	r5	;
+ 61c:	6d 79       	subc.b	@r9,	r13	;
+ 61e:	3a 28       	jnc	$+118    	;abs 0x694
+ 620:	30 2c       	jc	$+98     	;abs 0x682
+ 622:	34 29       	jnc	$+618    	;abs 0x88c
+ 624:	2c 33       	jn	$-422    	;abs 0x47e
+ 626:	2c 31       	jn	$+602    	;abs 0x880
+ 628:	3b 74       	subc	@r4+,	r11	;
+ 62a:	61 6d       	addc.b	@r13,	r1	;
+ 62c:	63 3a       	jl	$-824    	;abs 0x2f4
+ 62e:	28 30       	jn	$+82     	;abs 0x680
+ 630:	2c 34       	jge	$+90     	;abs 0x68a
+ 632:	29 2c       	jc	$+84     	;abs 0x686
+ 634:	34 2c       	jc	$+106    	;abs 0x69e
+ 636:	32 3b       	jl	$-410    	;abs 0x49c
+ 638:	74 61       	addc.b	@r1+,	r4	;
+ 63a:	69 64       	addc.b	@r4,	r9	;
+ 63c:	3a 28       	jnc	$+118    	;abs 0x6b2
+ 63e:	30 2c       	jc	$+98     	;abs 0x6a0
+ 640:	34 29       	jnc	$+618    	;abs 0x8aa
+ 642:	2c 36       	jge	$-934    	;abs 0x29c
+ 644:	2c 32       	jn	$-934    	;abs 0x29e
+ 646:	3b 74       	subc	@r4+,	r11	;
+ 648:	61 73       	subc.b	#2,	r1	;r3 As==10
+ 64a:	73 65       	.word	0x6573;	????
+ 64c:	6c 3a       	jl	$-806    	;abs 0x326
+ 64e:	28 30       	jn	$+82     	;abs 0x6a0
+ 650:	2c 34       	jge	$+90     	;abs 0x6aa
+ 652:	29 2c       	jc	$+84     	;abs 0x6a6
+ 654:	38 2c       	jc	$+114    	;abs 0x6c6
+ 656:	32 3b       	jl	$-410    	;abs 0x4bc
+ 658:	3b 00       	.word	0x003b;	????
+ 65a:	74 61       	addc.b	@r1+,	r4	;
+ 65c:	63 63       	.word	0x6363;	????
+ 65e:	74 6c       	addc.b	@r12+,	r4	;
+ 660:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 664:	28 38       	jl	$+82     	;abs 0x6b6
+ 666:	2c 33       	jn	$-422    	;abs 0x4c0
+ 668:	29 3d       	jmp	$+596    	;abs 0x8bc
+ 66a:	28 38       	jl	$+82     	;abs 0x6bc
+ 66c:	2c 34       	jge	$+90     	;abs 0x6c6
+ 66e:	29 3d       	jmp	$+596    	;abs 0x8c2
+ 670:	73 32       	jn	$-792    	;abs 0x358
+ 672:	63 63       	.word	0x6363;	????
+ 674:	69 66       	addc.b	@r6,	r9	;
+ 676:	67 3a       	jl	$-816    	;abs 0x346
+ 678:	28 30       	jn	$+82     	;abs 0x6ca
+ 67a:	2c 34       	jge	$+90     	;abs 0x6d4
+ 67c:	29 2c       	jc	$+84     	;abs 0x6d0
+ 67e:	30 2c       	jc	$+98     	;abs 0x6e0
+ 680:	31 3b       	jl	$-412    	;abs 0x4e4
+ 682:	63 6f       	.word	0x6f63;	????
+ 684:	76 3a       	jl	$-786    	;abs 0x372
+ 686:	28 30       	jn	$+82     	;abs 0x6d8
+ 688:	2c 34       	jge	$+90     	;abs 0x6e2
+ 68a:	29 2c       	jc	$+84     	;abs 0x6de
+ 68c:	31 2c       	jc	$+100    	;abs 0x6f0
+ 68e:	31 3b       	jl	$-412    	;abs 0x4f2
+ 690:	6f 75       	subc.b	@r5,	r15	;
+ 692:	74 3a       	jl	$-790    	;abs 0x37c
+ 694:	28 30       	jn	$+82     	;abs 0x6e6
+ 696:	2c 34       	jge	$+90     	;abs 0x6f0
+ 698:	29 2c       	jc	$+84     	;abs 0x6ec
+ 69a:	32 2c       	jc	$+102    	;abs 0x700
+ 69c:	31 3b       	jl	$-412    	;abs 0x500
+ 69e:	63 63       	.word	0x6363;	????
+ 6a0:	69 3a       	jl	$-812    	;abs 0x374
+ 6a2:	28 30       	jn	$+82     	;abs 0x6f4
+ 6a4:	2c 34       	jge	$+90     	;abs 0x6fe
+ 6a6:	29 2c       	jc	$+84     	;abs 0x6fa
+ 6a8:	33 2c       	jc	$+104    	;abs 0x710
+ 6aa:	31 3b       	jl	$-412    	;abs 0x50e
+ 6ac:	63 63       	.word	0x6363;	????
+ 6ae:	69 65       	addc.b	@r5,	r9	;
+ 6b0:	3a 28       	jnc	$+118    	;abs 0x726
+ 6b2:	30 2c       	jc	$+98     	;abs 0x714
+ 6b4:	34 29       	jnc	$+618    	;abs 0x91e
+ 6b6:	2c 34       	jge	$+90     	;abs 0x710
+ 6b8:	2c 31       	jn	$+602    	;abs 0x912
+ 6ba:	3b 6f       	addc	@r15+,	r11	;
+ 6bc:	75 74       	subc.b	@r4+,	r5	;
+ 6be:	6d 6f       	addc.b	@r15,	r13	;
+ 6c0:	64 3a       	jl	$-822    	;abs 0x38a
+ 6c2:	28 30       	jn	$+82     	;abs 0x714
+ 6c4:	2c 34       	jge	$+90     	;abs 0x71e
+ 6c6:	29 2c       	jc	$+84     	;abs 0x71a
+ 6c8:	35 2c       	jc	$+108    	;abs 0x734
+ 6ca:	33 3b       	jl	$-408    	;abs 0x532
+ 6cc:	63 61       	.word	0x6163;	????
+ 6ce:	70 3a       	jl	$-798    	;abs 0x3b0
+ 6d0:	28 30       	jn	$+82     	;abs 0x722
+ 6d2:	2c 34       	jge	$+90     	;abs 0x72c
+ 6d4:	29 2c       	jc	$+84     	;abs 0x728
+ 6d6:	38 2c       	jc	$+114    	;abs 0x748
+ 6d8:	31 3b       	jl	$-412    	;abs 0x53c
+ 6da:	64 75       	subc.b	@r5,	r4	;
+ 6dc:	6d 6d       	addc.b	@r13,	r13	;
+ 6de:	79 3a       	jl	$-780    	;abs 0x3d2
+ 6e0:	28 30       	jn	$+82     	;abs 0x732
+ 6e2:	2c 34       	jge	$+90     	;abs 0x73c
+ 6e4:	29 2c       	jc	$+84     	;abs 0x738
+ 6e6:	39 2c       	jc	$+116    	;abs 0x75a
+ 6e8:	31 3b       	jl	$-412    	;abs 0x54c
+ 6ea:	73 63       	.word	0x6373;	????
+ 6ec:	63 69       	.word	0x6963;	????
+ 6ee:	3a 28       	jnc	$+118    	;abs 0x764
+ 6f0:	30 2c       	jc	$+98     	;abs 0x752
+ 6f2:	34 29       	jnc	$+618    	;abs 0x95c
+ 6f4:	2c 31       	jn	$+602    	;abs 0x94e
+ 6f6:	30 2c       	jc	$+98     	;abs 0x758
+ 6f8:	31 3b       	jl	$-412    	;abs 0x55c
+ 6fa:	73 63       	.word	0x6373;	????
+ 6fc:	73 3a       	jl	$-792    	;abs 0x3e4
+ 6fe:	28 30       	jn	$+82     	;abs 0x750
+ 700:	2c 34       	jge	$+90     	;abs 0x75a
+ 702:	29 2c       	jc	$+84     	;abs 0x756
+ 704:	31 31       	jn	$+612    	;abs 0x968
+ 706:	2c 31       	jn	$+602    	;abs 0x960
+ 708:	3b 63       	addc	#-1,	r11	;r3 As==11
+ 70a:	63 69       	.word	0x6963;	????
+ 70c:	73 3a       	jl	$-792    	;abs 0x3f4
+ 70e:	28 30       	jn	$+82     	;abs 0x760
+ 710:	2c 34       	jge	$+90     	;abs 0x76a
+ 712:	29 2c       	jc	$+84     	;abs 0x766
+ 714:	31 32       	jn	$-924    	;abs 0x378
+ 716:	2c 32       	jn	$-934    	;abs 0x370
+ 718:	3b 63       	addc	#-1,	r11	;r3 As==11
+ 71a:	6d 3a       	jl	$-804    	;abs 0x3f6
+ 71c:	28 30       	jn	$+82     	;abs 0x76e
+ 71e:	2c 34       	jge	$+90     	;abs 0x778
+ 720:	29 2c       	jc	$+84     	;abs 0x774
+ 722:	31 34       	jge	$+100    	;abs 0x786
+ 724:	2c 32       	jn	$-934    	;abs 0x37e
+ 726:	3b 3b       	jl	$-392    	;abs 0x59e
+ 728:	00 74       	subc	r4,	r0	;
+ 72a:	69 6d       	addc.b	@r13,	r9	;
+ 72c:	65 72       	subc.b	#4,	r5	;r2 As==10
+ 72e:	61 5f       	add.b	@r15,	r1	;
+ 730:	74 3a       	jl	$-790    	;abs 0x41a
+ 732:	54 28       	jnc	$+170    	;abs 0x7dc
+ 734:	38 2c       	jc	$+114    	;abs 0x7a6
+ 736:	35 29       	jnc	$+620    	;abs 0x9a2
+ 738:	3d 73       	subc	#-1,	r13	;r3 As==11
+ 73a:	32 34       	jge	$+102    	;abs 0x7a0
+ 73c:	63 74       	.word	0x7463;	????
+ 73e:	6c 3a       	jl	$-806    	;abs 0x418
+ 740:	28 38       	jl	$+82     	;abs 0x792
+ 742:	2c 31       	jn	$+602    	;abs 0x99c
+ 744:	29 2c       	jc	$+84     	;abs 0x798
+ 746:	30 2c       	jc	$+98     	;abs 0x7a8
+ 748:	31 36       	jge	$-924    	;abs 0x3ac
+ 74a:	3b 63       	addc	#-1,	r11	;r3 As==11
+ 74c:	63 74       	.word	0x7463;	????
+ 74e:	6c 30       	jn	$+218    	;abs 0x828
+ 750:	3a 28       	jnc	$+118    	;abs 0x7c6
+ 752:	38 2c       	jc	$+114    	;abs 0x7c4
+ 754:	33 29       	jnc	$+616    	;abs 0x9bc
+ 756:	2c 31       	jn	$+602    	;abs 0x9b0
+ 758:	36 2c       	jc	$+110    	;abs 0x7c6
+ 75a:	31 36       	jge	$-924    	;abs 0x3be
+ 75c:	3b 63       	addc	#-1,	r11	;r3 As==11
+ 75e:	63 74       	.word	0x7463;	????
+ 760:	6c 31       	jn	$+730    	;abs 0xa3a
+ 762:	3a 28       	jnc	$+118    	;abs 0x7d8
+ 764:	38 2c       	jc	$+114    	;abs 0x7d6
+ 766:	33 29       	jnc	$+616    	;abs 0x9ce
+ 768:	2c 33       	jn	$-422    	;abs 0x5c2
+ 76a:	32 2c       	jc	$+102    	;abs 0x7d0
+ 76c:	31 36       	jge	$-924    	;abs 0x3d0
+ 76e:	3b 63       	addc	#-1,	r11	;r3 As==11
+ 770:	63 74       	.word	0x7463;	????
+ 772:	6c 32       	jn	$-806    	;abs 0x44c
+ 774:	3a 28       	jnc	$+118    	;abs 0x7ea
+ 776:	38 2c       	jc	$+114    	;abs 0x7e8
+ 778:	33 29       	jnc	$+616    	;abs 0x9e0
+ 77a:	2c 34       	jge	$+90     	;abs 0x7d4
+ 77c:	38 2c       	jc	$+114    	;abs 0x7ee
+ 77e:	31 36       	jge	$-924    	;abs 0x3e2
+ 780:	3b 64       	addc	@r4+,	r11	;
+ 782:	75 6d       	addc.b	@r13+,	r5	;
+ 784:	6d 79       	subc.b	@r9,	r13	;
+ 786:	3a 28       	jnc	$+118    	;abs 0x7fc
+ 788:	38 2c       	jc	$+114    	;abs 0x7fa
+ 78a:	36 29       	jnc	$+622    	;abs 0x9f8
+ 78c:	3d 61       	addc	@r1+,	r13	;
+ 78e:	72 28       	jnc	$+230    	;abs 0x874
+ 790:	38 2c       	jc	$+114    	;abs 0x802
+ 792:	37 29       	jnc	$+624    	;abs 0xa02
+ 794:	3d 72       	subc	#8,	r13	;r2 As==11
+ 796:	28 38       	jl	$+82     	;abs 0x7e8
+ 798:	2c 37       	jge	$-422    	;abs 0x5f2
+ 79a:	29 3b       	jl	$-428    	;abs 0x5ee
+ 79c:	30 30       	jn	$+98     	;abs 0x7fe
+ 79e:	30 30       	jn	$+98     	;abs 0x800
+ 7a0:	30 30       	jn	$+98     	;abs 0x802
+ 7a2:	30 30       	jn	$+98     	;abs 0x804
+ 7a4:	30 30       	jn	$+98     	;abs 0x806
+ 7a6:	30 30       	jn	$+98     	;abs 0x808
+ 7a8:	30 3b       	jl	$-414    	;abs 0x60a
+ 7aa:	30 30       	jn	$+98     	;abs 0x80c
+ 7ac:	30 30       	jn	$+98     	;abs 0x80e
+ 7ae:	30 30       	jn	$+98     	;abs 0x810
+ 7b0:	30 31       	jn	$+610    	;abs 0xa12
+ 7b2:	37 37       	jge	$-400    	;abs 0x622
+ 7b4:	37 37       	jge	$-400    	;abs 0x624
+ 7b6:	37 3b       	jl	$-400    	;abs 0x626
+ 7b8:	3b 30       	jn	$+120    	;abs 0x830
+ 7ba:	3b 33       	jn	$-392    	;abs 0x632
+ 7bc:	3b 28       	jnc	$+120    	;abs 0x834
+ 7be:	38 2c       	jc	$+114    	;abs 0x830
+ 7c0:	38 29       	jnc	$+626    	;abs 0xa32
+ 7c2:	3d 42       	mov	#8,	r13	;r2 As==11
+ 7c4:	28 30       	jn	$+82     	;abs 0x816
+ 7c6:	2c 34       	jge	$+90     	;abs 0x820
+ 7c8:	29 2c       	jc	$+84     	;abs 0x81c
+ 7ca:	36 34       	jge	$+110    	;abs 0x838
+ 7cc:	2c 36       	jge	$-934    	;abs 0x426
+ 7ce:	34 3b       	jl	$-406    	;abs 0x638
+ 7d0:	74 61       	addc.b	@r1+,	r4	;
+ 7d2:	72 3a       	jl	$-794    	;abs 0x4b8
+ 7d4:	28 30       	jn	$+82     	;abs 0x826
+ 7d6:	2c 34       	jge	$+90     	;abs 0x830
+ 7d8:	29 2c       	jc	$+84     	;abs 0x82c
+ 7da:	31 32       	jn	$-924    	;abs 0x43e
+ 7dc:	38 2c       	jc	$+114    	;abs 0x84e
+ 7de:	31 36       	jge	$-924    	;abs 0x442
+ 7e0:	3b 74       	subc	@r4+,	r11	;
+ 7e2:	61 63       	addc.b	#2,	r1	;r3 As==10
+ 7e4:	63 72       	.word	0x7263;	????
+ 7e6:	30 3a       	jl	$-926    	;abs 0x448
+ 7e8:	28 30       	jn	$+82     	;abs 0x83a
+ 7ea:	2c 34       	jge	$+90     	;abs 0x844
+ 7ec:	29 2c       	jc	$+84     	;abs 0x840
+ 7ee:	31 34       	jge	$+100    	;abs 0x852
+ 7f0:	34 2c       	jc	$+106    	;abs 0x85a
+ 7f2:	31 36       	jge	$-924    	;abs 0x456
+ 7f4:	3b 74       	subc	@r4+,	r11	;
+ 7f6:	61 63       	addc.b	#2,	r1	;r3 As==10
+ 7f8:	63 72       	.word	0x7263;	????
+ 7fa:	31 3a       	jl	$-924    	;abs 0x45e
+ 7fc:	28 30       	jn	$+82     	;abs 0x84e
+ 7fe:	2c 34       	jge	$+90     	;abs 0x858
+ 800:	29 2c       	jc	$+84     	;abs 0x854
+ 802:	31 36       	jge	$-924    	;abs 0x466
+ 804:	30 2c       	jc	$+98     	;abs 0x866
+ 806:	31 36       	jge	$-924    	;abs 0x46a
+ 808:	3b 74       	subc	@r4+,	r11	;
+ 80a:	61 63       	addc.b	#2,	r1	;r3 As==10
+ 80c:	63 72       	.word	0x7263;	????
+ 80e:	32 3a       	jl	$-922    	;abs 0x474
+ 810:	28 30       	jn	$+82     	;abs 0x862
+ 812:	2c 34       	jge	$+90     	;abs 0x86c
+ 814:	29 2c       	jc	$+84     	;abs 0x868
+ 816:	31 37       	jge	$-412    	;abs 0x67a
+ 818:	36 2c       	jc	$+110    	;abs 0x886
+ 81a:	31 36       	jge	$-924    	;abs 0x47e
+ 81c:	3b 3b       	jl	$-392    	;abs 0x694
+ 81e:	00 63       	adc	r0		;
+ 820:	3a 2f       	jc	$-394    	;abs 0x696
+ 822:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 824:	70 67       	addc.b	@r7+,	r0	;
+ 826:	63 63       	.word	0x6363;	????
+ 828:	2f 6d       	addc	@r13,	r15	;
+ 82a:	73 70       	.word	0x7073;	????
+ 82c:	34 33       	jn	$-406    	;abs 0x696
+ 82e:	30 2f       	jc	$-414    	;abs 0x690
+ 830:	69 6e       	addc.b	@r14,	r9	;
+ 832:	63 6c       	.word	0x6c63;	????
+ 834:	75 64       	addc.b	@r4+,	r5	;
+ 836:	65 2f       	jc	$-308    	;abs 0x702
+ 838:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 83a:	70 34       	jge	$+226    	;abs 0x91c
+ 83c:	33 30       	jn	$+104    	;abs 0x8a4
+ 83e:	2f 67       	addc	@r7,	r15	;
+ 840:	70 69       	addc.b	@r9+,	r0	;
+ 842:	6f 2e       	jc	$-800    	;abs 0x522
+ 844:	68 00       	.word	0x0068;	????
+ 846:	63 3a       	jl	$-824    	;abs 0x50e
+ 848:	2f 6d       	addc	@r13,	r15	;
+ 84a:	73 70       	.word	0x7073;	????
+ 84c:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 84e:	63 2f       	jc	$-312    	;abs 0x716
+ 850:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 852:	70 34       	jge	$+226    	;abs 0x934
+ 854:	33 30       	jn	$+104    	;abs 0x8bc
+ 856:	2f 69       	addc	@r9,	r15	;
+ 858:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 85a:	6c 75       	subc.b	@r5,	r12	;
+ 85c:	64 65       	addc.b	@r5,	r4	;
+ 85e:	2f 6d       	addc	@r13,	r15	;
+ 860:	73 70       	.word	0x7073;	????
+ 862:	34 33       	jn	$-406    	;abs 0x6cc
+ 864:	30 2f       	jc	$-414    	;abs 0x6c6
+ 866:	69 6f       	addc.b	@r15,	r9	;
+ 868:	73 74       	.word	0x7473;	????
+ 86a:	72 75       	subc.b	@r5+,	r2	;
+ 86c:	63 74       	.word	0x7463;	????
+ 86e:	75 72       	subc.b	#8,	r5	;r2 As==11
+ 870:	65 73       	subc.b	#2,	r5	;r3 As==10
+ 872:	2e 68       	addc	@r8,	r14	;
+ 874:	00 70       	subc	r0,	r0	;
+ 876:	6f 72       	subc.b	#4,	r15	;r2 As==10
+ 878:	74 3a       	jl	$-790    	;abs 0x562
+ 87a:	54 28       	jnc	$+170    	;abs 0x924
+ 87c:	31 30       	jn	$+100    	;abs 0x8e0
+ 87e:	2c 31       	jn	$+602    	;abs 0xad8
+ 880:	29 3d       	jmp	$+596    	;abs 0xad4
+ 882:	75 31       	jn	$+748    	;abs 0xb6e
+ 884:	72 65       	addc.b	@r5+,	r2	;
+ 886:	67 5f       	add.b	@r15,	r7	;
+ 888:	70 3a       	jl	$-798    	;abs 0x56a
+ 88a:	28 30       	jn	$+82     	;abs 0x8dc
+ 88c:	2c 31       	jn	$+602    	;abs 0xae6
+ 88e:	31 29       	jnc	$+612    	;abs 0xaf2
+ 890:	2c 30       	jn	$+90     	;abs 0x8ea
+ 892:	2c 38       	jl	$+90     	;abs 0x8ec
+ 894:	3b 5f       	add	@r15+,	r11	;
+ 896:	5f 70 69 6e 	subc.b	0x6e69,	r15	;PC rel. 0x7701
+ 89a:	3a 28       	jnc	$+118    	;abs 0x910
+ 89c:	31 30       	jn	$+100    	;abs 0x900
+ 89e:	2c 32       	jn	$-934    	;abs 0x4f8
+ 8a0:	29 3d       	jmp	$+596    	;abs 0xaf4
+ 8a2:	73 31       	jn	$+744    	;abs 0xb8a
+ 8a4:	5f 5f 70 30 	add.b	12400(r15),r15	;
+ 8a8:	3a 28       	jnc	$+118    	;abs 0x91e
+ 8aa:	30 2c       	jc	$+98     	;abs 0x90c
+ 8ac:	31 31       	jn	$+612    	;abs 0xb10
+ 8ae:	29 2c       	jc	$+84     	;abs 0x902
+ 8b0:	30 2c       	jc	$+98     	;abs 0x912
+ 8b2:	31 3b       	jl	$-412    	;abs 0x716
+ 8b4:	5f 5f 70 31 	add.b	12656(r15),r15	;
+ 8b8:	3a 28       	jnc	$+118    	;abs 0x92e
+ 8ba:	30 2c       	jc	$+98     	;abs 0x91c
+ 8bc:	31 31       	jn	$+612    	;abs 0xb20
+ 8be:	29 2c       	jc	$+84     	;abs 0x912
+ 8c0:	31 2c       	jc	$+100    	;abs 0x924
+ 8c2:	31 3b       	jl	$-412    	;abs 0x726
+ 8c4:	5f 5f 70 32 	add.b	12912(r15),r15	;
+ 8c8:	3a 28       	jnc	$+118    	;abs 0x93e
+ 8ca:	30 2c       	jc	$+98     	;abs 0x92c
+ 8cc:	31 31       	jn	$+612    	;abs 0xb30
+ 8ce:	29 2c       	jc	$+84     	;abs 0x922
+ 8d0:	32 2c       	jc	$+102    	;abs 0x936
+ 8d2:	31 3b       	jl	$-412    	;abs 0x736
+ 8d4:	5f 5f 70 33 	add.b	13168(r15),r15	;
+ 8d8:	3a 28       	jnc	$+118    	;abs 0x94e
+ 8da:	30 2c       	jc	$+98     	;abs 0x93c
+ 8dc:	31 31       	jn	$+612    	;abs 0xb40
+ 8de:	29 2c       	jc	$+84     	;abs 0x932
+ 8e0:	33 2c       	jc	$+104    	;abs 0x948
+ 8e2:	31 3b       	jl	$-412    	;abs 0x746
+ 8e4:	5f 5f 70 34 	add.b	13424(r15),r15	;
+ 8e8:	3a 28       	jnc	$+118    	;abs 0x95e
+ 8ea:	30 2c       	jc	$+98     	;abs 0x94c
+ 8ec:	31 31       	jn	$+612    	;abs 0xb50
+ 8ee:	29 2c       	jc	$+84     	;abs 0x942
+ 8f0:	34 2c       	jc	$+106    	;abs 0x95a
+ 8f2:	31 3b       	jl	$-412    	;abs 0x756
+ 8f4:	5f 5f 70 35 	add.b	13680(r15),r15	;
+ 8f8:	3a 28       	jnc	$+118    	;abs 0x96e
+ 8fa:	30 2c       	jc	$+98     	;abs 0x95c
+ 8fc:	31 31       	jn	$+612    	;abs 0xb60
+ 8fe:	29 2c       	jc	$+84     	;abs 0x952
+ 900:	35 2c       	jc	$+108    	;abs 0x96c
+ 902:	31 3b       	jl	$-412    	;abs 0x766
+ 904:	5f 5f 70 36 	add.b	13936(r15),r15	;
+ 908:	3a 28       	jnc	$+118    	;abs 0x97e
+ 90a:	30 2c       	jc	$+98     	;abs 0x96c
+ 90c:	31 31       	jn	$+612    	;abs 0xb70
+ 90e:	29 2c       	jc	$+84     	;abs 0x962
+ 910:	36 2c       	jc	$+110    	;abs 0x97e
+ 912:	31 3b       	jl	$-412    	;abs 0x776
+ 914:	5f 5f 70 37 	add.b	14192(r15),r15	;
+ 918:	3a 28       	jnc	$+118    	;abs 0x98e
+ 91a:	30 2c       	jc	$+98     	;abs 0x97c
+ 91c:	31 31       	jn	$+612    	;abs 0xb80
+ 91e:	29 2c       	jc	$+84     	;abs 0x972
+ 920:	37 2c       	jc	$+112    	;abs 0x990
+ 922:	31 3b       	jl	$-412    	;abs 0x786
+ 924:	3b 2c       	jc	$+120    	;abs 0x99c
+ 926:	30 2c       	jc	$+98     	;abs 0x988
+ 928:	38 3b       	jl	$-398    	;abs 0x79a
+ 92a:	3b 00       	.word	0x003b;	????
+ 92c:	69 6f       	addc.b	@r15,	r9	;
+ 92e:	72 65       	addc.b	@r5+,	r2	;
+ 930:	67 69       	addc.b	@r9,	r7	;
+ 932:	73 74       	.word	0x7473;	????
+ 934:	65 72       	subc.b	#4,	r5	;r2 As==10
+ 936:	5f 74 3a 74 	subc.b	29754(r4),r15	;
+ 93a:	28 31       	jn	$+594    	;abs 0xb8c
+ 93c:	30 2c       	jc	$+98     	;abs 0x99e
+ 93e:	33 29       	jnc	$+616    	;abs 0xba6
+ 940:	3d 28       	jnc	$+124    	;abs 0x9bc
+ 942:	31 30       	jn	$+100    	;abs 0x9a6
+ 944:	2c 31       	jn	$+602    	;abs 0xb9e
+ 946:	29 00       	.word	0x0029;	????
+ 948:	70 6f       	addc.b	@r15+,	r0	;
+ 94a:	72 74       	subc.b	@r4+,	r2	;
+ 94c:	5f 66 75 6c 	addc.b	27765(r6),r15	;
+ 950:	6c 5f       	add.b	@r15,	r12	;
+ 952:	74 3a       	jl	$-790    	;abs 0x63c
+ 954:	54 28       	jnc	$+170    	;abs 0x9fe
+ 956:	31 30       	jn	$+100    	;abs 0x9ba
+ 958:	2c 34       	jge	$+90     	;abs 0x9b2
+ 95a:	29 3d       	jmp	$+596    	;abs 0xbae
+ 95c:	73 38       	jl	$+232    	;abs 0xa44
+ 95e:	69 6e       	addc.b	@r14,	r9	;
+ 960:	3a 28       	jnc	$+118    	;abs 0x9d6
+ 962:	31 30       	jn	$+100    	;abs 0x9c6
+ 964:	2c 33       	jn	$-422    	;abs 0x7be
+ 966:	29 2c       	jc	$+84     	;abs 0x9ba
+ 968:	30 2c       	jc	$+98     	;abs 0x9ca
+ 96a:	38 3b       	jl	$-398    	;abs 0x7dc
+ 96c:	6f 75       	subc.b	@r5,	r15	;
+ 96e:	74 3a       	jl	$-790    	;abs 0x658
+ 970:	28 31       	jn	$+594    	;abs 0xbc2
+ 972:	30 2c       	jc	$+98     	;abs 0x9d4
+ 974:	33 29       	jnc	$+616    	;abs 0xbdc
+ 976:	2c 38       	jl	$+90     	;abs 0x9d0
+ 978:	2c 38       	jl	$+90     	;abs 0x9d2
+ 97a:	3b 64       	addc	@r4+,	r11	;
+ 97c:	69 72       	subc.b	#4,	r9	;r2 As==10
+ 97e:	3a 28       	jnc	$+118    	;abs 0x9f4
+ 980:	31 30       	jn	$+100    	;abs 0x9e4
+ 982:	2c 33       	jn	$-422    	;abs 0x7dc
+ 984:	29 2c       	jc	$+84     	;abs 0x9d8
+ 986:	31 36       	jge	$-924    	;abs 0x5ea
+ 988:	2c 38       	jl	$+90     	;abs 0x9e2
+ 98a:	3b 69       	addc	@r9+,	r11	;
+ 98c:	66 67       	addc.b	@r7,	r6	;
+ 98e:	3a 28       	jnc	$+118    	;abs 0xa04
+ 990:	31 30       	jn	$+100    	;abs 0x9f4
+ 992:	2c 33       	jn	$-422    	;abs 0x7ec
+ 994:	29 2c       	jc	$+84     	;abs 0x9e8
+ 996:	32 34       	jge	$+102    	;abs 0x9fc
+ 998:	2c 38       	jl	$+90     	;abs 0x9f2
+ 99a:	3b 69       	addc	@r9+,	r11	;
+ 99c:	65 73       	subc.b	#2,	r5	;r3 As==10
+ 99e:	3a 28       	jnc	$+118    	;abs 0xa14
+ 9a0:	31 30       	jn	$+100    	;abs 0xa04
+ 9a2:	2c 33       	jn	$-422    	;abs 0x7fc
+ 9a4:	29 2c       	jc	$+84     	;abs 0x9f8
+ 9a6:	33 32       	jn	$-920    	;abs 0x60e
+ 9a8:	2c 38       	jl	$+90     	;abs 0xa02
+ 9aa:	3b 69       	addc	@r9+,	r11	;
+ 9ac:	65 3a       	jl	$-820    	;abs 0x678
+ 9ae:	28 31       	jn	$+594    	;abs 0xc00
+ 9b0:	30 2c       	jc	$+98     	;abs 0xa12
+ 9b2:	33 29       	jnc	$+616    	;abs 0xc1a
+ 9b4:	2c 34       	jge	$+90     	;abs 0xa0e
+ 9b6:	30 2c       	jc	$+98     	;abs 0xa18
+ 9b8:	38 3b       	jl	$-398    	;abs 0x82a
+ 9ba:	73 65       	.word	0x6573;	????
+ 9bc:	6c 3a       	jl	$-806    	;abs 0x696
+ 9be:	28 31       	jn	$+594    	;abs 0xc10
+ 9c0:	30 2c       	jc	$+98     	;abs 0xa22
+ 9c2:	33 29       	jnc	$+616    	;abs 0xc2a
+ 9c4:	2c 34       	jge	$+90     	;abs 0xa1e
+ 9c6:	38 2c       	jc	$+114    	;abs 0xa38
+ 9c8:	38 3b       	jl	$-398    	;abs 0x83a
+ 9ca:	72 65       	addc.b	@r5+,	r2	;
+ 9cc:	6e 3a       	jl	$-802    	;abs 0x6aa
+ 9ce:	28 31       	jn	$+594    	;abs 0xc20
+ 9d0:	30 2c       	jc	$+98     	;abs 0xa32
+ 9d2:	33 29       	jnc	$+616    	;abs 0xc3a
+ 9d4:	2c 35       	jge	$+602    	;abs 0xc2e
+ 9d6:	36 2c       	jc	$+110    	;abs 0xa44
+ 9d8:	38 3b       	jl	$-398    	;abs 0x84a
+ 9da:	3b 00       	.word	0x003b;	????
+ 9dc:	63 3a       	jl	$-824    	;abs 0x6a4
+ 9de:	2f 6d       	addc	@r13,	r15	;
+ 9e0:	73 70       	.word	0x7073;	????
+ 9e2:	67 63       	addc.b	#2,	r7	;r3 As==10
+ 9e4:	63 2f       	jc	$-312    	;abs 0x8ac
+ 9e6:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ 9e8:	70 34       	jge	$+226    	;abs 0xaca
+ 9ea:	33 30       	jn	$+104    	;abs 0xa52
+ 9ec:	2f 69       	addc	@r9,	r15	;
+ 9ee:	6e 63       	addc.b	#2,	r14	;r3 As==10
+ 9f0:	6c 75       	subc.b	@r5,	r12	;
+ 9f2:	64 65       	addc.b	@r5,	r4	;
+ 9f4:	2f 6d       	addc	@r13,	r15	;
+ 9f6:	73 70       	.word	0x7073;	????
+ 9f8:	34 33       	jn	$-406    	;abs 0x862
+ 9fa:	30 2f       	jc	$-414    	;abs 0x85c
+ 9fc:	73 64       	.word	0x6473;	????
+ 9fe:	31 36       	jge	$-924    	;abs 0x662
+ a00:	2e 68       	addc	@r8,	r14	;
+ a02:	00 63       	adc	r0		;
+ a04:	3a 2f       	jc	$-394    	;abs 0x87a
+ a06:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ a08:	70 67       	addc.b	@r7+,	r0	;
+ a0a:	63 63       	.word	0x6363;	????
+ a0c:	2f 6d       	addc	@r13,	r15	;
+ a0e:	73 70       	.word	0x7073;	????
+ a10:	34 33       	jn	$-406    	;abs 0x87a
+ a12:	30 2f       	jc	$-414    	;abs 0x874
+ a14:	69 6e       	addc.b	@r14,	r9	;
+ a16:	63 6c       	.word	0x6c63;	????
+ a18:	75 64       	addc.b	@r4+,	r5	;
+ a1a:	65 2f       	jc	$-308    	;abs 0x8e6
+ a1c:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ a1e:	70 34       	jge	$+226    	;abs 0xb00
+ a20:	33 30       	jn	$+104    	;abs 0xa88
+ a22:	2f 75       	subc	@r5,	r15	;
+ a24:	73 69       	.word	0x6973;	????
+ a26:	2e 68       	addc	@r8,	r14	;
+ a28:	00 63       	adc	r0		;
+ a2a:	3a 2f       	jc	$-394    	;abs 0x8a0
+ a2c:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ a2e:	70 67       	addc.b	@r7+,	r0	;
+ a30:	63 63       	.word	0x6363;	????
+ a32:	2f 6d       	addc	@r13,	r15	;
+ a34:	73 70       	.word	0x7073;	????
+ a36:	34 33       	jn	$-406    	;abs 0x8a0
+ a38:	30 2f       	jc	$-414    	;abs 0x89a
+ a3a:	69 6e       	addc.b	@r14,	r9	;
+ a3c:	63 6c       	.word	0x6c63;	????
+ a3e:	75 64       	addc.b	@r4+,	r5	;
+ a40:	65 2f       	jc	$-308    	;abs 0x90c
+ a42:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ a44:	70 34       	jge	$+226    	;abs 0xb26
+ a46:	33 30       	jn	$+104    	;abs 0xaae
+ a48:	2f 63       	addc	#2,	r15	;r3 As==10
+ a4a:	6f 6d       	addc.b	@r13,	r15	;
+ a4c:	6d 6f       	addc.b	@r15,	r13	;
+ a4e:	6e 2e       	jc	$-802    	;abs 0x72c
+ a50:	68 00       	.word	0x0068;	????
+ a52:	6d 61       	addc.b	@r1,	r13	;
+ a54:	69 6e       	addc.b	@r14,	r9	;
+ a56:	3a 46       	mov	@r6+,	r10	;
+ a58:	28 30       	jn	$+82     	;abs 0xaaa
+ a5a:	2c 31       	jn	$+602    	;abs 0xcb4
+ a5c:	29 00       	.word	0x0029;	????
+ a5e:	69 3a       	jl	$-812    	;abs 0x732
+ a60:	72 28       	jnc	$+230    	;abs 0xb46
+ a62:	30 2c       	jc	$+98     	;abs 0xac4
+ a64:	32 29       	jnc	$+614    	;abs 0xcca
+ a66:	00 63       	adc	r0		;
+ a68:	6f 6e       	addc.b	@r14,	r15	;
+ a6a:	66 69       	addc.b	@r9,	r6	;
+ a6c:	67 75       	subc.b	@r5,	r7	;
+ a6e:	72 61       	addc.b	@r1+,	r2	;
+ a70:	5f 63       	addc.b	#1,	r15	;r3 As==01
+ a72:	70 75       	subc.b	@r5+,	r0	;
+ a74:	3a 46       	mov	@r6+,	r10	;
+ a76:	28 30       	jn	$+82     	;abs 0xac8
+ a78:	2c 32       	jn	$-934    	;abs 0x6d2
+ a7a:	30 29       	jnc	$+610    	;abs 0xcdc
+ a7c:	00 64       	addc	r4,	r0	;
+ a7e:	65 6c       	addc.b	@r12,	r5	;
+ a80:	61 79       	subc.b	@r9,	r1	;
+ a82:	75 73       	subc.b	#-1,	r5	;r3 As==11
+ a84:	3a 46       	mov	@r6+,	r10	;
+ a86:	28 30       	jn	$+82     	;abs 0xad8
+ a88:	2c 32       	jn	$-934    	;abs 0x6e2
+ a8a:	30 29       	jnc	$+610    	;abs 0xcec
+ a8c:	00 74       	subc	r4,	r0	;
+ a8e:	65 6d       	addc.b	@r13,	r5	;
+ a90:	70 6f       	addc.b	@r15+,	r0	;
+ a92:	3a 50 28 30 	add	#12328,	r10	;#0x3028
+ a96:	2c 34       	jge	$+90     	;abs 0xaf0
+ a98:	29 00       	.word	0x0029;	????
+ a9a:	69 3a       	jl	$-812    	;abs 0x76e
+ a9c:	72 28       	jnc	$+230    	;abs 0xb82
+ a9e:	30 2c       	jc	$+98     	;abs 0xb00
+ aa0:	31 29       	jnc	$+612    	;abs 0xd04
+ aa2:	00 64       	addc	r4,	r0	;
+ aa4:	65 6c       	addc.b	@r12,	r5	;
+ aa6:	61 79       	subc.b	@r9,	r1	;
+ aa8:	6d 73       	subc.b	#2,	r13	;r3 As==10
+ aaa:	3a 46       	mov	@r6+,	r10	;
+ aac:	28 30       	jn	$+82     	;abs 0xafe
+ aae:	2c 32       	jn	$-934    	;abs 0x708
+ ab0:	30 29       	jnc	$+610    	;abs 0xd12
+ ab2:	00 69       	addc	r9,	r0	;
+ ab4:	6e 69       	addc.b	@r9,	r14	;
+ ab6:	74 5f       	add.b	@r15+,	r4	;
+ ab8:	69 32       	jn	$-812    	;abs 0x78c
+ aba:	63 3a       	jl	$-824    	;abs 0x782
+ abc:	46 28       	jnc	$+142    	;abs 0xb4a
+ abe:	30 2c       	jc	$+98     	;abs 0xb20
+ ac0:	32 30       	jn	$+102    	;abs 0xb26
+ ac2:	29 00       	.word	0x0029;	????
+ ac4:	73 74       	.word	0x7473;	????
+ ac6:	61 72       	subc.b	#4,	r1	;r2 As==10
+ ac8:	74 5f       	add.b	@r15+,	r4	;
+ aca:	69 32       	jn	$-812    	;abs 0x79e
+ acc:	63 3a       	jl	$-824    	;abs 0x794
+ ace:	46 28       	jnc	$+142    	;abs 0xb5c
+ ad0:	30 2c       	jc	$+98     	;abs 0xb32
+ ad2:	32 30       	jn	$+102    	;abs 0xb38
+ ad4:	29 00       	.word	0x0029;	????
+ ad6:	73 74       	.word	0x7473;	????
+ ad8:	6f 70       	subc.b	@r0,	r15	;
+ ada:	5f 69 32 63 	addc.b	25394(r9),r15	;
+ ade:	3a 46       	mov	@r6+,	r10	;
+ ae0:	28 30       	jn	$+82     	;abs 0xb32
+ ae2:	2c 32       	jn	$-934    	;abs 0x73c
+ ae4:	30 29       	jnc	$+610    	;abs 0xd46
+ ae6:	00 73       	sbc	r0		;
+ ae8:	65 6e       	addc.b	@r14,	r5	;
+ aea:	64 5f       	add.b	@r15,	r4	;
+ aec:	30 3a       	jl	$-926    	;abs 0x74e
+ aee:	46 28       	jnc	$+142    	;abs 0xb7c
+ af0:	30 2c       	jc	$+98     	;abs 0xb52
+ af2:	32 30       	jn	$+102    	;abs 0xb58
+ af4:	29 00       	.word	0x0029;	????
+ af6:	73 65       	.word	0x6573;	????
+ af8:	6e 64       	addc.b	@r4,	r14	;
+ afa:	5f 31       	jn	$+704    	;abs 0xdba
+ afc:	3a 46       	mov	@r6+,	r10	;
+ afe:	28 30       	jn	$+82     	;abs 0xb50
+ b00:	2c 32       	jn	$-934    	;abs 0x75a
+ b02:	30 29       	jnc	$+610    	;abs 0xd64
+ b04:	00 6c       	addc	r12,	r0	;
+ b06:	65 62       	addc.b	#4,	r5	;r2 As==10
+ b08:	69 74       	subc.b	@r4,	r9	;
+ b0a:	3a 46       	mov	@r6+,	r10	;
+ b0c:	28 30       	jn	$+82     	;abs 0xb5e
+ b0e:	2c 31       	jn	$+602    	;abs 0xd68
+ b10:	31 29       	jnc	$+612    	;abs 0xd74
+ b12:	00 76       	subc	r6,	r0	;
+ b14:	3a 72       	subc	#8,	r10	;r2 As==11
+ b16:	28 30       	jn	$+82     	;abs 0xb68
+ b18:	2c 31       	jn	$+602    	;abs 0xd72
+ b1a:	31 29       	jnc	$+612    	;abs 0xd7e
+ b1c:	00 6c       	addc	r12,	r0	;
+ b1e:	65 5f       	add.b	@r15,	r5	;
+ b20:	69 32       	jn	$-812    	;abs 0x7f4
+ b22:	63 3a       	jl	$-824    	;abs 0x7ea
+ b24:	46 28       	jnc	$+142    	;abs 0xbb2
+ b26:	30 2c       	jc	$+98     	;abs 0xb88
+ b28:	31 31       	jn	$+612    	;abs 0xd8c
+ b2a:	29 00       	.word	0x0029;	????
+ b2c:	61 63       	addc.b	#2,	r1	;r3 As==10
+ b2e:	6b 6e       	addc.b	@r14,	r11	;
+ b30:	6f 77       	subc.b	@r7,	r15	;
+ b32:	6c 65       	addc.b	@r5,	r12	;
+ b34:	64 67       	addc.b	@r7,	r4	;
+ b36:	65 3a       	jl	$-820    	;abs 0x802
+ b38:	50 28       	jnc	$+162    	;abs 0xbda
+ b3a:	30 2c       	jc	$+98     	;abs 0xb9c
+ b3c:	31 31       	jn	$+612    	;abs 0xda0
+ b3e:	29 00       	.word	0x0029;	????
+ b40:	69 3a       	jl	$-812    	;abs 0x814
+ b42:	72 28       	jnc	$+230    	;abs 0xc28
+ b44:	30 2c       	jc	$+98     	;abs 0xba6
+ b46:	31 31       	jn	$+612    	;abs 0xdaa
+ b48:	29 00       	.word	0x0029;	????
+ b4a:	78 3a       	jl	$-782    	;abs 0x83c
+ b4c:	72 28       	jnc	$+230    	;abs 0xc32
+ b4e:	30 2c       	jc	$+98     	;abs 0xbb0
+ b50:	31 31       	jn	$+612    	;abs 0xdb4
+ b52:	29 00       	.word	0x0029;	????
+ b54:	65 73       	subc.b	#2,	r5	;r3 As==10
+ b56:	63 72       	.word	0x7263;	????
+ b58:	65 76       	subc.b	@r6,	r5	;
+ b5a:	65 5f       	add.b	@r15,	r5	;
+ b5c:	69 32       	jn	$-812    	;abs 0x830
+ b5e:	63 3a       	jl	$-824    	;abs 0x826
+ b60:	46 28       	jnc	$+142    	;abs 0xbee
+ b62:	30 2c       	jc	$+98     	;abs 0xbc4
+ b64:	31 31       	jn	$+612    	;abs 0xdc8
+ b66:	29 00       	.word	0x0029;	????
+ b68:	64 61       	addc.b	@r1,	r4	;
+ b6a:	64 6f       	addc.b	@r15,	r4	;
+ b6c:	3a 50 28 30 	add	#12328,	r10	;#0x3028
+ b70:	2c 31       	jn	$+602    	;abs 0xdca
+ b72:	31 29       	jnc	$+612    	;abs 0xdd6
+ b74:	00 6d       	addc	r13,	r0	;
+ b76:	61 73       	subc.b	#2,	r1	;r3 As==10
+ b78:	6b 3a       	jl	$-808    	;abs 0x850
+ b7a:	72 28       	jnc	$+230    	;abs 0xc60
+ b7c:	30 2c       	jc	$+98     	;abs 0xbde
+ b7e:	31 31       	jn	$+612    	;abs 0xde2
+ b80:	29 00       	.word	0x0029;	????
+ b82:	6d 65       	addc.b	@r5,	r13	;
+ b84:	6d 5f       	add.b	@r15,	r13	;
+ b86:	66 6f       	addc.b	@r15,	r6	;
+ b88:	75 6e       	addc.b	@r14+,	r5	;
+ b8a:	64 3a       	jl	$-822    	;abs 0x854
+ b8c:	46 28       	jnc	$+142    	;abs 0xc1a
+ b8e:	30 2c       	jc	$+98     	;abs 0xbf0
+ b90:	31 31       	jn	$+612    	;abs 0xdf4
+ b92:	29 00       	.word	0x0029;	????
+ b94:	73 6c       	.word	0x6c73;	????
+ b96:	61 76       	subc.b	@r6,	r1	;
+ b98:	65 5f       	add.b	@r15,	r5	;
+ b9a:	61 64       	addc.b	@r4,	r1	;
+ b9c:	64 72       	subc.b	#4,	r4	;r2 As==10
+ b9e:	65 73       	subc.b	#2,	r5	;r3 As==10
+ ba0:	73 3a       	jl	$-792    	;abs 0x888
+ ba2:	50 28       	jnc	$+162    	;abs 0xc44
+ ba4:	30 2c       	jc	$+98     	;abs 0xc06
+ ba6:	31 31       	jn	$+612    	;abs 0xe0a
+ ba8:	29 00       	.word	0x0029;	????
+ baa:	6d 65       	addc.b	@r5,	r13	;
+ bac:	6d 5f       	add.b	@r15,	r13	;
+ bae:	77 72       	subc.b	#8,	r7	;r2 As==11
+ bb0:	69 74       	subc.b	@r4,	r9	;
+ bb2:	65 3a       	jl	$-820    	;abs 0x87e
+ bb4:	46 28       	jnc	$+142    	;abs 0xc42
+ bb6:	30 2c       	jc	$+98     	;abs 0xc18
+ bb8:	31 31       	jn	$+612    	;abs 0xe1c
+ bba:	29 00       	.word	0x0029;	????
+ bbc:	61 64       	addc.b	@r4,	r1	;
+ bbe:	64 72       	subc.b	#4,	r4	;r2 As==10
+ bc0:	65 73       	subc.b	#2,	r5	;r3 As==10
+ bc2:	73 3a       	jl	$-792    	;abs 0x8aa
+ bc4:	50 28       	jnc	$+162    	;abs 0xc66
+ bc6:	30 2c       	jc	$+98     	;abs 0xc28
+ bc8:	34 29       	jnc	$+618    	;abs 0xe32
+ bca:	00 62       	addc	r2,	r0	;
+ bcc:	75 66       	addc.b	@r6+,	r5	;
+ bce:	3a 50 28 31 	add	#12584,	r10	;#0x3128
+ bd2:	2c 31       	jn	$+602    	;abs 0xe2c
+ bd4:	29 3d       	jmp	$+596    	;abs 0xe28
+ bd6:	2a 28       	jnc	$+86     	;abs 0xc2c
+ bd8:	30 2c       	jc	$+98     	;abs 0xc3a
+ bda:	31 31       	jn	$+612    	;abs 0xe3e
+ bdc:	29 00       	.word	0x0029;	????
+ bde:	6c 65       	addc.b	@r5,	r12	;
+ be0:	6e 3a       	jl	$-802    	;abs 0x8be
+ be2:	50 28       	jnc	$+162    	;abs 0xc84
+ be4:	30 2c       	jc	$+98     	;abs 0xc46
+ be6:	31 31       	jn	$+612    	;abs 0xe4a
+ be8:	29 00       	.word	0x0029;	????
+ bea:	6d 65       	addc.b	@r5,	r13	;
+ bec:	6d 5f       	add.b	@r15,	r13	;
+ bee:	72 65       	addc.b	@r5+,	r2	;
+ bf0:	61 64       	addc.b	@r4,	r1	;
+ bf2:	3a 46       	mov	@r6+,	r10	;
+ bf4:	28 30       	jn	$+82     	;abs 0xc46
+ bf6:	2c 31       	jn	$+602    	;abs 0xe50
+ bf8:	31 29       	jnc	$+612    	;abs 0xe5c
+ bfa:	00 62       	addc	r2,	r0	;
+ bfc:	75 66       	addc.b	@r6+,	r5	;
+ bfe:	3a 50 28 31 	add	#12584,	r10	;#0x3128
+ c02:	2c 31       	jn	$+602    	;abs 0xe5c
+ c04:	29 00       	.word	0x0029;	????
+ c06:	44 43       	clr.b	r4		;
+ c08:	4f 43       	clr.b	r15		;
+ c0a:	54 4c 3a 47 	mov.b	18234(r12),r4	;
+ c0e:	28 31       	jn	$+594    	;abs 0xe60
+ c10:	2c 32       	jn	$-934    	;abs 0x86a
+ c12:	29 3d       	jmp	$+596    	;abs 0xe66
+ c14:	42 28       	jnc	$+134    	;abs 0xc9a
+ c16:	30 2c       	jc	$+98     	;abs 0xc78
+ c18:	31 31       	jn	$+612    	;abs 0xe7c
+ c1a:	29 00       	.word	0x0029;	????
+ c1c:	42 43       	clr.b	r2		;
+ c1e:	53 43       	.word	0x4353;	????
+ c20:	54 4c 31 3a 	mov.b	14897(r12),r4	;
+ c24:	47 28       	jnc	$+144    	;abs 0xcb4
+ c26:	31 2c       	jc	$+100    	;abs 0xc8a
+ c28:	32 29       	jnc	$+614    	;abs 0xe8e
+ c2a:	00 42       	br	r2		;
+ c2c:	43 53       	.word	0x5343;	????
+ c2e:	43 54       	.word	0x5443;	????
+ c30:	4c 32       	jn	$-870    	;abs 0x8ca
+ c32:	3a 47       	mov	@r7+,	r10	;
+ c34:	28 31       	jn	$+594    	;abs 0xe86
+ c36:	2c 32       	jn	$-934    	;abs 0x890
+ c38:	29 00       	.word	0x0029;	????
+ c3a:	42 43       	clr.b	r2		;
+ c3c:	53 43       	.word	0x4353;	????
+ c3e:	54 4c 33 3a 	mov.b	14899(r12),r4	;
+ c42:	47 28       	jnc	$+144    	;abs 0xcd2
+ c44:	31 2c       	jc	$+100    	;abs 0xca8
+ c46:	32 29       	jnc	$+614    	;abs 0xeac
+ c48:	00 46       	br	r6		;
+ c4a:	43 54       	.word	0x5443;	????
+ c4c:	4c 31       	jn	$+666    	;abs 0xee6
+ c4e:	3a 47       	mov	@r7+,	r10	;
+ c50:	28 38       	jl	$+82     	;abs 0xca2
+ c52:	2c 38       	jl	$+90     	;abs 0xcac
+ c54:	29 00       	.word	0x0029;	????
+ c56:	46 43       	clr.b	r6		;
+ c58:	54 4c 32 3a 	mov.b	14898(r12),r4	;
+ c5c:	47 28       	jnc	$+144    	;abs 0xcec
+ c5e:	38 2c       	jc	$+114    	;abs 0xcd0
+ c60:	38 29       	jnc	$+626    	;abs 0xed2
+ c62:	00 46       	br	r6		;
+ c64:	43 54       	.word	0x5443;	????
+ c66:	4c 33       	jn	$-358    	;abs 0xb00
+ c68:	3a 47       	mov	@r7+,	r10	;
+ c6a:	28 38       	jl	$+82     	;abs 0xcbc
+ c6c:	2c 38       	jl	$+90     	;abs 0xcc6
+ c6e:	29 00       	.word	0x0029;	????
+ c70:	45 50       	add.b	r0,	r5	;
+ c72:	43 54       	.word	0x5443;	????
+ c74:	4c 3a       	jl	$-870    	;abs 0x90e
+ c76:	47 28       	jnc	$+144    	;abs 0xd06
+ c78:	31 2c       	jc	$+100    	;abs 0xcdc
+ c7a:	32 29       	jnc	$+614    	;abs 0xee0
+ c7c:	00 54       	add	r4,	r0	;
+ c7e:	41 30       	jn	$+132    	;abs 0xd02
+ c80:	49 56       	add.b	r6,	r9	;
+ c82:	3a 47       	mov	@r7+,	r10	;
+ c84:	28 38       	jl	$+82     	;abs 0xcd6
+ c86:	2c 38       	jl	$+90     	;abs 0xce0
+ c88:	29 00       	.word	0x0029;	????
+ c8a:	54 41 30 43 	mov.b	17200(r1),r4	;
+ c8e:	54 4c 3a 47 	mov.b	18234(r12),r4	;
+ c92:	28 38       	jl	$+82     	;abs 0xce4
+ c94:	2c 38       	jl	$+90     	;abs 0xcee
+ c96:	29 00       	.word	0x0029;	????
+ c98:	54 41 30 52 	mov.b	21040(r1),r4	;
+ c9c:	3a 47       	mov	@r7+,	r10	;
+ c9e:	28 38       	jl	$+82     	;abs 0xcf0
+ ca0:	2c 38       	jl	$+90     	;abs 0xcfa
+ ca2:	29 00       	.word	0x0029;	????
+ ca4:	54 41 30 43 	mov.b	17200(r1),r4	;
+ ca8:	43 54       	.word	0x5443;	????
+ caa:	4c 30       	jn	$+154    	;abs 0xd44
+ cac:	3a 47       	mov	@r7+,	r10	;
+ cae:	28 38       	jl	$+82     	;abs 0xd00
+ cb0:	2c 38       	jl	$+90     	;abs 0xd0a
+ cb2:	29 00       	.word	0x0029;	????
+ cb4:	54 41 30 43 	mov.b	17200(r1),r4	;
+ cb8:	43 54       	.word	0x5443;	????
+ cba:	4c 31       	jn	$+666    	;abs 0xf54
+ cbc:	3a 47       	mov	@r7+,	r10	;
+ cbe:	28 38       	jl	$+82     	;abs 0xd10
+ cc0:	2c 38       	jl	$+90     	;abs 0xd1a
+ cc2:	29 00       	.word	0x0029;	????
+ cc4:	54 41 30 43 	mov.b	17200(r1),r4	;
+ cc8:	43 52       	.word	0x5243;	????
+ cca:	30 3a       	jl	$-926    	;abs 0x92c
+ ccc:	47 28       	jnc	$+144    	;abs 0xd5c
+ cce:	38 2c       	jc	$+114    	;abs 0xd40
+ cd0:	38 29       	jnc	$+626    	;abs 0xf42
+ cd2:	00 54       	add	r4,	r0	;
+ cd4:	41 30       	jn	$+132    	;abs 0xd58
+ cd6:	43 43       	clr.b	r3		;
+ cd8:	52 31       	jn	$+678    	;abs 0xf7e
+ cda:	3a 47       	mov	@r7+,	r10	;
+ cdc:	28 38       	jl	$+82     	;abs 0xd2e
+ cde:	2c 38       	jl	$+90     	;abs 0xd38
+ ce0:	29 00       	.word	0x0029;	????
+ ce2:	74 69       	addc.b	@r9+,	r4	;
+ ce4:	6d 65       	addc.b	@r5,	r13	;
+ ce6:	72 61       	addc.b	@r1+,	r2	;
+ ce8:	3a 47       	mov	@r7+,	r10	;
+ cea:	28 38       	jl	$+82     	;abs 0xd3c
+ cec:	2c 35       	jge	$+602    	;abs 0xf46
+ cee:	29 00       	.word	0x0029;	????
+ cf0:	70 6f       	addc.b	@r15+,	r0	;
+ cf2:	72 74       	subc.b	@r4+,	r2	;
+ cf4:	31 3a       	jl	$-924    	;abs 0x958
+ cf6:	47 28       	jnc	$+144    	;abs 0xd86
+ cf8:	31 30       	jn	$+100    	;abs 0xd5c
+ cfa:	2c 34       	jge	$+90     	;abs 0xd54
+ cfc:	29 00       	.word	0x0029;	????
+ cfe:	70 6f       	addc.b	@r15+,	r0	;
+ d00:	72 74       	subc.b	@r4+,	r2	;
+ d02:	32 3a       	jl	$-922    	;abs 0x968
+ d04:	47 28       	jnc	$+144    	;abs 0xd94
+ d06:	31 30       	jn	$+100    	;abs 0xd6a
+ d08:	2c 34       	jge	$+90     	;abs 0xd62
+ d0a:	29 00       	.word	0x0029;	????
+ d0c:	50 31       	jn	$+674    	;abs 0xfae
+ d0e:	49 4e       	mov.b	r14,	r9	;
+ d10:	3a 47       	mov	@r7+,	r10	;
+ d12:	28 31       	jn	$+594    	;abs 0xf64
+ d14:	2c 32       	jn	$-934    	;abs 0x96e
+ d16:	29 00       	.word	0x0029;	????
+ d18:	50 31       	jn	$+674    	;abs 0xfba
+ d1a:	4f 55       	add.b	r5,	r15	;
+ d1c:	54 3a       	jl	$-854    	;abs 0x9c6
+ d1e:	47 28       	jnc	$+144    	;abs 0xdae
+ d20:	31 2c       	jc	$+100    	;abs 0xd84
+ d22:	32 29       	jnc	$+614    	;abs 0xf88
+ d24:	00 50       	rla	r0		;
+ d26:	31 44       	mov	@r4+,	r1	;
+ d28:	49 52       	add.b	r2,	r9	;
+ d2a:	3a 47       	mov	@r7+,	r10	;
+ d2c:	28 31       	jn	$+594    	;abs 0xf7e
+ d2e:	2c 32       	jn	$-934    	;abs 0x988
+ d30:	29 00       	.word	0x0029;	????
+ d32:	50 31       	jn	$+674    	;abs 0xfd4
+ d34:	49 46       	mov.b	r6,	r9	;
+ d36:	47 3a       	jl	$-880    	;abs 0x9c6
+ d38:	47 28       	jnc	$+144    	;abs 0xdc8
+ d3a:	31 2c       	jc	$+100    	;abs 0xd9e
+ d3c:	32 29       	jnc	$+614    	;abs 0xfa2
+ d3e:	00 50       	rla	r0		;
+ d40:	31 49       	mov	@r9+,	r1	;
+ d42:	45 53       	add.b	#0,	r5	;r3 As==00
+ d44:	3a 47       	mov	@r7+,	r10	;
+ d46:	28 31       	jn	$+594    	;abs 0xf98
+ d48:	2c 32       	jn	$-934    	;abs 0x9a2
+ d4a:	29 00       	.word	0x0029;	????
+ d4c:	50 31       	jn	$+674    	;abs 0xfee
+ d4e:	49 45       	mov.b	r5,	r9	;
+ d50:	3a 47       	mov	@r7+,	r10	;
+ d52:	28 31       	jn	$+594    	;abs 0xfa4
+ d54:	2c 32       	jn	$-934    	;abs 0x9ae
+ d56:	29 00       	.word	0x0029;	????
+ d58:	50 31       	jn	$+674    	;abs 0xffa
+ d5a:	53 45       	.word	0x4553;	????
+ d5c:	4c 3a       	jl	$-870    	;abs 0x9f6
+ d5e:	47 28       	jnc	$+144    	;abs 0xdee
+ d60:	31 2c       	jc	$+100    	;abs 0xdc4
+ d62:	32 29       	jnc	$+614    	;abs 0xfc8
+ d64:	00 50       	rla	r0		;
+ d66:	31 52       	add	#8,	r1	;r2 As==11
+ d68:	45 4e       	mov.b	r14,	r5	;
+ d6a:	3a 47       	mov	@r7+,	r10	;
+ d6c:	28 31       	jn	$+594    	;abs 0xfbe
+ d6e:	2c 32       	jn	$-934    	;abs 0x9c8
+ d70:	29 00       	.word	0x0029;	????
+ d72:	50 32       	jn	$-862    	;abs 0xa14
+ d74:	49 4e       	mov.b	r14,	r9	;
+ d76:	3a 47       	mov	@r7+,	r10	;
+ d78:	28 31       	jn	$+594    	;abs 0xfca
+ d7a:	2c 32       	jn	$-934    	;abs 0x9d4
+ d7c:	29 00       	.word	0x0029;	????
+ d7e:	50 32       	jn	$-862    	;abs 0xa20
+ d80:	4f 55       	add.b	r5,	r15	;
+ d82:	54 3a       	jl	$-854    	;abs 0xa2c
+ d84:	47 28       	jnc	$+144    	;abs 0xe14
+ d86:	31 2c       	jc	$+100    	;abs 0xdea
+ d88:	32 29       	jnc	$+614    	;abs 0xfee
+ d8a:	00 50       	rla	r0		;
+ d8c:	32 44       	mov	@r4+,	r2	;
+ d8e:	49 52       	add.b	r2,	r9	;
+ d90:	3a 47       	mov	@r7+,	r10	;
+ d92:	28 31       	jn	$+594    	;abs 0xfe4
+ d94:	2c 32       	jn	$-934    	;abs 0x9ee
+ d96:	29 00       	.word	0x0029;	????
+ d98:	50 32       	jn	$-862    	;abs 0xa3a
+ d9a:	49 46       	mov.b	r6,	r9	;
+ d9c:	47 3a       	jl	$-880    	;abs 0xa2c
+ d9e:	47 28       	jnc	$+144    	;abs 0xe2e
+ da0:	31 2c       	jc	$+100    	;abs 0xe04
+ da2:	32 29       	jnc	$+614    	;abs 0x1008
+ da4:	00 50       	rla	r0		;
+ da6:	32 49       	mov	@r9+,	r2	;
+ da8:	45 53       	add.b	#0,	r5	;r3 As==00
+ daa:	3a 47       	mov	@r7+,	r10	;
+ dac:	28 31       	jn	$+594    	;abs 0xffe
+ dae:	2c 32       	jn	$-934    	;abs 0xa08
+ db0:	29 00       	.word	0x0029;	????
+ db2:	50 32       	jn	$-862    	;abs 0xa54
+ db4:	49 45       	mov.b	r5,	r9	;
+ db6:	3a 47       	mov	@r7+,	r10	;
+ db8:	28 31       	jn	$+594    	;abs 0x100a
+ dba:	2c 32       	jn	$-934    	;abs 0xa14
+ dbc:	29 00       	.word	0x0029;	????
+ dbe:	50 32       	jn	$-862    	;abs 0xa60
+ dc0:	53 45       	.word	0x4553;	????
+ dc2:	4c 3a       	jl	$-870    	;abs 0xa5c
+ dc4:	47 28       	jnc	$+144    	;abs 0xe54
+ dc6:	31 2c       	jc	$+100    	;abs 0xe2a
+ dc8:	32 29       	jnc	$+614    	;abs 0x102e
+ dca:	00 50       	rla	r0		;
+ dcc:	32 52       	add	#8,	r2	;r2 As==11
+ dce:	45 4e       	mov.b	r14,	r5	;
+ dd0:	3a 47       	mov	@r7+,	r10	;
+ dd2:	28 31       	jn	$+594    	;abs 0x1024
+ dd4:	2c 32       	jn	$-934    	;abs 0xa2e
+ dd6:	29 00       	.word	0x0029;	????
+ dd8:	53 44       	.word	0x4453;	????
+ dda:	31 36       	jge	$-924    	;abs 0xa3e
+ ddc:	43 54       	.word	0x5443;	????
+ dde:	4c 3a       	jl	$-870    	;abs 0xa78
+ de0:	47 28       	jnc	$+144    	;abs 0xe70
+ de2:	38 2c       	jc	$+114    	;abs 0xe54
+ de4:	38 29       	jnc	$+626    	;abs 0x1056
+ de6:	00 53       	add	#0,	r0	;r3 As==00
+ de8:	44 31       	jn	$+650    	;abs 0x1072
+ dea:	36 49       	mov	@r9+,	r6	;
+ dec:	56 3a       	jl	$-850    	;abs 0xa9a
+ dee:	47 28       	jnc	$+144    	;abs 0xe7e
+ df0:	38 2c       	jc	$+114    	;abs 0xe62
+ df2:	38 29       	jnc	$+626    	;abs 0x1064
+ df4:	00 53       	add	#0,	r0	;r3 As==00
+ df6:	44 31       	jn	$+650    	;abs 0x1080
+ df8:	36 41       	pop	r6		;
+ dfa:	45 3a       	jl	$-884    	;abs 0xa86
+ dfc:	47 28       	jnc	$+144    	;abs 0xe8c
+ dfe:	31 2c       	jc	$+100    	;abs 0xe62
+ e00:	32 29       	jnc	$+614    	;abs 0x1066
+ e02:	00 53       	add	#0,	r0	;r3 As==00
+ e04:	44 31       	jn	$+650    	;abs 0x108e
+ e06:	36 49       	mov	@r9+,	r6	;
+ e08:	4e 43       	clr.b	r14		;
+ e0a:	54 4c 30 3a 	mov.b	14896(r12),r4	;
+ e0e:	47 28       	jnc	$+144    	;abs 0xe9e
+ e10:	31 2c       	jc	$+100    	;abs 0xe74
+ e12:	32 29       	jnc	$+614    	;abs 0x1078
+ e14:	00 53       	add	#0,	r0	;r3 As==00
+ e16:	44 31       	jn	$+650    	;abs 0x10a0
+ e18:	36 50 52 45 	add	#17746,	r6	;#0x4552
+ e1c:	30 3a       	jl	$-926    	;abs 0xa7e
+ e1e:	47 28       	jnc	$+144    	;abs 0xeae
+ e20:	31 2c       	jc	$+100    	;abs 0xe84
+ e22:	32 29       	jnc	$+614    	;abs 0x1088
+ e24:	00 53       	add	#0,	r0	;r3 As==00
+ e26:	44 31       	jn	$+650    	;abs 0x10b0
+ e28:	36 43       	mov	#-1,	r6	;r3 As==11
+ e2a:	43 54       	.word	0x5443;	????
+ e2c:	4c 30       	jn	$+154    	;abs 0xec6
+ e2e:	3a 47       	mov	@r7+,	r10	;
+ e30:	28 38       	jl	$+82     	;abs 0xe82
+ e32:	2c 38       	jl	$+90     	;abs 0xe8c
+ e34:	29 00       	.word	0x0029;	????
+ e36:	53 44       	.word	0x4453;	????
+ e38:	31 36       	jge	$-924    	;abs 0xa9c
+ e3a:	4d 45       	mov.b	r5,	r13	;
+ e3c:	4d 30       	jn	$+156    	;abs 0xed8
+ e3e:	3a 47       	mov	@r7+,	r10	;
+ e40:	28 38       	jl	$+82     	;abs 0xe92
+ e42:	2c 38       	jl	$+90     	;abs 0xe9c
+ e44:	29 00       	.word	0x0029;	????
+ e46:	55 53       	inc.b	r5		;
+ e48:	49 43       	clr.b	r9		;
+ e4a:	54 4c 30 3a 	mov.b	14896(r12),r4	;
+ e4e:	47 28       	jnc	$+144    	;abs 0xede
+ e50:	31 2c       	jc	$+100    	;abs 0xeb4
+ e52:	32 29       	jnc	$+614    	;abs 0x10b8
+ e54:	00 55       	add	r5,	r0	;
+ e56:	53 49       	.word	0x4953;	????
+ e58:	43 54       	.word	0x5443;	????
+ e5a:	4c 31       	jn	$+666    	;abs 0x10f4
+ e5c:	3a 47       	mov	@r7+,	r10	;
+ e5e:	28 31       	jn	$+594    	;abs 0x10b0
+ e60:	2c 32       	jn	$-934    	;abs 0xaba
+ e62:	29 00       	.word	0x0029;	????
+ e64:	55 53       	inc.b	r5		;
+ e66:	49 43       	clr.b	r9		;
+ e68:	4b 43       	clr.b	r11		;
+ e6a:	54 4c 3a 47 	mov.b	18234(r12),r4	;
+ e6e:	28 31       	jn	$+594    	;abs 0x10c0
+ e70:	2c 32       	jn	$-934    	;abs 0xaca
+ e72:	29 00       	.word	0x0029;	????
+ e74:	55 53       	inc.b	r5		;
+ e76:	49 43       	clr.b	r9		;
+ e78:	4e 54       	add.b	r4,	r14	;
+ e7a:	3a 47       	mov	@r7+,	r10	;
+ e7c:	28 31       	jn	$+594    	;abs 0x10ce
+ e7e:	2c 32       	jn	$-934    	;abs 0xad8
+ e80:	29 00       	.word	0x0029;	????
+ e82:	55 53       	inc.b	r5		;
+ e84:	49 53       	add.b	#0,	r9	;r3 As==00
+ e86:	52 4c 3a 47 	mov.b	18234(r12),r2	;
+ e8a:	28 31       	jn	$+594    	;abs 0x10dc
+ e8c:	2c 32       	jn	$-934    	;abs 0xae6
+ e8e:	29 00       	.word	0x0029;	????
+ e90:	55 53       	inc.b	r5		;
+ e92:	49 53       	add.b	#0,	r9	;r3 As==00
+ e94:	52 48 3a 47 	mov.b	18234(r8),r2	;
+ e98:	28 31       	jn	$+594    	;abs 0x10ea
+ e9a:	2c 32       	jn	$-934    	;abs 0xaf4
+ e9c:	29 00       	.word	0x0029;	????
+ e9e:	55 53       	inc.b	r5		;
+ ea0:	49 43       	clr.b	r9		;
+ ea2:	54 4c 3a 47 	mov.b	18234(r12),r4	;
+ ea6:	28 38       	jl	$+82     	;abs 0xef8
+ ea8:	2c 38       	jl	$+90     	;abs 0xf02
+ eaa:	29 00       	.word	0x0029;	????
+ eac:	55 53       	inc.b	r5		;
+ eae:	49 43       	clr.b	r9		;
+ eb0:	43 54       	.word	0x5443;	????
+ eb2:	4c 3a       	jl	$-870    	;abs 0xb4c
+ eb4:	47 28       	jnc	$+144    	;abs 0xf44
+ eb6:	38 2c       	jc	$+114    	;abs 0xf28
+ eb8:	38 29       	jnc	$+626    	;abs 0x112a
+ eba:	00 55       	add	r5,	r0	;
+ ebc:	53 49       	.word	0x4953;	????
+ ebe:	53 52       	.word	0x5253;	????
+ ec0:	3a 47       	mov	@r7+,	r10	;
+ ec2:	28 38       	jl	$+82     	;abs 0xf14
+ ec4:	2c 38       	jl	$+90     	;abs 0xf1e
+ ec6:	29 00       	.word	0x0029;	????
+ ec8:	57 44 54 43 	mov.b	17236(r4),r7	;
+ ecc:	54 4c 3a 47 	mov.b	18234(r12),r4	;
+ ed0:	28 38       	jl	$+82     	;abs 0xf22
+ ed2:	2c 38       	jl	$+90     	;abs 0xf2c
+ ed4:	29 00       	.word	0x0029;	????
+ ed6:	49 45       	mov.b	r5,	r9	;
+ ed8:	31 3a       	jl	$-924    	;abs 0xb3c
+ eda:	47 28       	jnc	$+144    	;abs 0xf6a
+ edc:	31 2c       	jc	$+100    	;abs 0xf40
+ ede:	32 29       	jnc	$+614    	;abs 0x1144
+ ee0:	00 49       	br	r9		;
+ ee2:	46 47       	mov.b	r7,	r6	;
+ ee4:	31 3a       	jl	$-924    	;abs 0xb48
+ ee6:	47 28       	jnc	$+144    	;abs 0xf76
+ ee8:	31 2c       	jc	$+100    	;abs 0xf4c
+ eea:	32 29       	jnc	$+614    	;abs 0x1150
+ eec:	00 43       	clr	r0		;
+ eee:	41 4c       	mov.b	r12,	r1	;
+ ef0:	44 43       	clr.b	r4		;
+ ef2:	4f 5f       	rla.b	r15		;
+ ef4:	31 36       	jge	$-924    	;abs 0xb58
+ ef6:	4d 48       	mov.b	r8,	r13	;
+ ef8:	5a 3a       	jl	$-842    	;abs 0xbae
+ efa:	47 28       	jnc	$+144    	;abs 0xf8a
+ efc:	31 2c       	jc	$+100    	;abs 0xf60
+ efe:	32 29       	jnc	$+614    	;abs 0x1164
+ f00:	00 43       	clr	r0		;
+ f02:	41 4c       	mov.b	r12,	r1	;
+ f04:	42 43       	clr.b	r2		;
+ f06:	31 5f       	add	@r15+,	r1	;
+ f08:	31 36       	jge	$-924    	;abs 0xb6c
+ f0a:	4d 48       	mov.b	r8,	r13	;
+ f0c:	5a 3a       	jl	$-842    	;abs 0xbc2
+ f0e:	47 28       	jnc	$+144    	;abs 0xf9e
+ f10:	31 2c       	jc	$+100    	;abs 0xf74
+ f12:	32 29       	jnc	$+614    	;abs 0x1178
+ f14:	00 43       	clr	r0		;
+ f16:	41 4c       	mov.b	r12,	r1	;
+ f18:	44 43       	clr.b	r4		;
+ f1a:	4f 5f       	rla.b	r15		;
+ f1c:	31 32       	jn	$-924    	;abs 0xb80
+ f1e:	4d 48       	mov.b	r8,	r13	;
+ f20:	5a 3a       	jl	$-842    	;abs 0xbd6
+ f22:	47 28       	jnc	$+144    	;abs 0xfb2
+ f24:	31 2c       	jc	$+100    	;abs 0xf88
+ f26:	32 29       	jnc	$+614    	;abs 0x118c
+ f28:	00 43       	clr	r0		;
+ f2a:	41 4c       	mov.b	r12,	r1	;
+ f2c:	42 43       	clr.b	r2		;
+ f2e:	31 5f       	add	@r15+,	r1	;
+ f30:	31 32       	jn	$-924    	;abs 0xb94
+ f32:	4d 48       	mov.b	r8,	r13	;
+ f34:	5a 3a       	jl	$-842    	;abs 0xbea
+ f36:	47 28       	jnc	$+144    	;abs 0xfc6
+ f38:	31 2c       	jc	$+100    	;abs 0xf9c
+ f3a:	32 29       	jnc	$+614    	;abs 0x11a0
+ f3c:	00 43       	clr	r0		;
+ f3e:	41 4c       	mov.b	r12,	r1	;
+ f40:	44 43       	clr.b	r4		;
+ f42:	4f 5f       	rla.b	r15		;
+ f44:	38 4d       	mov	@r13+,	r8	;
+ f46:	48 5a       	add.b	r10,	r8	;
+ f48:	3a 47       	mov	@r7+,	r10	;
+ f4a:	28 31       	jn	$+594    	;abs 0x119c
+ f4c:	2c 32       	jn	$-934    	;abs 0xba6
+ f4e:	29 00       	.word	0x0029;	????
+ f50:	43 41       	.word	0x4143;	????
+ f52:	4c 42       	mov.b	r2,	r12	;
+ f54:	43 31       	jn	$+648    	;abs 0x11dc
+ f56:	5f 38       	jl	$+192    	;abs 0x1016
+ f58:	4d 48       	mov.b	r8,	r13	;
+ f5a:	5a 3a       	jl	$-842    	;abs 0xc10
+ f5c:	47 28       	jnc	$+144    	;abs 0xfec
+ f5e:	31 2c       	jc	$+100    	;abs 0xfc2
+ f60:	32 29       	jnc	$+614    	;abs 0x11c6
+ f62:	00 43       	clr	r0		;
+ f64:	41 4c       	mov.b	r12,	r1	;
+ f66:	44 43       	clr.b	r4		;
+ f68:	4f 5f       	rla.b	r15		;
+ f6a:	31 4d       	mov	@r13+,	r1	;
+ f6c:	48 5a       	add.b	r10,	r8	;
+ f6e:	3a 47       	mov	@r7+,	r10	;
+ f70:	28 31       	jn	$+594    	;abs 0x11c2
+ f72:	2c 32       	jn	$-934    	;abs 0xbcc
+ f74:	29 00       	.word	0x0029;	????
+ f76:	43 41       	.word	0x4143;	????
+ f78:	4c 42       	mov.b	r2,	r12	;
+ f7a:	43 31       	jn	$+648    	;abs 0x1202
+ f7c:	5f 31       	jn	$+704    	;abs 0x123c
+ f7e:	4d 48       	mov.b	r8,	r13	;
+ f80:	5a 3a       	jl	$-842    	;abs 0xc36
+ f82:	47 28       	jnc	$+144    	;abs 0x1012
+ f84:	31 2c       	jc	$+100    	;abs 0xfe8
+ f86:	32 29       	jnc	$+614    	;abs 0x11ec
+ f88:	00 62       	addc	r2,	r0	;
+ f8a:	75 66       	addc.b	@r6+,	r5	;
+ f8c:	66 65       	addc.b	@r5,	r6	;
+ f8e:	72 3a       	jl	$-794    	;abs 0xc74
+ f90:	47 28       	jnc	$+144    	;abs 0x1020
+ f92:	31 2c       	jc	$+100    	;abs 0xff6
+ f94:	33 29       	jnc	$+616    	;abs 0x11fc
+ f96:	3d 61       	addc	@r1+,	r13	;
+ f98:	72 28       	jnc	$+230    	;abs 0x107e
+ f9a:	38 2c       	jc	$+114    	;abs 0x100c
+ f9c:	37 29       	jnc	$+624    	;abs 0x120c
+ f9e:	3b 30       	jn	$+120    	;abs 0x1016
+ fa0:	3b 37       	jge	$-392    	;abs 0xe18
+ fa2:	3b 28       	jnc	$+120    	;abs 0x101a
+ fa4:	30 2c       	jc	$+98     	;abs 0x1006
+ fa6:	31 31       	jn	$+612    	;abs 0x120a
+ fa8:	29 00       	.word	0x0029;	????

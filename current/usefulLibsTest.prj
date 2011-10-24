@@ -1,23 +1,34 @@
 <project version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\analog.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\analog.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\delay.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\delay.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\eeprom.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\eeprom.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\i2c.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\i2c.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\lcd6100.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\lcd6100.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\main.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\microquad.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\color.h" />
+	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\eeprom.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\eeprom.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\i2c.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\i2c.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\itg3200.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\itg3200.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\lcd6100.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\lcd6100.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main2.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\mains.txt" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\resources.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\usefullibs.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\usefullibs.h" />
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.c" linenum="284" placement="0:1:-1:-1:-8:-30:125:125:1196:393" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\usefullibs.h" linenum="59" placement="0:1:-1:-1:-8:-30:0:0:1075:272" />
-	<localfile path="C:\Users\flaviohpo\Desktop\microquad\kkversion\usefulLibsTest\main.c" linenum="199" placement="2:3:-1:-1:-8:-30:125:125:1200:397" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.h" linenum="29" placement="0:1:-1:-1:-8:-30:50:50:970:350" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main2.c" linenum="31" placement="0:1:-1:-1:-8:-30:75:75:995:375" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\usefullibs.h" linenum="23" placement="0:1:-1:-1:-8:-30:100:100:1020:400" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\usefullibs.c" linenum="236" placement="2:3:-1:-1:-8:-30:125:125:1045:425" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" linenum="24" placement="0:1:-1:-1:-8:-30:0:0:920:300" />
+	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" linenum="2" placement="0:1:-1:-1:-8:-30:25:25:945:325" />
 </workspace>
 

@@ -27,52 +27,36 @@
 //                             
 //
 //
-/* 
-    avacalhado por flavio em 20/11/2010
-    - lcd_drawcircle(...);
-    - lcd_drawline(...);
-    - otimizacao do codigo:
-        - funcao n6100_sendcommand e n6100_senddata viraram uma so: n6100_send(char,char)
-        - o codigo foi reduzido em aproximadamente 20% de tamanho
-        - fonts.h foi movido para lcd6100.h
-        - prototipos foram movidos para lcd6100.h
-        - cor ORANGE e LIME foram adicionadas
-    
-    continuacao flavio 24/7/2011
-        void lcd_drawpoint(unsigned char x, unsigned char y, int color)
-*/                             
-// ****************************************************************
-// ** TABELA DE CORES BÁSICAS (8Bits) - FORMATO: RRRGGGBB        **
-// ****************************************************************
+// 
+//    avacalhado por flavio em 20/11/2010
+//    - lcd_drawcircle(...);
+//    - lcd_drawline(...);
+//    - otimizacao do codigo:
+//        - funcao n6100_sendcommand e n6100_senddata viraram uma so: n6100_send(char,char)
+//        - o codigo foi reduzido em aproximadamente 20% de tamanho
+//        - fonts.h foi movido para lcd6100.h
+//        - prototipos foram movidos para lcd6100.h
+//        - cor ORANGE e LIME foram adicionadas
+//    
+//    continuacao flavio 24/7/2011
+//        void lcd_drawpoint(unsigned char x, unsigned char y, int color)
+//    
+//    continuacao flavio 23/10/2011
+//        adicionado typedef COLOR
+//        cor ORANGE foi removida
+//        
+//                             
 //
-#define BLACK           0x00
-#define GRAY            0x49
-#define MARROON         0x40
-#define OLIVE           0x6c
-#define GREEN           0x08
-#define TEAL            0x09
-#define NAVY            0x01
-#define PURPLE          0x41
-#define MAGENTA         0xe3
-#define BLUE            0x03
-#define AQUA            0x1f
-#define LIME            0x1c
-#define YELLOW          0xfc
-#define RED             0xe0
-#define SILVER          0xb6
-#define WHITE           0xff
-#define CYAN            0x1F
-#define ORANGE          (YELLOW | RED)
-
 //
 // ****************************************************************
 // ** V A R I Á V E I S  D O  D I S P L A Y                      **
 // ****************************************************************
 //
-extern unsigned char LCD_linecount;
-extern unsigned char LCD_charcount;
-extern unsigned char color_back;
-extern unsigned char color_fore;
+extern unsigned char LCDLineCount;
+extern unsigned char LCDCharCount;
+
+extern unsigned char LCDBackColor;
+extern unsigned char LCDForeColor;
 
 // Display Gráfico Color 
 //
@@ -87,12 +71,6 @@ extern unsigned char color_fore;
 #define direto          0x48
 #define invertido       0x00
 
-extern unsigned char LCD_linecount;
-extern unsigned char LCD_charcount ;
-extern unsigned char LCD_back_color;
-extern unsigned char LCD_fore_color;
-
-
 extern const char asciitable[640];
 
 //
@@ -103,22 +81,23 @@ extern const char asciitable[640];
 
 void lcd_setcolor(unsigned char foreground_color, unsigned char background_color);
 void n6100_send(unsigned char data, unsigned char cmd);
-void lcd_init(unsigned char cor);
-void lcd_clear(unsigned char cor); 
+void lcd_init(unsigned char color);
+void lcd_clear(unsigned char color); 
 void n6100_sendcom1(unsigned char comm, unsigned char dat);
 void n6100_sendcom2(unsigned char comm, unsigned char dat1, unsigned char dat2);
-void lcd_drawpoint(unsigned char x, unsigned char y, int color);
-void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char cor);
+void lcd_drawpoint(unsigned char x, unsigned char y, unsigned char color);
+void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char color);
 void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char p[]);
 void lcd_newline(void);
 void lcd_goto(unsigned char x, unsigned char y);
 void lcd_wrchar(unsigned char c);
 void lcd_putchar(unsigned char c);
 void lcd_drawcircle(unsigned int x, unsigned int y, unsigned int radius, unsigned char color, int width);
-void lcd_drawline(int x0, int y0, int x1, int y1, int color);
-void lcd_drawprogressbar(int x0, int y0, int x1, int y1, int color, int colorprogress, int percent);
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color);
+void lcd_drawprogressbar(int x0, int y0, int x1, int y1, unsigned char color, unsigned char colorprogress, int percent);
 void lcd_putdot(int from, int to);
-void lcd_set_colour(unsigned char back, unsigned char fore);
+
+
 // ************************************************************************
 // **                                                                    **
 // **  TABELA ASCII para LCDs Gráficos                                   **
@@ -130,9 +109,3 @@ void lcd_set_colour(unsigned char back, unsigned char fore);
 // **                                                                    **
 // ************************************************************************
 //
-
-
-
-
-
-

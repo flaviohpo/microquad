@@ -9,16 +9,18 @@
 #include "eeprom.h"
 #include "i2c.h"
 #include "microquad.h"
+#include "resources.h"
 
 volatile unsigned int MenuCounter = 0;
-char low_battery_flag = 0;
 
-char MenuVisible = FALSE;       // indica se o menu deve ser processado ou nao
-char MotorArmed = FALSE;        // seguranca, o loop de controle so eh feito quando esta variavei for TRUE
-char DrawRCInputCheck = FALSE; // serve para desenhar o textos uma vez so
-char DrawControlRefCheck = FALSE;
-char ShowSettingsCheck = FALSE;
-char DrawMotorOutCheck = FALSE; // serve para desenhar o textos uma vez so
+// fazer uma struct com bitfield com todos esse flags
+unsigned char low_battery_flag = FALSE;
+unsigned char MenuVisible = FALSE;       // indica se o menu deve ser processado ou nao
+unsigned char MotorArmed = FALSE;        // seguranca, o loop de controle so eh feito quando esta variavei for TRUE
+unsigned char DrawRCInputCheck = FALSE; // serve para desenhar o textos uma vez so
+unsigned char DrawControlRefCheck = FALSE;
+unsigned char ShowSettingsCheck = FALSE;
+unsigned char DrawMotorOutCheck = FALSE; // serve para desenhar o textos uma vez so
 
 MENU_STEPSET MenuStep = DISPLAY;        // gerencia o menu principal
 MENU_STEPSET MenuAnalog = DISPLAY;      // gerencia os canais analog visiveis
@@ -28,64 +30,37 @@ MENU_OPTION MenuOption = READY;         // guarda a opcao escolhida no menu prin
 PID_TUNING_OPT PIDMenuOption = CHANGE_P_ROLL;
 
 // variaveis usadas no menu analog graph
-char AnalogSelect = 7;      // serve para selecionar a entrada no menu analog
-char AnalogChecked = 0x00;  // verifica se a entrada X deve ser mostrada no grafico
+unsigned char AnalogSelect = 7;      // serve para selecionar a entrada no menu analog
+unsigned char AnalogChecked = 0x00;  // verifica se a entrada X deve ser mostrada no grafico
+unsigned char AnalogColours[8] = {BLUE, LIME, RED, YELLOW, ORANGE, MAGENTA, AQUA, WHITE}; 
 char AnalogGraph[8][GRAPH_LENGHT];   // um vetor para cada entrada analogica, guarda as ultimas GRAPH_LENGHT leituras, total = 800B
-char AnalogColours[8] = {BLUE, LIME, RED, YELLOW, ORANGE, MAGENTA, AQUA, WHITE}; 
 
 // variaveis ajuste radio - roll pitch e yaw
 int PPMOffset[4] = {0, 0, 0, 0};
 
 // controle - roll pitch e yaw
-int Gain[3][3] = {{1, 1, 1}, {0, 0, 0}, {0, 0, 0}};
+unsigned int Gain[3][3] = {{1, 1, 1}, {0, 0, 0}, {0, 0, 0}};
 int ControlRef[4] = {0, 0, 0, 0};
-int MotorOut[4] = {0, 0, 0, 0};
+unsigned int MotorOut[4] = {0, 0, 0, 0};
+
+// vars sensores
+volatile int GyroValue[3] = {0, 0, 0};
+int AccelValue[3] = {0, 0, 0};
+
 // var menu ajuste do controle
 int StickCounter = 1;
 
 // variaveis leitura radio raw
-volatile int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};            // 
-volatile int PPMValue[8] = {0,0,0,0,0,0,0,0};
+volatile unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};            // 
+volatile unsigned int PPMValue[8] = {0,0,0,0,0,0,0,0};
 
 int main(){
     WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
 
-    setup();    // inicializa perifericos e verifica se precisa calibrar o radio
-
-    lcd_clear(BLACK);
-    
-    // estados iniciais dos menus
-    MenuOption = READY;
-    MenuStep = DISPLAY;
-    MenuVisible = TRUE;     // inicializa mostrando o menu
+    setup();
     
     while(1){
-        
-        if(MotorArmed == TRUE){
-            main_loop();
-        }
-
-        if(MenuVisible == TRUE){
-            if(!low_battery_flag){
-                analog_refresh_all();
-                process_menu();
-            }
-        }
-        else{
-            if(PPMValue[CH6_CH] > STICK_UP_THRESHOLD){
-                MenuVisible = TRUE;
-                MotorArmed = FALSE;
-            }
-        }
-#ifdef BATTERY_MONITOR
-        if((AnalogValue[BATTERY_CH] < LOW_BAT) && low_battery_flag == FALSE){
-            low_battery_flag = TRUE;
-            MenuVisible = FALSE;   
-            lcd_clear(BLACK);
-            lcd_goto(1,8);
-            printf("LOW BATTERY!!!");
-        }
-#endif //BATTERY_MONITOR
+    
     }
 }
 
@@ -188,9 +163,9 @@ void process_menu(void){
             printf("SELECT %d       ", (int)MenuOption);
             
             lcd_goto(0,(int)MenuOption + 2);
-            LCD_fore_color = RED;
+            LCDForeColor = RED;
             printf(">");
-            LCD_fore_color = LIME;
+            LCDForeColor = LIME;
             
             // movimento pra baixo e pra cima
             if(PPMValue[PITCH_CH] < STICK_DOWN_THRESHOLD){
@@ -318,7 +293,6 @@ void process_option(){
 
             delayms(2500);
             MenuVisible = TRUE;
-            // seta o flag initial setup
             break;          
         
         case RE_CALIBRATE_GYRO:
@@ -396,15 +370,15 @@ void process_PID_menu(void){
             lcd_goto(16,2);
             for(i=0; i < 3; i++){
                 for(j=0; j<3; j++){
-                    lcd_goto(16, LCD_linecount);
+                    lcd_goto(16, LCDLineCount);
                     printf("%d  \n",Gain[i][j]);
                 }
             }
             
             lcd_goto(0,(int)PIDMenuOption + 2);
-            LCD_fore_color = RED;
+            LCDForeColor = RED;
             printf(">");
-            LCD_fore_color = LIME;
+            LCDForeColor = LIME;
             
             // movimento pra baixo e pra cima
             if(PPMValue[PITCH_CH] < STICK_DOWN_THRESHOLD){
@@ -581,55 +555,55 @@ void show_settings(void){
     printf("SETTINGS\n\n");
     
     printf("P Pitch");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[PROPORTIONAL][PITCH]);
     
     printf("P Roll");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[PROPORTIONAL][ROLL]);
     
     printf("P Yaw");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[PROPORTIONAL][YAW]);
     
     printf("D Pitch");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[DERIVATIVE][PITCH]);
     
     printf("D Roll");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[DERIVATIVE][ROLL]);
     
     printf("D Yaw");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[DERIVATIVE][YAW]);
     
     printf("I Pitch");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[INTEGRAL][PITCH]);
     
     printf("I Roll");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[INTEGRAL][ROLL]);
     
     printf("I Yaw");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", Gain[INTEGRAL][YAW]);
         
     printf("Pitch Offset");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", PPMOffset[PITCH]);
     
     printf("Roll Offset");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", PPMOffset[ROLL]);
     
     printf("Yaw Offset");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", PPMOffset[YAW]);
     
     printf("Throt. Offset");
-    lcd_putdot(LCD_charcount, 16);
+    lcd_putdot(LCDCharCount, 16);
     printf("%d\n", PPMOffset[THROTTLE]);
     
 }
@@ -875,27 +849,27 @@ void refresh_analog_menu(void){
     lcd_goto(1,12);
     for(i = 0; i < 8; i++){             // para as 8 entradas analogicas
         if((1 << i) & AnalogChecked){   // se a entrada analogica estiver visible
-            LCD_back_color = LIME;          // a cor do fundo muda para azul
-            LCD_fore_color = BLACK;
+            LCDBackColor = LIME;          // a cor do fundo muda para azul
+            LCDForeColor = BLACK;
         }
         else{                           // senao
-            LCD_back_color = BLACK;         // a cor do fundo muda para preto
-            LCD_fore_color = LIME;
+            LCDBackColor = BLACK;         // a cor do fundo muda para preto
+            LCDForeColor = LIME;
         }
         
         if(AnalogSelect == i){          // se o cursor estiver em cima   
-            LCD_fore_color = RED;           // a cor da letra muda para vermelho 
+            LCDForeColor = RED;           // a cor da letra muda para vermelho 
         }                                                                
         else{                           // se nao                        
-            if(LCD_back_color == LIME){
-                LCD_fore_color = BLACK;
+            if(LCDBackColor == LIME){
+                LCDForeColor = BLACK;
             }
         }                               
         
         printf("%d",i);
         // ajusta as cores para o normal
-        LCD_fore_color = LIME;
-        LCD_back_color = BLACK;
+        LCDForeColor = LIME;
+        LCDBackColor = BLACK;
         printf(" ");
     }
     printf("                    ");
@@ -942,22 +916,32 @@ void clock_init(void)
 }
 
 // ok
-void p1_init(){
-        /* Port 1 Output Register */
+void P1_init(){
+    /* Port 1 Output Register */
     P1OUT = PPM_P1MASK;
-
     /* Port 1 Resistor Enable Register */
     P1REN = PPM_P1MASK;
-
     /* Port 1 Interrupt Edge Select Register */
     P1IES = 0; // subida
-
     /* Port 1 Interrupt Flag Register */
     P1IFG = 0;
-
     /* Port 1 Interrupt Enable Register */
     P1IE = PPM_P1MASK;
+}
 
+void P2_init(){ // p2 eh interruption do gyro
+#ifdef ITG3200
+    /* Port 1 Output Register */
+    P2OUT = 0x01;
+    /* Port 1 Resistor Enable Register */
+    P1REN = 0x01;
+    /* Port 1 Interrupt Edge Select Register */
+    P1IES = 0; // subida
+    /* Port 1 Interrupt Flag Register */
+    P1IFG = 0;
+    /* Port 1 Interrupt Enable Register */
+    P1IE = 0x01;
+#endif
 }
 
 // TIMERA: base para leitura dos canais do receptor e interrupt de 2ms
@@ -1042,13 +1026,7 @@ interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
                 P1IES |= (PPM_ch_counter & PPM_P1MASK); // configura high to low
             }
             else{ // high to low
-            
-                if(TimeUpEdge[channel_num] > PPM_aux){ // se deu overflow na contagem do timer
-                    PPMValue[channel_num] = (TACCR0 - TimeUpEdge[channel_num] + PPM_aux);
-                }
-                else{ // se nao deu overflow na contagem do timer
-                    PPMValue[channel_num] = (PPM_aux - TimeUpEdge[channel_num]);
-                }
+                PPMValue[channel_num] = (PPM_aux - TimeUpEdge[channel_num]);
                 P1IES &= ~(PPM_ch_counter & PPM_P1MASK); // configure low to high      
             }
 
@@ -1059,6 +1037,30 @@ interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
     }
 }
 
+interrupt (PORT2_VECTOR) PORT2_ISR_HOOK(void){
+#ifdef ITG3200
+    int varaux = 0;
+    if(ITG3200Done){
+        if(ITG3200_getX(&varaux)){
+            // fazer
+        }
+        GyroValue[GYRO_ROLL] = varaux;
+        
+        if(ITG3200_getY(&varaux)){
+            // fazer        
+        }
+        GyroValue[GYRO_PITCH] = varaux;
+        
+        if(ITG3200_getZ(&varaux)){
+            // fazer        
+        }
+        GyroValue[GYRO_YAW] = varaux;
+        
+    }
+#endif
+    P2IFG = 0x00;
+}
+    
 // consagred
 void calibrate_gyro(void){
     int i, k;
@@ -1170,8 +1172,8 @@ void calibrate_radio(void){
 void load_eeprom_values(void){
     twobytes ValorAux;
 
-    i2c_change_address(EEPROM_I2C_ADDR);    
-
+    i2c_change_slaveaddress(EEPROM_I2C_ADDR);    
+#ifdef SIXTEEN_BIT_EEPROM
     //-------------- PROPORTIONAL
     
     i2c_read16_multiples(_ROLL_P, ValorAux.uc, 2);
@@ -1222,7 +1224,58 @@ void load_eeprom_values(void){
     Gain[INTEGRAL][YAW] = ValorAux.i;
     
     delayms(100);
+#else
+    //-------------- PROPORTIONAL
     
+    i2c_wread_one_buffer(_ROLL_P, ValorAux.uc, 2);
+    Gain[PROPORTIONAL][ROLL] = ValorAux.i;                        
+    
+    delayms(100);
+    
+    i2c_wread_one_buffer(_PITCH_P, ValorAux.uc, 2);
+    Gain[PROPORTIONAL][PITCH] = ValorAux.i;
+    
+    delayms(100);
+    
+    i2c_wread_one_buffer(_YAW_P, ValorAux.uc, 2);
+    Gain[PROPORTIONAL][YAW] = ValorAux.i;
+    
+    delayms(100);
+    
+    //------------------ derivative
+       
+    i2c_wread_one_buffer(_ROLL_D, ValorAux.uc, 2);
+    Gain[DERIVATIVE][ROLL] = ValorAux.i;                        
+    
+    delayms(100);
+    
+    i2c_wread_one_buffer(_PITCH_D, ValorAux.uc, 2);
+    Gain[DERIVATIVE][PITCH] = ValorAux.i;
+    
+    delayms(100);
+    
+    i2c_wread_one_buffer(_YAW_D, ValorAux.uc, 2);
+    Gain[DERIVATIVE][YAW] = ValorAux.i;
+    
+    delayms(100);
+    
+    //--------------------- INTEGRAL
+    
+    i2c_wread_one_buffer(_ROLL_I, ValorAux.uc, 2);
+    Gain[INTEGRAL][ROLL] = ValorAux.i;
+    
+    delayms(100);
+    
+    i2c_wread_one_buffer(_PITCH_I, ValorAux.uc, 2);
+    Gain[INTEGRAL][PITCH] = ValorAux.i;
+    
+    delayms(100);
+    
+    i2c_wread_one_buffer(_YAW_I, ValorAux.uc, 2);
+    Gain[INTEGRAL][YAW] = ValorAux.i;
+    
+    delayms(100);
+#endif
     printf("\nPARAMS LOADED.");
 }
 
@@ -1231,6 +1284,7 @@ void save_current_gains(void){
     twobytes ValorAux;
         
     if(EEPROMFound){
+#ifdef SIXTEEN_BIT_EEPROM
         //proportional
         ValorAux.i = Gain[PROPORTIONAL][PITCH];
         i2c_write16_multiples(_PITCH_P, ValorAux.uc, 2);
@@ -1267,11 +1321,48 @@ void save_current_gains(void){
         ValorAux.i = Gain[INTEGRAL][YAW];
         i2c_write16_multiples(_YAW_I, ValorAux.uc, 2);
         delayms(100);
-    
-        printf("\nParams. saved");
+#else
+        //proportional
+        ValorAux.i = Gain[PROPORTIONAL][PITCH];
+        i2c_write_one_buffer(_PITCH_P, ValorAux.uc, 2);
+        delayms(100);   
+        
+        ValorAux.i = Gain[PROPORTIONAL][ROLL];
+        i2c_write_one_buffer(_ROLL_P, ValorAux.uc, 2);
+        delayms(100);
+        
+        ValorAux.i = Gain[PROPORTIONAL][YAW];
+        i2c_write_one_buffer(_YAW_P, ValorAux.uc, 2);
+        delayms(100);
+        //derivative
+        ValorAux.i = Gain[DERIVATIVE][PITCH];
+        i2c_write_one_buffer(_PITCH_D, ValorAux.uc, 2);
+        delayms(100);
+        
+        ValorAux.i = Gain[DERIVATIVE][ROLL];
+        i2c_write_one_buffer(_ROLL_D, ValorAux.uc, 2);
+        delayms(100);
+        
+        ValorAux.i = Gain[DERIVATIVE][YAW];
+        i2c_write_one_buffer(_YAW_D, ValorAux.uc, 2);
+        delayms(100);
+        //integral
+        ValorAux.i = Gain[INTEGRAL][PITCH];
+        i2c_write_one_buffer(_PITCH_I, ValorAux.uc, 2);
+        delayms(100);
+        
+        ValorAux.i = Gain[INTEGRAL][ROLL];
+        i2c_write_one_buffer(_ROLL_I, ValorAux.uc, 2);
+        delayms(100);
+        
+        ValorAux.i = Gain[INTEGRAL][YAW];
+        i2c_write_one_buffer(_YAW_I, ValorAux.uc, 2);
+        delayms(100);
+#endif
+        printf("\nDefault params saved.");
     }
     else{
-        printf("\nParams. not saved");
+        printf("\nDefault params. not\n saved");
     }
 }
 
@@ -1348,8 +1439,7 @@ void draw_rc_inputs(){
 // consagred
 int find_first(int startaddress){
     for(; startaddress < 255; startaddress++){
-        i2c_config(startaddress);
-        if(!i2c_find_device()){
+        if(!i2c_find_device(startaddress)){
             return startaddress;
         }
     }   
@@ -1357,97 +1447,85 @@ int find_first(int startaddress){
 }
 
 void setup(){
-    int i, j;
+    unsigned int i = 0, j = 0;
     
     clock_init();
     timer_init(); // inicia com 0 ppm no ESC (ESC fica esperando sinal valido beep --- beep --- beep)
+    lcd_init(LCDBackColor);
     
-    p1_init();
-
-    // fazer iniciar iluminacao progressiva
-    while(TACCR1 < 2500){
+    P1_init(); // ppm receiver interrupt
+    P2_init(); // itg3200 sample interrupt
+    
+    // iluminacao progressiva do LCD
+    while(TACCR1 < LCD_MAX_BRIGHT){
         TACCR1 = TACCR1 + 1;
-        delayus(600);
+        delayus(1200);
     }
     
-    analog_init();
-    i2c_init();
-    eint();
+    analog_init(); // config registradores
     
-    lcd_init(BLACK);
+    eint(); // habilita interrupt
     
-    // fazer battery check
-    if(PPMValue[THROTTLE_CH] > 3000){
-        lcd_goto(0,0);
-        printf("ESC CALIBRATION\n3s to start!");
-        delayms(2000);
-        if(PPMValue[THROTTLE_CH] > 3000){
-            set_motor(4000, 4000, 4000, 4000);
-            printf("\nAll motors full throttle.");
-            delayms(2500);
-            printf("\nESC calibrated.");
-            delayms(2000);
-        }
+    battery_check();
+    
+    // calibra ESC
+    if(PPMValue[THROTTLE_CH] > STICK_UP_THRESHOLD){
+        esc_calibration();
+        lcd_clear(BLACK);
     }
-    set_motor(2000, 2000, 2000, 2000);
     
-    //printf("\nITG3200 ADDRESS: %dd\n", find_first(0)); // essa funcao disconfigura alguma coisa da i2c
-        
-    lcd_goto(0,0);
+    set_motor(THROTTLE_MIN, THROTTLE_MIN, THROTTLE_MIN, THROTTLE_MIN); // set all motors throttle min
+
     i2c_config(ITG_I2C_ADDR);
-    ITGFound = !(i2c_find_device());
+    ITG3200Found = !(i2c_find_device(ITG_I2C_ADDR));
     
 #ifdef ITG3200
-    if(ITGFound){
-        printf("\nITG3200 found");
-        ITG_init();
+    if(ITG3200Found){
+        lcd_goto(0,0);
+        printf("\nITG3200 found.");
+        if(ITG3200_init()){
+            printf("\nITG3200 init failled.");
+            delayms(4000);
+        }
     }
     else{
-        LCD_fore_color = RED;
-        printf("\nITG3200 not found");
-        LCD_fore_color = LIME;
+        
+        LCDForeColor = RED;
+        printf("\nITG3200 not found.");
+        LCDForeColor = LIME;
     }
+    printf("\nADDR. %d", ITG_I2C_ADDR);
 #endif //ITG3200
 
     i2c_config(EEPROM_I2C_ADDR);
-    EEPROMFound = !(i2c_find_device());
+    EEPROMFound = !(i2c_find_device(EEPROM_I2C_ADDR));
     
     if(EEPROMFound){
-        printf("\nEEPROM found");
+        printf("\nEEPROM found.");
+        printf("\nADDR. %d", EEPROM_I2C_ADDR);
         load_eeprom_values();
     }
     else{
-        LCD_fore_color = RED;
-        printf("\nEEPROM not found");
-        LCD_fore_color = LIME;
-        
+        LCDForeColor = RED;
+        printf("\nEEPROM not found.");
+        printf("\nADDR. %d", ITG_I2C_ADDR);
+        LCDForeColor = LIME;
         set_defaults();
     }
     
-    delayms(2000);
+    delayms(3000);
     
-    //analog_graph_clear_all();
-
     // inicializa os vetores para desenhar graficos dos analog input
     for(i = 0; i < 8; i++){
         for(j = 0; j<100; j++){
             AnalogGraph[i][j] = GRAPH_OFFSET;
         }
     }
-    
-    delayms(1000);
-    
-    lcd_clear(BLACK);
-        // faz um x vermelho e azul para testar display e draw line
-    lcd_drawline(10,80,90,90,RED);
-    lcd_drawline(10,90,90,80,GREEN);
-    lcd_drawline(45,85,45,50,BLUE);
-    
-    delayms(1000);
+
     lcd_clear(BLACK);
     
-    calibrate_radio();
-    calibrate_gyro();
+    //calibrate_radio();
+    //calibrate_gyro();
     
 }
 
@@ -1473,6 +1551,47 @@ void set_defaults(void){
     Gain[INTEGRAL][YAW] = YAW_I_DEFAULT;
     
     save_current_gains();
+}
+
+void esc_calibration(void){
+    int i;
+    
+    lcd_goto(0,0);
+    printf("WARNING\nTAKE ALL PROPS OFF");
+    printf("PUT THROTTLE DOWN\nTO CANCEL\n");
+    printf("\nESC CALIBRATION\n6s left to start!.");
+    for(i = 0; i < 6; i++){
+        printf(".");
+        delayms(1000);
+    }
+    if(PPMValue[THROTTLE_CH] > STICK_UP_THRESHOLD){
+        set_motor(4000, 4000, 4000, 4000);
+        printf("\nAll motors full throttle.");
+        delayms(2500);
+        printf("\nESC calibrated.");
+        delayms(2000);
+    }   
+}
+
+void battery_check(void){
+#ifdef BATTERY_CHECK
+    if(AnalogValue[BATTERY_CH] < LOW_BAT){
+        lcd_init(BLACK);
+        lcd_goto(5,5);
+        LCDForeColor = RED;
+        printf("LOW BATTERY");
+        P5DIR |= 0x10;
+        
+        while(1){
+            delayms(1000);
+            TACCR1 = 0;
+            P5OUT |= 0x10;
+            delayms(1000);
+            TACCR1 = LCD_MAX_BRIGHT;
+            P5OUT &= ~0x10;
+        }
+    }    
+#endif
 }
 
 inline void set_motor(int m1, int m2, int m3, int m4){

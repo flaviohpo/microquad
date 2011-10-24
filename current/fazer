@@ -2,21 +2,13 @@ imagem de entrada e uma barrinha de loading com um console pra mostrar o que ta 
 
 guardar tempo de voo ( detectar quando a bateria foi carregada para inciar automaticamente uma nova contagem )
 
-gravar na EEPROM o ultimo modo de voo selecionado
-
 melhorar controle
 
-implementar biblioteca de menus com funcao de next page
+implementar menus pela usefulibs
 
 descobrir valores default pro PID
 
-tirar auto calibrate low throttle
-
-inverter a ordem dos valores no show analog graph
-
 adicionar acelerometro e controle da camera
-
-fazer #ifdef para selecionar o hardware
 
 fazer opções para inverter o gyro
 
@@ -24,4 +16,4 @@ deixar somente 2 modos de voo
 
 fazer logica para apagar o lcd quando sai voando
 
-* procurar por "arrumar" no source
+* procurar por "arrumar" e "fazer" no source

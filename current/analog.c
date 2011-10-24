@@ -10,7 +10,7 @@ void analog_init(void){
     ADC12CTL0 &= ~ENC;
     ADC12CTL0 = REFON + ADC12ON;
     ADC12CTL1 = SHP;
-    ADC12CTL0 |= ENC;           
+    ADC12CTL0 |= ENC;
 }
 
 void analog_calibrate_channel(int i){

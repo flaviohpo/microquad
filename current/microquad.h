@@ -2,7 +2,12 @@
 
 #define ITG3200
 //#define LPR510AL
-#define LOW_BAT 2000
+
+//#define BATTERY_CHECK 
+#define LOW_BAT 750
+#define THROTTLE_MIN 2000
+#define THROTTLE_MAX 4000
+#define LCD_MAX_BRIGHT 2250
 
 // descobrir valor bom
 #define PITCH_P_DEFAULT     1
@@ -103,8 +108,11 @@ typedef enum{
     CHANGE_I_PITCH = 0x20 & PITCH
 }PID_TUNING_OPT;
 
+void esc_calibration(void);
+void battery_check(void);
 void clock_init(void);
-void p1_init(void);
+void P1_init(void);
+void P2_init(void);
 void timer_init(void);
 inline void set_motor(int, int, int, int);
 void calibrate_radio(void);
