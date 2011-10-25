@@ -25,13 +25,26 @@ int main(){
     int val = 0;
     
     Item *oItem = create_item("item1", 0,0,0,0,0,0,0,&val);
-    MENU *MainMenu = menu_create("MENU1", oItem, 2, 0, 0, 0, 5, 0);
-    menu_add_item(MainMenu, create_item("item2", 0,0,0,0,0,0,0,&val));
-    menu_add_item(MainMenu, create_item("item3", 0,0,0,0,0,0,0,&val));
-    menu_add_item(MainMenu, create_item("item4", 0,0,0,0,0,0,0,&val));
-    menu_add_item(MainMenu, create_item("item5", 0,0,0,0,0,0,0,&val));
+    MENU *MainMenu = menu_create("MENU1", oItem, 6, 0, 0, 0, 5, 0);
+    val |= menu_add_item(MainMenu, create_item("item2", 0,0,0,0,0,0,0,&val));
+    val |= menu_add_item(MainMenu, create_item("item3", 0,0,0,0,0,0,0,&val)) << 1;
+    val |= menu_add_item(MainMenu, create_item("item4", 0,0,0,0,0,0,0,&val)) << 2;
+    val |= menu_add_item(MainMenu, create_item("item5", 0,0,0,0,0,0,0,&val)) << 4;
+    val |= menu_add_item(MainMenu, create_item("item6", 0,0,0,0,0,0,0,&val)) << 5;
+    val |= menu_add_item(MainMenu, create_item("item7", 0,0,0,0,0,0,0,&val)) << 6;
+    val |= menu_add_item(MainMenu, create_item("item8", 0,0,0,0,0,0,0,&val)) << 7;
+    
+    if(val > 0){
+        printf("%d",val);
+    }
     
     draw_menu(MainMenu, 1);
+
+    while(1){
+        MainMenu->SelectedItem = (MainMenu->SelectedItem + 1) % MainMenu->oListItems->Size;
+        delayms(1000);   
+        draw_menu(MainMenu, 0);
+    }
     
     __bis_SR_register(LPM4_bits);
     

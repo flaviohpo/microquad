@@ -24,11 +24,8 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.h" linenum="29" placement="0:1:-1:-1:-8:-30:50:50:970:350" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main2.c" linenum="31" placement="0:1:-1:-1:-8:-30:75:75:995:375" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\usefullibs.h" linenum="23" placement="0:1:-1:-1:-8:-30:100:100:1020:400" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\usefullibs.c" linenum="236" placement="2:3:-1:-1:-8:-30:125:125:1045:425" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" linenum="24" placement="0:1:-1:-1:-8:-30:0:0:920:300" />
-	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" linenum="2" placement="0:1:-1:-1:-8:-30:25:25:945:325" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main2.c" linenum="59" placement="2:3:-1:-1:-8:-30:75:75:991:371" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" linenum="56" placement="0:1:-1:-1:-8:-30:100:100:1020:400" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.h" linenum="18" placement="0:1:-1:-1:-8:-30:125:125:1045:425" />
 </workspace>
 

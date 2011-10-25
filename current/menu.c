@@ -16,6 +16,8 @@ MENU* menu_create(char *tittle, Item *FirstItem, uchar janelasize, char autorefr
         oMenu->ValuePositionH = valueposh;
         oMenu->ArrowPositionH = arrowposh;
         oMenu->BarsLenght = barslen;
+        oMenu->SelectedItem = 0;
+        oMenu->FirstShowed = 0;
     }
     return oMenu;
 }
@@ -31,8 +33,6 @@ void menu_refresh(MENU* menu){
 
 void draw_menu(MENU* oMenu, uchar clear){
     uint16 i = 0;
-    uint16 LimiteMin = oMenu->JanelaSize;
-    uint16 LimiteMax = oMenu->oListItems->Size - 1 - oMenu->JanelaSize;
     
     uchar SetaCima = 1;
     uchar SetaBaixo = 1;
@@ -43,64 +43,34 @@ void draw_menu(MENU* oMenu, uchar clear){
         printf(oMenu->oListItems->Label);
     }
     
-    if(oMenu->SelectedItem < LimiteMin){ // se utrapassou o limite inferior da janela
-        SetaCima = 0;
-        // coloca desde o inicio ate o tamanho de 2*Janela+1
-        for(i = 0; i < oMenu->JanelaSize * 2 + 2; i++){
-            if(i < oMenu->oListItems->Size){
-                lcd_goto(0, 2 + i);
-                if(i == oMenu->SelectedItem){
-                    printf("> ");
-                }
-                else{
-                    printf("  ");    
-                }
-                printf(list_items_get_node(oMenu->oListItems, i)->Value->Label);
-                LCDLineCount++;
+    // coloca desde o inicio ate o tamanho de 2*Janela+1
+    if(oMenu->SelectedItem < oMenu->FirstShowed && oMenu->FirstShowed > 0){
+        oMenu->FirstShowed = oMenu->SelectedItem;
+    }
+    if(oMenu->SelectedItem >= (oMenu->FirstShowed + oMenu->JanelaSize) && oMenu->SelectedItem < oMenu->oListItems->Size){
+        oMenu->FirstShowed = oMenu->SelectedItem - oMenu->JanelaSize + 1;
+    }
+    if(oMenu->FirstShowed == 0){
+        SetaCima = 0;    
+    }
+    if((oMenu->JanelaSize + oMenu->FirstShowed) >= oMenu->oListItems->Size){
+        SetaBaixo = 0;
+    }
+    for(i = oMenu->FirstShowed; i < oMenu->FirstShowed + oMenu->JanelaSize; i++){
+        if(i < oMenu->oListItems->Size){
+            lcd_goto(0, 2 + i - oMenu->FirstShowed);
+            if(i == oMenu->SelectedItem){
+                printf("> ");
             }
             else{
-                SetaBaixo = 0;
+                printf("  ");    
             }
+            printf(list_items_get_node(oMenu->oListItems, i)->Value->Label);
+            LCDLineCount++;
         }
+
     }
-    else{
-        SetaBaixo = 0;
-        if(oMenu->SelectedItem > LimiteMax){
-            // coloca a parte do final
-            if(i < oMenu->oListItems->Size){ // precaucao
-                for(i = oMenu->oListItems->Size - oMenu->JanelaSize * 2 - 2; i < oMenu->oListItems->Size; i++){
-                    lcd_goto(0, (i - oMenu->oListItems->Size - oMenu->JanelaSize * 2));
-                    if(i == oMenu->SelectedItem){
-                        printf("> ");
-                    }
-                    else{
-                        printf("  ");    
-                    }
-                    printf(list_items_get_node(oMenu->oListItems, i)->Value->Label);
-                    LCDLineCount++;
-                }
-            }        
-        }
-        else{ // significa que o item selecionado esta bem no meio da janela
-            // coloca o selected no meio, inicia em selected-janela e vai ate selected+janela
-            for(i = oMenu->SelectedItem - oMenu->JanelaSize; i < oMenu->SelectedItem - oMenu->JanelaSize + 1; i++){
-                if(i < oMenu->oListItems->Size){            
-                    lcd_goto(0, i - oMenu->oListItems->Size - oMenu->JanelaSize * 2);
-                    if(i == oMenu->SelectedItem){
-                        printf("> ");
-                    }
-                    else{
-                        printf("  ");    
-                    }
-                    printf(list_items_get_node(oMenu->oListItems, i)->Value->Label);
-                    LCDLineCount++;
-                }
-                else{
-                    SetaBaixo = 0;
-                }
-            }
-        }    
-    }
+
     lcd_goto(oMenu->ArrowPositionH, 1);
     if(SetaCima){
         printf("/\\");

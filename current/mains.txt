@@ -40,3 +40,28 @@ int main(){
         
     }
 }
+
+// HMC5843
+
+int main(){
+    WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
+
+    setup();    // inicializa perifericos e verifica se precisa calibrar o radio
+    lcd_setcolor(BLACK, WHITE);   
+    
+    const unsigned char HMC5843_I2C_ADDR = 0x3C;
+    
+    i2c_config(HMC5843_I2C_ADDR);
+    if(i2c_find_device(HMC5843_I2C_ADDR)){
+        printf("HMC nao responde");
+    }
+    else{
+        printf("HMC encontrado");
+    }
+  
+    __bis_SR_register(LPM4_bits);
+    
+    while(1){
+        
+    }
+}

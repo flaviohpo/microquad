@@ -15,6 +15,7 @@ typedef struct{
     ListItems *oListItems;
     uint16 SelectedItem;
     uchar JanelaSize;
+    uint16 FirstShowed;
     char AutoRefresh            : 1;
     // attributes
     uchar BarsPositionH;
