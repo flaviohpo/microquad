@@ -6,19 +6,36 @@
 // undef ULIBS_AUTO_TEST to undeclare void UsefulLibsAutoTest() function
 #define ULIBS_AUTO_TEST
 
+#define MASK_SUBMENU            0x01
+#define MASK_WRITE              0x02
+#define MASK_READ               0x04
+#define MASK_BOOL               0x08
+#define MASK_VALUE              0x10
+#define MASK_BAR                0x20
+
+typedef enum{
+    ITEMTYPE_SUBMENU        =   MASK_SUBMENU | MASK_READ | MASK_WRITE,
+    ITEMTYPE_VALUE_RW       =   MASK_READ | MASK_WRITE | MASK_VALUE,
+    ITEMTYPE_VALUE_R        =   MASK_READ | MASK_VALUE,
+    ITEMTYPE_BAR_R          =   MASK_READ | MASK_BAR,
+    ITEMTYPE_BAR_RW         =   MASK_READ | MASK_WRITE | MASK_BAR,
+    ITEMTYPE_VALUE_BAR_RW   =   MASK_READ | MASK_WRITE | MASK_VALUE | MASK_BAR,
+    ITEMTYPE_VALUE_BAR_R    =   MASK_READ | MASK_VALUE | MASK_BAR,
+    ITEMTYPE_BOOLEAN_RW     =   MASK_READ | MASK_WRITE | MASK_BOOL,
+    ITEMTYPE_BOOLEAN_R      =   MASK_READ | MASK_BOOL
+}ITEMTYPE;
+
 typedef struct{
-    char *Label;
-    char BarVisible     : 1;
-    char ValueVisible   : 1;
-    char CheckVisible   : 1;
-    char Checked        : 1;
-    int MaxVal;
-    int MinVal;
-    int Interval;
-    int *Value; // o valor eh uma referencia de algum lugar da memoria
+    char *Label;    
+    int *Value; // o valor eh uma referencia de algum lugar da memoria    
+    int *MaxVal;
+    int *MinVal;
+    int *Interval;
+    ITEMTYPE ItemType;
 }Item;
 
-Item* create_item(char* label, char barvis, char valvis, char checkvis, char checked, int maxval, int minval, int interval, int *val);
+// podia fazer um __atributte__ pra nao permitir valor != de ponteiro e ITEMTYPE deve ser valido
+Item* create_item(char* label, ITEMTYPE type, int *minval, int *maxval, int *interval, int *val);
 
 /* PILHA - LIFO */
 
@@ -82,6 +99,7 @@ uchar list_items_insert(ListItems* ListItemsHandler, Item* Value, uint16 index);
 uchar list_items_remove(ListItems* ListItemsHandler, uint16 index);
 ListItems* list_items_create(Item* First, char* Label);
 _ListNodePtr list_items_get_node(ListItems* ListItemsHandler, uint16 index);
+Item* list_items_get_item(ListItems* ListItemsHandler, uint16 index);
 
 #ifdef ULIBS_AUTO_TEST
 void useful_libs_auto_test();

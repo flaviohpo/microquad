@@ -11,18 +11,15 @@
 #include "delay.h"
 #endif //ULIBS_AUTO_TEST
 
-Item* create_item(char* label, char barvis, char valvis, char checkvis, char checked, int maxval, int minval, int interval, int *val){
+Item* create_item(char* label, ITEMTYPE type, int *maxval, int *minval, int *interval, int *val){
     Item* oItem = (Item*)malloc(sizeof(Item));
     if(oItem != NULL){
-        oItem->Label=label;
-        oItem->BarVisible=barvis;
-        oItem->ValueVisible=valvis;
-        oItem->CheckVisible=checkvis;
-        oItem->Checked=checked;
-        oItem->MaxVal=maxval;
-        oItem->MinVal=minval;
-        oItem->Interval=interval;
-        oItem->Value=val;
+        oItem->Label        =   label;
+        oItem->ItemType     =   type;
+        oItem->MaxVal       =   maxval;
+        oItem->MinVal       =   minval;
+        oItem->Interval     =   interval;
+        oItem->Value        =   val;
     }
     return oItem;
 }
@@ -213,6 +210,10 @@ uchar list_items_remove(ListItems* ListItemsHandler, uint16 index){
     return result;
 }
 
+Item* list_items_get_item(ListItems* ListItemsHandler, uint16 index){
+    return list_items_get_node(ListItemsHandler, index)->Value;
+}
+
 void list_items_dispose(ListItems* ListItemsHandler){
     while(list_items_remove(ListItemsHandler, ListItemsHandler->Size - 1));
     free(ListItemsHandler);
@@ -235,11 +236,11 @@ void useful_libs_auto_test(){
     lcd_setcolor(BLACK,WHITE);
     
     // cria item ptr
-    Item *oItem = create_item("Item0", 0,0,0,0,0,0,0,0);
+    Item *oItem = create_item("Item0",0,0,0,0,0);
     oStack = stack_items_create(oItem, "Stack"); 
-    oItem = create_item("Item0", 0,0,0,0,0,0,0,0);
+    oItem = create_item("Item0", 0,0,0,0,0);
     oQueue = queue_items_create(oItem, "Queue");
-    oItem = create_item("Item0", 0,0,0,0,0,0,0,0);
+    oItem = create_item("Item0", 0,0,0,0,0);
     oList = list_items_create(oItem, "List");
     
     if(oList == NULL){
@@ -248,67 +249,67 @@ void useful_libs_auto_test(){
         __bis_SR_register(LPM4_bits);
     }
     else{
-        oItem = create_item("item1",0,0,0,0,0,0,0,0);
+        oItem = create_item("item1",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item1",0,0,0,0,0,0,0,0);
+        oItem = create_item("item1",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item1",0,0,0,0,0,0,0,0);
+        oItem = create_item("item1",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item2",0,0,0,0,0,0,0,0);
+        oItem = create_item("item2",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item2",0,0,0,0,0,0,0,0);
+        oItem = create_item("item2",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item2",0,0,0,0,0,0,0,0);
+        oItem = create_item("item2",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item3",0,0,0,0,0,0,0,0);
+        oItem = create_item("item3",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item3",0,0,0,0,0,0,0,0);
+        oItem = create_item("item3",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item3",0,0,0,0,0,0,0,0);
+        oItem = create_item("item3",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item4",0,0,0,0,0,0,0,0);
+        oItem = create_item("item4",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item4",0,0,0,0,0,0,0,0);
+        oItem = create_item("item4",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item4",0,0,0,0,0,0,0,0);
+        oItem = create_item("item4",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item5",0,0,0,0,0,0,0,0);
+        oItem = create_item("item5",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item5",0,0,0,0,0,0,0,0);
+        oItem = create_item("item5",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item5",0,0,0,0,0,0,0,0);
+        oItem = create_item("item5",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item6",0,0,0,0,0,0,0,0);
+        oItem = create_item("item6",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item6",0,0,0,0,0,0,0,0);
+        oItem = create_item("item6",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item6",0,0,0,0,0,0,0,0);
+        oItem = create_item("item6",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item7",0,0,0,0,0,0,0,0);
+        oItem = create_item("item7",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item7",0,0,0,0,0,0,0,0);
+        oItem = create_item("item7",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item7",0,0,0,0,0,0,0,0);
+        oItem = create_item("item7",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item8",0,0,0,0,0,0,0,0);
+        oItem = create_item("item8",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item8",0,0,0,0,0,0,0,0);
+        oItem = create_item("item8",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item8",0,0,0,0,0,0,0,0);
+        oItem = create_item("item8",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
         
-        oItem = create_item("item9",0,0,0,0,0,0,0,0);
+        oItem = create_item("item9",0,0,0,0,0);
         stack_items_push(oStack, oItem);
-        oItem = create_item("item9",0,0,0,0,0,0,0,0);
+        oItem = create_item("item9",0,0,0,0,0);
         queue_items_push(oQueue, oItem);
-        oItem = create_item("item9",0,0,0,0,0,0,0,0);
+        oItem = create_item("item9",0,0,0,0,0);
         list_items_insert(oList, oItem, oList->Size);
        
         print_test();

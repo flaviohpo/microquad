@@ -4767,182 +4767,182 @@ inline void set_motor(int m1, int m2, int m3, int m4){
 	...
 
 00004d5a <lcd_setcolor>:
-    return 0;
-}
                          
 void lcd_setcolor(unsigned char foreground_color, unsigned char background_color)
 {
     LCDBackColor = background_color;
-    4d5a:	c2 4e ba 12 	mov.b	r14,	&0x12ba	
     LCDForeColor = foreground_color;
-    4d5e:	c2 4f 52 12 	mov.b	r15,	&0x1252	
 }
+    4d5a:	c2 4e ba 12 	mov.b	r14,	&0x12ba	
+
+    4d5e:	c2 4f 52 12 	mov.b	r15,	&0x1252	
+/*
     4d62:	30 41       	ret			
 
 00004d64 <n6100_send>:
-    cmd = 1 writedata without stop
-    cmd = 2 writecommand with stop
     cmd = 3 writecommand without stop
 */
 void n6100_send(unsigned char data, unsigned char cmd)
 {
-    4d64:	0b 12       	push	r11		
     unsigned char mask = 0x80;
     unsigned char i;
+    4d64:	0b 12       	push	r11		
     
     if(cmd > 1){ 
+        P5OUT &= ~SDA; // comando
+    }
     4d66:	6e 93       	cmp.b	#2,	r14	;r3 As==10
     4d68:	2d 28       	jnc	$+92     	;abs 0x4dc4
-        P5OUT &= ~SDA; // comando
+    else{
     4d6a:	f2 f0 fd ff 	and.b	#-3,	&0x0031	;#0xfffd
     4d6e:	31 00 
-    }
-    else{
         P5OUT |= SDA; // dado
     }
     
     P5OUT &= ~CSX;
+    P5OUT |= SCLK;
+    P5OUT &= ~SCLK;
     4d70:	f2 f0 fe ff 	and.b	#-2,	&0x0031	;#0xfffe
     4d74:	31 00 
-    P5OUT |= SCLK;
+    
     4d76:	f2 d2 31 00 	bis.b	#8,	&0x0031	;r2 As==11
-    P5OUT &= ~SCLK;
+    for (i=0; i<8; i++){
     4d7a:	f2 f0 f7 ff 	and.b	#-9,	&0x0031	;#0xfff7
     4d7e:	31 00 
     4d80:	7d 42       	mov.b	#8,	r13	;r2 As==11
-    cmd = 2 writecommand with stop
-    cmd = 3 writecommand without stop
 */
 void n6100_send(unsigned char data, unsigned char cmd)
 {
     unsigned char mask = 0x80;
+    unsigned char i;
+    
     4d82:	7c 40 80 ff 	mov.b	#-128,	r12	;#0xff80
     4d86:	0b 3c       	jmp	$+24     	;abs 0x4d9e
-    P5OUT |= SCLK;
-    P5OUT &= ~SCLK;
     
     for (i=0; i<8; i++){
         if(data & mask){
             P5OUT |= SDA; 
+        }
+        else{
     4d88:	e2 d3 31 00 	bis.b	#2,	&0x0031	;r3 As==10
-        }
-        else{
-            P5OUT &= ~SDA;
-        }
-        P5OUT |= SCLK;
-    4d8c:	f2 d2 31 00 	bis.b	#8,	&0x0031	;r2 As==11
-        P5OUT &= ~SCLK;
-    4d90:	f2 f0 f7 ff 	and.b	#-9,	&0x0031	;#0xfff7
-    4d94:	31 00 
-    4d96:	7d 53       	add.b	#-1,	r13	;r3 As==11
-    
-    P5OUT &= ~CSX;
-    P5OUT |= SCLK;
-    P5OUT &= ~SCLK;
-    
-    for (i=0; i<8; i++){
-    4d98:	09 24       	jz	$+20     	;abs 0x4dac
-        else{
             P5OUT &= ~SDA;
         }
         P5OUT |= SCLK;
         P5OUT &= ~SCLK;
         mask >>= 1;
-    4d9a:	12 c3       	clrc			
-    4d9c:	4c 10       	rrc.b	r12		
-    P5OUT &= ~CSX;
+    4d8c:	f2 d2 31 00 	bis.b	#8,	&0x0031	;r2 As==11
+    }
+    4d90:	f2 f0 f7 ff 	and.b	#-9,	&0x0031	;#0xfff7
+    4d94:	31 00 
+    4d96:	7d 53       	add.b	#-1,	r13	;r3 As==11
     P5OUT |= SCLK;
     P5OUT &= ~SCLK;
     
     for (i=0; i<8; i++){
         if(data & mask){
+            P5OUT |= SDA; 
+    4d98:	09 24       	jz	$+20     	;abs 0x4dac
+        }
+        P5OUT |= SCLK;
+        P5OUT &= ~SCLK;
+        mask >>= 1;
+    }
+    
+    4d9a:	12 c3       	clrc			
+    4d9c:	4c 10       	rrc.b	r12		
+    P5OUT &= ~SCLK;
+    
+    for (i=0; i<8; i++){
+        if(data & mask){
+            P5OUT |= SDA; 
+        }
     4d9e:	4b 4c       	mov.b	r12,	r11	
     4da0:	4b ff       	and.b	r15,	r11	
     4da2:	f2 23       	jnz	$-26     	;abs 0x4d88
-            P5OUT |= SDA; 
-        }
         else{
             P5OUT &= ~SDA;
+        }
+        P5OUT |= SCLK;
     4da4:	f2 f0 fd ff 	and.b	#-3,	&0x0031	;#0xfffd
     4da8:	31 00 
     4daa:	f0 3f       	jmp	$-30     	;abs 0x4d8c
-        P5OUT |= SCLK;
-        P5OUT &= ~SCLK;
         mask >>= 1;
     }
     
     if(cmd == 1 || cmd == 3)
+        return;
+        
     4dac:	5e 93       	cmp.b	#1,	r14	;r3 As==01
     4dae:	08 24       	jz	$+18     	;abs 0x4dc0
     4db0:	7e 90 03 00 	cmp.b	#3,	r14	;#0x0003
     4db4:	05 24       	jz	$+12     	;abs 0x4dc0
-        return;
-        
     P5OUT &= ~SDA;
+    P5OUT |= CSX;
+}
     4db6:	f2 f0 fd ff 	and.b	#-3,	&0x0031	;#0xfffd
     4dba:	31 00 
-    P5OUT |= CSX;
+
     4dbc:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
-}
+void lcd_init(unsigned char color)
     4dc0:	3b 41       	pop	r11		
     4dc2:	30 41       	ret			
-    
-    if(cmd > 1){ 
         P5OUT &= ~SDA; // comando
     }
     else{
         P5OUT |= SDA; // dado
+    }
+    
     4dc4:	e2 d3 31 00 	bis.b	#2,	&0x0031	;r3 As==10
     4dc8:	d3 3f       	jmp	$-88     	;abs 0x4d70
 
 00004dca <n6100_sendcom1>:
-{
-  lcd_fillrect(0, 0, 132, 132, cor);
 }
 
 void n6100_sendcom1(unsigned char comm, unsigned char dat)
 {
+    n6100_send(comm, 3);
+    n6100_send(dat, 0);
     4dca:	0b 12       	push	r11		
     4dcc:	4b 4e       	mov.b	r14,	r11	
-    n6100_send(comm, 3);
+}
     4dce:	7e 40 03 00 	mov.b	#3,	r14	;#0x0003
     4dd2:	b0 12 64 4d 	call	#0x4d64	
-    n6100_send(dat, 0);
+
     4dd6:	4e 43       	clr.b	r14		
     4dd8:	4f 4b       	mov.b	r11,	r15	
     4dda:	b0 12 64 4d 	call	#0x4d64	
-}
+void n6100_sendcom2(unsigned char comm, unsigned char dat1, unsigned char dat2)
     4dde:	3b 41       	pop	r11		
     4de0:	30 41       	ret			
 
 00004de2 <n6100_sendcom2>:
-
-void n6100_sendcom2(unsigned char comm, unsigned char dat1, unsigned char dat2)
 {
+    n6100_send(comm, 3);
+    n6100_send(dat1, 1);
     4de2:	0b 12       	push	r11		
     4de4:	0a 12       	push	r10		
     4de6:	4a 4e       	mov.b	r14,	r10	
     4de8:	4b 4d       	mov.b	r13,	r11	
-    n6100_send(comm, 3);
+    n6100_send(dat2, 0);
     4dea:	7e 40 03 00 	mov.b	#3,	r14	;#0x0003
     4dee:	b0 12 64 4d 	call	#0x4d64	
-    n6100_send(dat1, 1);
+}
     4df2:	5e 43       	mov.b	#1,	r14	;r3 As==01
     4df4:	4f 4a       	mov.b	r10,	r15	
     4df6:	b0 12 64 4d 	call	#0x4d64	
-    n6100_send(dat2, 0);
+
     4dfa:	4e 43       	clr.b	r14		
     4dfc:	4f 4b       	mov.b	r11,	r15	
     4dfe:	b0 12 64 4d 	call	#0x4d64	
-}
+void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char color)
     4e02:	3a 41       	pop	r10		
     4e04:	3b 41       	pop	r11		
     4e06:	30 41       	ret			
 
 00004e08 <lcd_fillrect>:
-
-void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char cor)
 {
+    unsigned int addr, max;
+    
     4e08:	0b 12       	push	r11		
     4e0a:	0a 12       	push	r10		
     4e0c:	09 12       	push	r9		
@@ -4951,16 +4951,16 @@ void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned c
     4e12:	4b 4d       	mov.b	r13,	r11	
     4e14:	4a 4c       	mov.b	r12,	r10	
     4e16:	59 41 0a 00 	mov.b	10(r1),	r9	;0x000a(r1)
-    unsigned int addr, max;
-    
     n6100_sendcom2(0x2a, x, x+lx-1);
+    n6100_sendcom2(0x2b, y, y+ly-1);
+    
     4e1a:	4d 4f       	mov.b	r15,	r13	
     4e1c:	7d 53       	add.b	#-1,	r13	;r3 As==11
     4e1e:	4d 5b       	add.b	r11,	r13	
     4e20:	4e 4f       	mov.b	r15,	r14	
     4e22:	7f 40 2a 00 	mov.b	#42,	r15	;#0x002a
     4e26:	b0 12 e2 4d 	call	#0x4de2	
-    n6100_sendcom2(0x2b, y, y+ly-1);
+    n6100_send(0x2c, 3);
     4e2a:	4d 48       	mov.b	r8,	r13	
     4e2c:	7d 53       	add.b	#-1,	r13	;r3 As==11
     4e2e:	4d 5a       	add.b	r10,	r13	
@@ -4968,12 +4968,12 @@ void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned c
     4e32:	7f 40 2b 00 	mov.b	#43,	r15	;#0x002b
     4e36:	b0 12 e2 4d 	call	#0x4de2	
     
-    n6100_send(0x2c, 3);
+    max = lx*ly;
     4e3a:	7e 40 03 00 	mov.b	#3,	r14	;#0x0003
     4e3e:	7f 40 2c 00 	mov.b	#44,	r15	;#0x002c
     4e42:	b0 12 64 4d 	call	#0x4d64	
-    
-    max = lx*ly;
+    for(addr=0; addr<max; addr++)
+    {
     4e46:	02 12       	push	r2		
     4e48:	32 c2       	dint			
     4e4a:	03 43       	nop			
@@ -4981,45 +4981,45 @@ void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned c
     4e50:	c2 4b 38 01 	mov.b	r11,	&0x0138	
     4e54:	1a 42 3a 01 	mov	&0x013a,r10	
     4e58:	32 41       	pop	r2		
-    for(addr=0; addr<max; addr++)
+      n6100_send(color, 1);
     4e5a:	0a 93       	tst	r10		
     4e5c:	08 24       	jz	$+18     	;abs 0x4e6e
     4e5e:	0b 43       	clr	r11		
-    {
-      n6100_send(cor, 1);
+    }
+    
     4e60:	5e 43       	mov.b	#1,	r14	;r3 As==01
     4e62:	4f 49       	mov.b	r9,	r15	
     4e64:	b0 12 64 4d 	call	#0x4d64	
-    n6100_sendcom2(0x2b, y, y+ly-1);
-    
     n6100_send(0x2c, 3);
     
     max = lx*ly;
     for(addr=0; addr<max; addr++)
+    {
+      n6100_send(color, 1);
     4e68:	1b 53       	inc	r11		
     4e6a:	0b 9a       	cmp	r10,	r11	
     4e6c:	f9 2b       	jnc	$-12     	;abs 0x4e60
-    {
-      n6100_send(cor, 1);
     }
     
     P5OUT &= ~SDA;
+    P5OUT |= CSX;
+    
     4e6e:	f2 f0 fd ff 	and.b	#-3,	&0x0031	;#0xfffd
     4e72:	31 00 
-    P5OUT |= CSX;
-    4e74:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
-    
     n6100_sendcom2(0x2a, 0, 0x83);
+    4e74:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
+    n6100_sendcom2(0x2b, 0, 0x83);
+}
     4e78:	7d 40 83 ff 	mov.b	#-125,	r13	;#0xff83
     4e7c:	4e 43       	clr.b	r14		
     4e7e:	7f 40 2a 00 	mov.b	#42,	r15	;#0x002a
     4e82:	b0 12 e2 4d 	call	#0x4de2	
-    n6100_sendcom2(0x2b, 0, 0x83);
+
     4e86:	7d 40 83 ff 	mov.b	#-125,	r13	;#0xff83
     4e8a:	4e 43       	clr.b	r14		
     4e8c:	7f 40 2b 00 	mov.b	#43,	r15	;#0x002b
     4e90:	b0 12 e2 4d 	call	#0x4de2	
-}
+
     4e94:	38 41       	pop	r8		
     4e96:	39 41       	pop	r9		
     4e98:	3a 41       	pop	r10		
@@ -5027,12 +5027,12 @@ void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned c
     4e9c:	30 41       	ret			
 
 00004e9e <lcd_clear>:
-  //delayms(4000);
+
+void lcd_clear(unsigned char color) 
+{
+  lcd_fillrect(0, 0, 132, 132, color);
 }
 
-void lcd_clear(unsigned char cor) 
-{
-  lcd_fillrect(0, 0, 132, 132, cor);
     4e9e:	4f 12       	push.b	r15		
     4ea0:	7c 40 84 ff 	mov.b	#-124,	r12	;#0xff84
     4ea4:	4d 4c       	mov.b	r12,	r13	
@@ -5040,16 +5040,16 @@ void lcd_clear(unsigned char cor)
     4ea8:	4f 4e       	mov.b	r14,	r15	
     4eaa:	b0 12 08 4e 	call	#0x4e08	
     4eae:	21 53       	incd	r1		
-}
+void n6100_sendcom1(unsigned char comm, unsigned char dat)
     4eb0:	30 41       	ret			
 
 00004eb2 <lcd_init>:
-    P5OUT &= ~SDA;
-    P5OUT |= CSX;
 }
 
-void lcd_init(unsigned char cor)
+void lcd_init(unsigned char color)
 {
+    P5DIR |= CSX + SDA + SCLK + RESX;
+    
     4eb2:	0b 12       	push	r11		
     4eb4:	0a 12       	push	r10		
     4eb6:	09 12       	push	r9		
@@ -5058,162 +5058,162 @@ void lcd_init(unsigned char cor)
     4ebc:	06 12       	push	r6		
     4ebe:	05 12       	push	r5		
     4ec0:	45 4f       	mov.b	r15,	r5	
-    P5DIR |= CSX + SDA + SCLK + RESX;
+  P5OUT |= CSX;
     4ec2:	f2 d0 0f 00 	bis.b	#15,	&0x0032	;#0x000f
     4ec6:	32 00 
-    
-  P5OUT |= CSX;
-    4ec8:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
   P5OUT &= ~SDA;
+  P5OUT &= ~SCLK;
+    4ec8:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
+
     4ecc:	f2 f0 fd ff 	and.b	#-3,	&0x0031	;#0xfffd
     4ed0:	31 00 
-  P5OUT &= ~SCLK;
+  P5OUT &= ~RESX;
     4ed2:	f2 f0 f7 ff 	and.b	#-9,	&0x0031	;#0xfff7
     4ed6:	31 00 
-
-  P5OUT &= ~RESX;
+  delayms(20);
+  P5OUT |= RESX;
     4ed8:	f2 f0 fb ff 	and.b	#-5,	&0x0031	;#0xfffb
     4edc:	31 00 
   delayms(20);
     4ede:	3b 40 14 00 	mov	#20,	r11	;#0x0014
     4ee2:	0f 4b       	mov	r11,	r15	
     4ee4:	b0 12 88 59 	call	#0x5988	
-  P5OUT |= RESX;
+
     4ee8:	e2 d2 31 00 	bis.b	#4,	&0x0031	;r2 As==10
-  delayms(20);
+  // Sleep out...
     4eec:	0f 4b       	mov	r11,	r15	
     4eee:	b0 12 88 59 	call	#0x5988	
-
-  // Sleep out...
   n6100_send(0x11,2);   
+  // Ajusta o contraste...
+  n6100_sendcom1(0x25, 0x40);
     4ef2:	6e 43       	mov.b	#2,	r14	;r3 As==10
     4ef4:	7f 40 11 00 	mov.b	#17,	r15	;#0x0011
     4ef8:	b0 12 64 4d 	call	#0x4d64	
-  // Ajusta o contraste...
-  n6100_sendcom1(0x25, 0x40);
+  // Liga o display e o booster...    
+  n6100_send(0x29,2);
     4efc:	7e 40 40 00 	mov.b	#64,	r14	;#0x0040
     4f00:	7f 40 25 00 	mov.b	#37,	r15	;#0x0025
     4f04:	b0 12 ca 4d 	call	#0x4dca	
-  // Liga o display e o booster...    
-  n6100_send(0x29,2);
+  n6100_send(0x03,2);
+  delayms(10);  
     4f08:	6e 43       	mov.b	#2,	r14	;r3 As==10
     4f0a:	7f 40 29 00 	mov.b	#41,	r15	;#0x0029
     4f0e:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x03,2);
+    
     4f12:	6e 43       	mov.b	#2,	r14	;r3 As==10
     4f14:	7f 40 03 00 	mov.b	#3,	r15	;#0x0003
     4f18:	b0 12 64 4d 	call	#0x4d64	
-  delayms(10);  
+  // Color Format... (8bits/pixel)
     4f1c:	3f 40 0a 00 	mov	#10,	r15	;#0x000a
     4f20:	b0 12 88 59 	call	#0x5988	
-    
-  // Color Format... (8bits/pixel)
   n6100_sendcom1(0x3a, 0x02);
+  // Inicializa a tabela de cores 8bits/pixel
+  n6100_send(0x2d,2);
     4f24:	6e 43       	mov.b	#2,	r14	;r3 As==10
     4f26:	7f 40 3a 00 	mov.b	#58,	r15	;#0x003a
     4f2a:	b0 12 ca 4d 	call	#0x4dca	
-  // Inicializa a tabela de cores 8bits/pixel
-  n6100_send(0x2d,2);
+  // red
+  n6100_send(0x00,0);
     4f2e:	6e 43       	mov.b	#2,	r14	;r3 As==10
     4f30:	7f 40 2d 00 	mov.b	#45,	r15	;#0x002d
     4f34:	b0 12 64 4d 	call	#0x4d64	
-  // red
-  n6100_send(0x00,0);
+  n6100_send(0x02,0);
+  n6100_send(0x05,0);
     4f38:	4e 43       	clr.b	r14		
     4f3a:	4f 4e       	mov.b	r14,	r15	
     4f3c:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x02,0);
+  n6100_send(0x07,0);
     4f40:	4e 43       	clr.b	r14		
     4f42:	6f 43       	mov.b	#2,	r15	;r3 As==10
     4f44:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x05,0);
+  n6100_send(0x09,0);
     4f48:	79 40 05 00 	mov.b	#5,	r9	;#0x0005
     4f4c:	4e 43       	clr.b	r14		
     4f4e:	4f 49       	mov.b	r9,	r15	
     4f50:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x07,0);
+  n6100_send(0x0b,0);
     4f54:	76 40 07 00 	mov.b	#7,	r6	;#0x0007
     4f58:	4e 43       	clr.b	r14		
     4f5a:	4f 46       	mov.b	r6,	r15	
     4f5c:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x09,0);
+  n6100_send(0x0d,0);
     4f60:	77 40 09 00 	mov.b	#9,	r7	;#0x0009
     4f64:	4e 43       	clr.b	r14		
     4f66:	4f 47       	mov.b	r7,	r15	
     4f68:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0b,0);
+  n6100_send(0x0f,0);
     4f6c:	7a 40 0b 00 	mov.b	#11,	r10	;#0x000b
     4f70:	4e 43       	clr.b	r14		
     4f72:	4f 4a       	mov.b	r10,	r15	
     4f74:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0d,0);
+  // green
     4f78:	78 40 0d 00 	mov.b	#13,	r8	;#0x000d
     4f7c:	4e 43       	clr.b	r14		
     4f7e:	4f 48       	mov.b	r8,	r15	
     4f80:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0f,0);
+  n6100_send(0x00,0);
     4f84:	7b 50 fb ff 	add.b	#-5,	r11	;#0xfffb
     4f88:	4e 43       	clr.b	r14		
     4f8a:	4f 4b       	mov.b	r11,	r15	
     4f8c:	b0 12 64 4d 	call	#0x4d64	
-  // green
-  n6100_send(0x00,0);
+  n6100_send(0x02,0);
+  n6100_send(0x05,0);
     4f90:	4e 43       	clr.b	r14		
     4f92:	4f 4e       	mov.b	r14,	r15	
     4f94:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x02,0);
+  n6100_send(0x07,0);
     4f98:	4e 43       	clr.b	r14		
     4f9a:	6f 43       	mov.b	#2,	r15	;r3 As==10
     4f9c:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x05,0);
+  n6100_send(0x09,0);
     4fa0:	4e 43       	clr.b	r14		
     4fa2:	4f 49       	mov.b	r9,	r15	
     4fa4:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x07,0);
+  n6100_send(0x0b,0);
     4fa8:	4e 43       	clr.b	r14		
     4faa:	4f 46       	mov.b	r6,	r15	
     4fac:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x09,0);
+  n6100_send(0x0d,0);
     4fb0:	4e 43       	clr.b	r14		
     4fb2:	4f 47       	mov.b	r7,	r15	
     4fb4:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0b,0);
+  n6100_send(0x0f,0);
     4fb8:	4e 43       	clr.b	r14		
     4fba:	4f 4a       	mov.b	r10,	r15	
     4fbc:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0d,0);
+  // blue
     4fc0:	4e 43       	clr.b	r14		
     4fc2:	4f 48       	mov.b	r8,	r15	
     4fc4:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0f,0);
+  n6100_send(0x00,0);
     4fc8:	4e 43       	clr.b	r14		
     4fca:	4f 4b       	mov.b	r11,	r15	
     4fcc:	b0 12 64 4d 	call	#0x4d64	
-  // blue
-  n6100_send(0x00,0);
+  n6100_send(0x05,0);
+  n6100_send(0x0b,0);
     4fd0:	4e 43       	clr.b	r14		
     4fd2:	4f 4e       	mov.b	r14,	r15	
     4fd4:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x05,0);
+  n6100_send(0x0f,0);
     4fd8:	4e 43       	clr.b	r14		
     4fda:	4f 49       	mov.b	r9,	r15	
     4fdc:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0b,0);
+
     4fe0:	4e 43       	clr.b	r14		
     4fe2:	4f 4a       	mov.b	r10,	r15	
     4fe4:	b0 12 64 4d 	call	#0x4d64	
-  n6100_send(0x0f,0);
+  // Memory Access Control...  
     4fe8:	4e 43       	clr.b	r14		
     4fea:	4f 4b       	mov.b	r11,	r15	
     4fec:	b0 12 64 4d 	call	#0x4d64	
-
-  // Memory Access Control...  
   n6100_sendcom1(0x36, invertido);
+  // Agradecimentos...
+  lcd_fillrect(0, 0, 132, 132, color);
     4ff0:	4e 43       	clr.b	r14		
     4ff2:	7f 40 36 00 	mov.b	#54,	r15	;#0x0036
     4ff6:	b0 12 ca 4d 	call	#0x4dca	
-  // Agradecimentos...
-  lcd_fillrect(0, 0, 132, 132, cor);
+  //n6100_putlogo(2, 2, 128, 128, (unsigned char *)Matrix);
+  //delayms(4000);
     4ffa:	45 12       	push.b	r5		
     4ffc:	7c 40 84 ff 	mov.b	#-124,	r12	;#0xff84
     5000:	4d 4c       	mov.b	r12,	r13	
@@ -5221,9 +5221,9 @@ void lcd_init(unsigned char cor)
     5004:	4f 4e       	mov.b	r14,	r15	
     5006:	b0 12 08 4e 	call	#0x4e08	
     500a:	21 53       	incd	r1		
-  //n6100_putlogo(2, 2, 128, 128, (unsigned char *)Matrix);
-  //delayms(4000);
 }
+
+void lcd_clear(unsigned char color) 
     500c:	35 41       	pop	r5		
     500e:	36 41       	pop	r6		
     5010:	37 41       	pop	r7		
@@ -5234,12 +5234,12 @@ void lcd_init(unsigned char cor)
     501a:	30 41       	ret			
 
 0000501c <lcd_drawcircle>:
-    n6100_sendcom2(0x2a, 0, 0x83);
-    n6100_sendcom2(0x2b, 0, 0x83);
 }
 
 
 void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsigned char color, int width){
+    int f = 1 - radius;
+    int ddF_x = 0;
     501c:	0b 12       	push	r11		
     501e:	0a 12       	push	r10		
     5020:	09 12       	push	r9		
@@ -5253,13 +5253,13 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5032:	09 4e       	mov	r14,	r9	
     5034:	45 4c       	mov.b	r12,	r5	
     5036:	1b 41 1c 00 	mov	28(r1),	r11	;0x001c(r1)
-    int f = 1 - radius;
-    int ddF_x = 0;
     int ddF_y = -2 * radius;
     int x = 0;
     int y = radius;
-    503a:	81 4d 04 00 	mov	r13,	4(r1)	;0x0004(r1)
     lcd_fillrect(x0, y0 + radius,width,width, color);
+    lcd_fillrect(x0, y0 - radius,width,width, color);
+    503a:	81 4d 04 00 	mov	r13,	4(r1)	;0x0004(r1)
+    lcd_fillrect(x0 + radius, y0,width,width, color);
     503e:	46 4b       	mov.b	r11,	r6	
     5040:	c1 4e 00 00 	mov.b	r14,	0(r1)	;0x0000(r1)
     5044:	5a 41 04 00 	mov.b	4(r1),	r10	;0x0004(r1)
@@ -5270,7 +5270,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5052:	4e 4a       	mov.b	r10,	r14	
     5054:	5e 51 02 00 	add.b	2(r1),	r14	;0x0002(r1)
     5058:	b0 12 08 4e 	call	#0x4e08	
-    lcd_fillrect(x0, y0 - radius,width,width, color);
+    lcd_fillrect(x0 - radius, y0,width,width, color);
     505c:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
     5060:	4c 4b       	mov.b	r11,	r12	
     5062:	4d 4b       	mov.b	r11,	r13	
@@ -5278,7 +5278,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5068:	4e 8a       	sub.b	r10,	r14	
     506a:	4f 48       	mov.b	r8,	r15	
     506c:	b0 12 08 4e 	call	#0x4e08	
-    lcd_fillrect(x0 + radius, y0,width,width, color);
+    while (x < y) {
     5070:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
     5074:	4c 4b       	mov.b	r11,	r12	
     5076:	4d 4b       	mov.b	r11,	r13	
@@ -5286,7 +5286,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     507a:	4f 4a       	mov.b	r10,	r15	
     507c:	5f 51 03 00 	add.b	3(r1),	r15	;0x0003(r1)
     5080:	b0 12 08 4e 	call	#0x4e08	
-    lcd_fillrect(x0 - radius, y0,width,width, color);
+        if (f >= 0) {
     5084:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
     5088:	4c 4b       	mov.b	r11,	r12	
     508a:	4d 4b       	mov.b	r11,	r13	
@@ -5295,20 +5295,20 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5092:	4f 8a       	sub.b	r10,	r15	
     5094:	b0 12 08 4e 	call	#0x4e08	
     5098:	21 53       	incd	r1		
-    while (x < y) {
+            y--;
     509a:	0f 43       	clr	r15		
     509c:	1f 91 04 00 	cmp	4(r1),	r15	;0x0004(r1)
     50a0:	82 34       	jge	$+262    	;abs 0x51a6
-    n6100_sendcom2(0x2b, 0, 0x83);
-}
 
 
 void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsigned char color, int width){
     int f = 1 - radius;
-    50a2:	14 43       	mov	#1,	r4	;r3 As==01
-    50a4:	14 81 04 00 	sub	4(r1),	r4	;0x0004(r1)
     int ddF_x = 0;
     int ddF_y = -2 * radius;
+    50a2:	14 43       	mov	#1,	r4	;r3 As==01
+    50a4:	14 81 04 00 	sub	4(r1),	r4	;0x0004(r1)
+    int x = 0;
+    int y = radius;
     50a8:	1e 41 04 00 	mov	4(r1),	r14	;0x0004(r1)
     50ac:	0e 11       	rra	r14		
     50ae:	0e 43       	clr	r14		
@@ -5319,55 +5319,55 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     50be:	08 00 
     50c0:	b1 40 03 00 	mov	#3,	6(r1)	;#0x0003, 0x0006(r1)
     50c4:	06 00 
-    int x = 0;
+    lcd_fillrect(x0, y0 + radius,width,width, color);
     50c6:	81 4f 02 00 	mov	r15,	2(r1)	;0x0002(r1)
     50ca:	04 3c       	jmp	$+10     	;abs 0x50d4
-            ddF_y += 2;
-            f += ddF_y;
         }
         x++;
         ddF_x += 2;
         f += ddF_x + 1;
+        lcd_fillrect(x0 + x, y0 + y,width,width, color);
+        lcd_fillrect(x0 - x, y0 + y,width,width, color);
     50cc:	14 51 06 00 	add	6(r1),	r4	;0x0006(r1)
     50d0:	a1 53 06 00 	incd	6(r1)		;0x0006(r1)
-    lcd_fillrect(x0, y0 + radius,width,width, color);
-    lcd_fillrect(x0, y0 - radius,width,width, color);
     lcd_fillrect(x0 + radius, y0,width,width, color);
     lcd_fillrect(x0 - radius, y0,width,width, color);
     while (x < y) {
         if (f >= 0) {
+            y--;
+            ddF_y += 2;
     50d4:	04 93       	tst	r4		
     50d6:	06 38       	jl	$+14     	;abs 0x50e4
-            y--;
-    50d8:	b1 53 04 00 	add	#-1,	4(r1)	;r3 As==11, 0x0004(r1)
-            ddF_y += 2;
-    50dc:	a1 53 08 00 	incd	8(r1)		;0x0008(r1)
             f += ddF_y;
-    50e0:	14 51 08 00 	add	8(r1),	r4	;0x0008(r1)
+    50d8:	b1 53 04 00 	add	#-1,	4(r1)	;r3 As==11, 0x0004(r1)
         }
+    50dc:	a1 53 08 00 	incd	8(r1)		;0x0008(r1)
         x++;
-    50e4:	91 53 02 00 	inc	2(r1)		;0x0002(r1)
+    50e0:	14 51 08 00 	add	8(r1),	r4	;0x0008(r1)
         ddF_x += 2;
         f += ddF_x + 1;
+    50e4:	91 53 02 00 	inc	2(r1)		;0x0002(r1)
         lcd_fillrect(x0 + x, y0 + y,width,width, color);
+        lcd_fillrect(x0 - x, y0 + y,width,width, color);
+        lcd_fillrect(x0 + x, y0 - y,width,width, color);
     50e8:	5a 41 04 00 	mov.b	4(r1),	r10	;0x0004(r1)
     50ec:	6b 41       	mov.b	@r1,	r11	
     50ee:	4b 5a       	add.b	r10,	r11	
-    n6100_sendcom2(0x2a, 0, 0x83);
-    n6100_sendcom2(0x2b, 0, 0x83);
 }
 
 
 void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsigned char color, int width){
+    int f = 1 - radius;
+    int ddF_x = 0;
     50f0:	58 41 02 00 	mov.b	2(r1),	r8	;0x0002(r1)
     50f4:	57 41 01 00 	mov.b	1(r1),	r7	;0x0001(r1)
     50f8:	47 58       	add.b	r8,	r7	
-            f += ddF_y;
-        }
         x++;
         ddF_x += 2;
         f += ddF_x + 1;
         lcd_fillrect(x0 + x, y0 + y,width,width, color);
+        lcd_fillrect(x0 - x, y0 + y,width,width, color);
+        lcd_fillrect(x0 + x, y0 - y,width,width, color);
     50fa:	45 12       	push.b	r5		
     50fc:	4c 46       	mov.b	r6,	r12	
     50fe:	4d 46       	mov.b	r6,	r13	
@@ -5376,14 +5376,14 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5104:	b0 12 08 4e 	call	#0x4e08	
     5108:	59 41 03 00 	mov.b	3(r1),	r9	;0x0003(r1)
     510c:	49 88       	sub.b	r8,	r9	
-        lcd_fillrect(x0 - x, y0 + y,width,width, color);
+        lcd_fillrect(x0 - x, y0 - y,width,width, color);
     510e:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
     5112:	4c 46       	mov.b	r6,	r12	
     5114:	4d 46       	mov.b	r6,	r13	
     5116:	4e 4b       	mov.b	r11,	r14	
     5118:	4f 49       	mov.b	r9,	r15	
     511a:	b0 12 08 4e 	call	#0x4e08	
-        lcd_fillrect(x0 + x, y0 - y,width,width, color);
+        lcd_fillrect(x0 + y, y0 + x,width,width, color);
     511e:	5b 41 02 00 	mov.b	2(r1),	r11	;0x0002(r1)
     5122:	4b 8a       	sub.b	r10,	r11	
     5124:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
@@ -5392,7 +5392,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     512c:	4e 4b       	mov.b	r11,	r14	
     512e:	4f 47       	mov.b	r7,	r15	
     5130:	b0 12 08 4e 	call	#0x4e08	
-        lcd_fillrect(x0 - x, y0 - y,width,width, color);
+        lcd_fillrect(x0 - y, y0 + x,width,width, color);
     5134:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
     5138:	4c 46       	mov.b	r6,	r12	
     513a:	4d 46       	mov.b	r6,	r13	
@@ -5401,7 +5401,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5140:	b0 12 08 4e 	call	#0x4e08	
     5144:	5b 41 02 00 	mov.b	2(r1),	r11	;0x0002(r1)
     5148:	4b 58       	add.b	r8,	r11	
-        lcd_fillrect(x0 + y, y0 + x,width,width, color);
+        lcd_fillrect(x0 + y, y0 - x,width,width, color);
     514a:	59 41 03 00 	mov.b	3(r1),	r9	;0x0003(r1)
     514e:	49 5a       	add.b	r10,	r9	
     5150:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
@@ -5410,7 +5410,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5158:	4e 4b       	mov.b	r11,	r14	
     515a:	4f 49       	mov.b	r9,	r15	
     515c:	b0 12 08 4e 	call	#0x4e08	
-        lcd_fillrect(x0 - y, y0 + x,width,width, color);
+        lcd_fillrect(x0 - y,y0 - x,width,width, color);   
     5160:	5f 41 03 00 	mov.b	3(r1),	r15	;0x0003(r1)
     5164:	4f 8a       	sub.b	r10,	r15	
     5166:	4a 4f       	mov.b	r15,	r10	
@@ -5421,14 +5421,14 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5172:	b0 12 08 4e 	call	#0x4e08	
     5176:	5b 41 02 00 	mov.b	2(r1),	r11	;0x0002(r1)
     517a:	4b 88       	sub.b	r8,	r11	
-        lcd_fillrect(x0 + y, y0 - x,width,width, color);
+    }
     517c:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
     5180:	4c 46       	mov.b	r6,	r12	
     5182:	4d 46       	mov.b	r6,	r13	
     5184:	4e 4b       	mov.b	r11,	r14	
     5186:	4f 49       	mov.b	r9,	r15	
     5188:	b0 12 08 4e 	call	#0x4e08	
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
+}
     518c:	c1 45 00 00 	mov.b	r5,	0(r1)	;0x0000(r1)
     5190:	4c 46       	mov.b	r6,	r12	
     5192:	4d 46       	mov.b	r6,	r13	
@@ -5436,21 +5436,21 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     5196:	4f 4a       	mov.b	r10,	r15	
     5198:	b0 12 08 4e 	call	#0x4e08	
     519c:	21 53       	incd	r1		
-    int y = radius;
-    lcd_fillrect(x0, y0 + radius,width,width, color);
     lcd_fillrect(x0, y0 - radius,width,width, color);
     lcd_fillrect(x0 + radius, y0,width,width, color);
     lcd_fillrect(x0 - radius, y0,width,width, color);
     while (x < y) {
+        if (f >= 0) {
+            y--;
     519e:	91 91 04 00 	cmp	4(r1),	2(r1)	;0x0004(r1), 0x0002(r1)
     51a2:	02 00 
     51a4:	93 3b       	jl	$-216    	;abs 0x50cc
-        lcd_fillrect(x0 + y, y0 + x,width,width, color);
-        lcd_fillrect(x0 - y, y0 + x,width,width, color);
         lcd_fillrect(x0 + y, y0 - x,width,width, color);
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
+        lcd_fillrect(x0 - y,y0 - x,width,width, color);   
     }
 }
+
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
     51a6:	31 50 0a 00 	add	#10,	r1	;#0x000a
     51aa:	34 41       	pop	r4		
     51ac:	35 41       	pop	r5		
@@ -5463,59 +5463,59 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     51ba:	30 41       	ret			
 
 000051bc <lcd_drawpoint>:
-        }
-    }
 }
 
-void lcd_drawpoint(unsigned char x, unsigned char y, int color)
+void lcd_drawpoint(unsigned char x, unsigned char y, unsigned char color)
 {
+    n6100_sendcom2(0x2a, x, x);
+    n6100_sendcom2(0x2b, y, y);
     51bc:	0b 12       	push	r11		
     51be:	0a 12       	push	r10		
     51c0:	09 12       	push	r9		
     51c2:	08 12       	push	r8		
     51c4:	48 4e       	mov.b	r14,	r8	
     51c6:	0a 4d       	mov	r13,	r10	
-    n6100_sendcom2(0x2a, x, x);
+    
     51c8:	79 40 2a 00 	mov.b	#42,	r9	;#0x002a
     51cc:	4d 4f       	mov.b	r15,	r13	
     51ce:	4e 4f       	mov.b	r15,	r14	
     51d0:	4f 49       	mov.b	r9,	r15	
     51d2:	b0 12 e2 4d 	call	#0x4de2	
-    n6100_sendcom2(0x2b, y, y);
+    n6100_send(0x2c, 3);
     51d6:	7b 40 2b 00 	mov.b	#43,	r11	;#0x002b
     51da:	4d 48       	mov.b	r8,	r13	
     51dc:	4e 48       	mov.b	r8,	r14	
     51de:	4f 4b       	mov.b	r11,	r15	
     51e0:	b0 12 e2 4d 	call	#0x4de2	
-    
-    n6100_send(0x2c, 3);
+    n6100_send((unsigned char)color, 1);
+
     51e4:	7e 40 03 00 	mov.b	#3,	r14	;#0x0003
     51e8:	7f 40 2c 00 	mov.b	#44,	r15	;#0x002c
     51ec:	b0 12 64 4d 	call	#0x4d64	
-    n6100_send(color, 1);
+    
     51f0:	5e 43       	mov.b	#1,	r14	;r3 As==01
     51f2:	4f 4a       	mov.b	r10,	r15	
     51f4:	b0 12 64 4d 	call	#0x4d64	
-
-    
     P5OUT &= ~SDA;
+    P5OUT |= CSX;
+    
     51f8:	f2 f0 fd ff 	and.b	#-3,	&0x0031	;#0xfffd
     51fc:	31 00 
-    P5OUT |= CSX;
-    51fe:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
-    
     n6100_sendcom2(0x2a, 0, 0x83);
+    51fe:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
+    n6100_sendcom2(0x2b, 0, 0x83);
+}
     5202:	7a 40 83 ff 	mov.b	#-125,	r10	;#0xff83
     5206:	4d 4a       	mov.b	r10,	r13	
     5208:	4e 43       	clr.b	r14		
     520a:	4f 49       	mov.b	r9,	r15	
     520c:	b0 12 e2 4d 	call	#0x4de2	
-    n6100_sendcom2(0x2b, 0, 0x83);
+
     5210:	4d 4a       	mov.b	r10,	r13	
     5212:	4e 43       	clr.b	r14		
     5214:	4f 4b       	mov.b	r11,	r15	
     5216:	b0 12 e2 4d 	call	#0x4de2	
-}
+void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char p[])
     521a:	38 41       	pop	r8		
     521c:	39 41       	pop	r9		
     521e:	3a 41       	pop	r10		
@@ -5523,12 +5523,12 @@ void lcd_drawpoint(unsigned char x, unsigned char y, int color)
     5222:	30 41       	ret			
 
 00005224 <lcd_drawline>:
-        lcd_fillrect(x0 + y, y0 - x,width,width, color);
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
+    int dy = y1 - y0;
+    int dx = x1 - x0;
     5224:	0b 12       	push	r11		
     5226:	0a 12       	push	r10		
     5228:	09 12       	push	r9		
@@ -5543,119 +5543,119 @@ void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
     523a:	81 4d 00 00 	mov	r13,	0(r1)	;0x0000(r1)
     523e:	81 4c 02 00 	mov	r12,	2(r1)	;0x0002(r1)
     5242:	14 41 16 00 	mov	22(r1),	r4	;0x0016(r1)
-    int dy = y1 - y0;
+    int stepx, stepy;
     5246:	05 4c       	mov	r12,	r5	
     5248:	05 8e       	sub	r14,	r5	
-    int dx = x1 - x0;
+    if (dy < 0) { 
     524a:	06 4d       	mov	r13,	r6	
     524c:	06 8f       	sub	r15,	r6	
-    int stepx, stepy;
-    if (dy < 0) { 
-    524e:	05 93       	tst	r5		
-    5250:	4c 38       	jl	$+154    	;abs 0x52ea
         dy = -dy; 
         stepy = -1; 
+    524e:	05 93       	tst	r5		
+    5250:	4c 38       	jl	$+154    	;abs 0x52ea
     } 
     else { 
         stepy = 1; 
-    5252:	18 43       	mov	#1,	r8	;r3 As==01
     }
     if (dx < 0) {
-    5254:	06 93       	tst	r6		
-    5256:	45 38       	jl	$+140    	;abs 0x52e2
+    5252:	18 43       	mov	#1,	r8	;r3 As==01
         dx = -dx; 
         stepx = -1; 
+    5254:	06 93       	tst	r6		
+    5256:	45 38       	jl	$+140    	;abs 0x52e2
     } 
     else { 
         stepx = 1; 
-    5258:	17 43       	mov	#1,	r7	;r3 As==01
     }
     dy <<= 1; // dy is now 2*dy
-    525a:	05 55       	rla	r5		
+    5258:	17 43       	mov	#1,	r7	;r3 As==01
     dx <<= 1; // dx is now 2*dx
-    525c:	06 56       	rla	r6		
     
+    525a:	05 55       	rla	r5		
     lcd_drawpoint(x0, y0, color);
+    525c:	06 56       	rla	r6		
+
+    if (dx > dy) {
     525e:	0d 44       	mov	r4,	r13	
     5260:	4e 4a       	mov.b	r10,	r14	
     5262:	4f 49       	mov.b	r9,	r15	
     5264:	b0 12 bc 51 	call	#0x51bc	
-
-    if (dx > dy) {
-    5268:	05 96       	cmp	r6,	r5	
-    526a:	21 34       	jge	$+68     	;abs 0x52ae
         int fraction = dy - (dx >> 1); // same as 2*dy - dx
         while (x0 != x1) {
+    5268:	05 96       	cmp	r6,	r5	
+    526a:	21 34       	jge	$+68     	;abs 0x52ae
+            if (fraction >= 0) {
+                y0 += stepy;
     526c:	29 91       	cmp	@r1,	r9	
     526e:	15 24       	jz	$+44     	;abs 0x529a
-    dx <<= 1; // dx is now 2*dx
-    
     lcd_drawpoint(x0, y0, color);
 
     if (dx > dy) {
         int fraction = dy - (dx >> 1); // same as 2*dy - dx
+        while (x0 != x1) {
+            if (fraction >= 0) {
     5270:	0f 46       	mov	r6,	r15	
     5272:	0f 11       	rra	r15		
     5274:	0b 45       	mov	r5,	r11	
     5276:	0b 8f       	sub	r15,	r11	
-        lcd_fillrect(x0 + y, y0 - x,width,width, color);
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
+    int dy = y1 - y0;
+    int dx = x1 - x0;
     5278:	09 57       	add	r7,	r9	
     527a:	01 3c       	jmp	$+4      	;abs 0x527e
-            if (fraction >= 0) {
-                y0 += stepy;
                 fraction -= dx; // same as fraction -= 2*dx
-            }
-            x0 += stepx;
-            fraction += dy; // same as fraction -= 2*dy
-    527c:	0b 55       	add	r5,	r11	
-    lcd_drawpoint(x0, y0, color);
-
-    if (dx > dy) {
-        int fraction = dy - (dx >> 1); // same as 2*dy - dx
-        while (x0 != x1) {
-            if (fraction >= 0) {
-    527e:	0b 93       	tst	r11		
-    5280:	02 38       	jl	$+6      	;abs 0x5286
-                y0 += stepy;
-    5282:	0a 58       	add	r8,	r10	
-                fraction -= dx; // same as fraction -= 2*dx
-    5284:	0b 86       	sub	r6,	r11	
             }
             x0 += stepx;
             fraction += dy; // same as fraction -= 2*dy
             lcd_drawpoint(x0, y0, color);
+        }
+    527c:	0b 55       	add	r5,	r11	
+    if (dx > dy) {
+        int fraction = dy - (dx >> 1); // same as 2*dy - dx
+        while (x0 != x1) {
+            if (fraction >= 0) {
+                y0 += stepy;
+                fraction -= dx; // same as fraction -= 2*dx
+    527e:	0b 93       	tst	r11		
+    5280:	02 38       	jl	$+6      	;abs 0x5286
+            }
+    5282:	0a 58       	add	r8,	r10	
+            x0 += stepx;
+    5284:	0b 86       	sub	r6,	r11	
+            fraction += dy; // same as fraction -= 2*dy
+            lcd_drawpoint(x0, y0, color);
+        }
+    } 
     5286:	0d 44       	mov	r4,	r13	
     5288:	4e 4a       	mov.b	r10,	r14	
     528a:	4f 49       	mov.b	r9,	r15	
     528c:	b0 12 bc 51 	call	#0x51bc	
     5290:	09 57       	add	r7,	r9	
-        lcd_fillrect(x0 + y, y0 - x,width,width, color);
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
+    int dy = y1 - y0;
+    int dx = x1 - x0;
     5292:	0f 49       	mov	r9,	r15	
     5294:	0f 87       	sub	r7,	r15	
-    
-    lcd_drawpoint(x0, y0, color);
 
     if (dx > dy) {
         int fraction = dy - (dx >> 1); // same as 2*dy - dx
         while (x0 != x1) {
+            if (fraction >= 0) {
+                y0 += stepy;
     5296:	2f 91       	cmp	@r1,	r15	
     5298:	f1 23       	jnz	$-28     	;abs 0x527c
-            y0 += stepy;
-            fraction += dx;
             lcd_drawpoint(x0, y0, color);
         }
     }
 }
+
+void lcd_drawpoint(unsigned char x, unsigned char y, unsigned char color)
     529a:	21 52       	add	#4,	r1	;r2 As==10
     529c:	34 41       	pop	r4		
     529e:	35 41       	pop	r5		
@@ -5666,107 +5666,107 @@ void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
     52a8:	3a 41       	pop	r10		
     52aa:	3b 41       	pop	r11		
     52ac:	30 41       	ret			
-            lcd_drawpoint(x0, y0, color);
+    } 
+    else {
+        int fraction = dx - (dy >> 1);
+        while (y0 != y1) {
+            if (fraction >= 0) {
+                x0 += stepx;
+    52ae:	81 9a 02 00 	cmp	r10,	2(r1)	;0x0002(r1)
+    52b2:	f3 27       	jz	$-24     	;abs 0x529a
         }
     } 
     else {
         int fraction = dx - (dy >> 1);
         while (y0 != y1) {
-    52ae:	81 9a 02 00 	cmp	r10,	2(r1)	;0x0002(r1)
-    52b2:	f3 27       	jz	$-24     	;abs 0x529a
-            fraction += dy; // same as fraction -= 2*dy
-            lcd_drawpoint(x0, y0, color);
-        }
-    } 
-    else {
-        int fraction = dx - (dy >> 1);
+            if (fraction >= 0) {
     52b4:	0f 45       	mov	r5,	r15	
     52b6:	0f 11       	rra	r15		
     52b8:	0b 46       	mov	r6,	r11	
     52ba:	0b 8f       	sub	r15,	r11	
-        lcd_fillrect(x0 + y, y0 - x,width,width, color);
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
+    int dy = y1 - y0;
+    int dx = x1 - x0;
     52bc:	0a 58       	add	r8,	r10	
     52be:	01 3c       	jmp	$+4      	;abs 0x52c2
-            if (fraction >= 0) {
-                x0 += stepx;
                 fraction -= dy;
-            }
-            y0 += stepy;
-            fraction += dx;
-    52c0:	0b 56       	add	r6,	r11	
-        }
-    } 
-    else {
-        int fraction = dx - (dy >> 1);
-        while (y0 != y1) {
-            if (fraction >= 0) {
-    52c2:	0b 93       	tst	r11		
-    52c4:	02 38       	jl	$+6      	;abs 0x52ca
-                x0 += stepx;
-    52c6:	09 57       	add	r7,	r9	
-                fraction -= dy;
-    52c8:	0b 85       	sub	r5,	r11	
             }
             y0 += stepy;
             fraction += dx;
             lcd_drawpoint(x0, y0, color);
+        }
+    52c0:	0b 56       	add	r6,	r11	
+    else {
+        int fraction = dx - (dy >> 1);
+        while (y0 != y1) {
+            if (fraction >= 0) {
+                x0 += stepx;
+                fraction -= dy;
+    52c2:	0b 93       	tst	r11		
+    52c4:	02 38       	jl	$+6      	;abs 0x52ca
+            }
+    52c6:	09 57       	add	r7,	r9	
+            y0 += stepy;
+    52c8:	0b 85       	sub	r5,	r11	
+            fraction += dx;
+            lcd_drawpoint(x0, y0, color);
+        }
+    }
     52ca:	0d 44       	mov	r4,	r13	
     52cc:	4e 4a       	mov.b	r10,	r14	
     52ce:	4f 49       	mov.b	r9,	r15	
     52d0:	b0 12 bc 51 	call	#0x51bc	
     52d4:	0a 58       	add	r8,	r10	
-        lcd_fillrect(x0 + y, y0 - x,width,width, color);
-        lcd_fillrect(x0 - y,y0 - x,width,width,color);   
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
+void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
+    int dy = y1 - y0;
+    int dx = x1 - x0;
     52d6:	0f 4a       	mov	r10,	r15	
     52d8:	0f 88       	sub	r8,	r15	
-            lcd_drawpoint(x0, y0, color);
-        }
     } 
     else {
         int fraction = dx - (dy >> 1);
         while (y0 != y1) {
+            if (fraction >= 0) {
+                x0 += stepx;
     52da:	81 9f 02 00 	cmp	r15,	2(r1)	;0x0002(r1)
     52de:	f0 23       	jnz	$-30     	;abs 0x52c0
     52e0:	dc 3f       	jmp	$-70     	;abs 0x529a
-    } 
-    else { 
         stepy = 1; 
     }
     if (dx < 0) {
         dx = -dx; 
+        stepx = -1; 
+    } 
     52e2:	36 e3       	inv	r6		
     52e4:	16 53       	inc	r6		
-        stepx = -1; 
+    else { 
     52e6:	37 43       	mov	#-1,	r7	;r3 As==11
     52e8:	b8 3f       	jmp	$-142    	;abs 0x525a
-void lcd_drawline(int x0, int y0, int x1, int y1, int color) {
-    int dy = y1 - y0;
     int dx = x1 - x0;
     int stepx, stepy;
     if (dy < 0) { 
         dy = -dy; 
+        stepy = -1; 
+    } 
     52ea:	35 e3       	inv	r5		
     52ec:	15 53       	inc	r5		
-        stepy = -1; 
+    else { 
     52ee:	38 43       	mov	#-1,	r8	;r3 As==11
     52f0:	b1 3f       	jmp	$-156    	;abs 0x5254
 
 000052f2 <lcd_putlogo>:
-    n6100_sendcom2(0x2a, 0, 0x83);
-    n6100_sendcom2(0x2b, 0, 0x83);
 }
 
 void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char p[])
 {
+    unsigned int addr, max;
+
     52f2:	0b 12       	push	r11		
     52f4:	0a 12       	push	r10		
     52f6:	09 12       	push	r9		
@@ -5775,16 +5775,16 @@ void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned ch
     52fc:	4b 4d       	mov.b	r13,	r11	
     52fe:	4a 4c       	mov.b	r12,	r10	
     5300:	19 41 0a 00 	mov	10(r1),	r9	;0x000a(r1)
-    unsigned int addr, max;
-
     n6100_sendcom2(0x2a, x, x+lx-1);
+    n6100_sendcom2(0x2b, y, y+ly-1);
+    
     5304:	4d 4f       	mov.b	r15,	r13	
     5306:	7d 53       	add.b	#-1,	r13	;r3 As==11
     5308:	4d 5b       	add.b	r11,	r13	
     530a:	4e 4f       	mov.b	r15,	r14	
     530c:	7f 40 2a 00 	mov.b	#42,	r15	;#0x002a
     5310:	b0 12 e2 4d 	call	#0x4de2	
-    n6100_sendcom2(0x2b, y, y+ly-1);
+    n6100_send(0x2c, 3);
     5314:	4d 48       	mov.b	r8,	r13	
     5316:	7d 53       	add.b	#-1,	r13	;r3 As==11
     5318:	4d 5a       	add.b	r10,	r13	
@@ -5792,12 +5792,12 @@ void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned ch
     531c:	7f 40 2b 00 	mov.b	#43,	r15	;#0x002b
     5320:	b0 12 e2 4d 	call	#0x4de2	
     
-    n6100_send(0x2c, 3);
+    max = lx*ly;
     5324:	7e 40 03 00 	mov.b	#3,	r14	;#0x0003
     5328:	7f 40 2c 00 	mov.b	#44,	r15	;#0x002c
     532c:	b0 12 64 4d 	call	#0x4d64	
-    
-    max = lx*ly;
+    for(addr=0; addr<max; addr++)
+    {
     5330:	02 12       	push	r2		
     5332:	32 c2       	dint			
     5334:	03 43       	nop			
@@ -5805,57 +5805,57 @@ void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned ch
     533a:	c2 4b 38 01 	mov.b	r11,	&0x0138	
     533e:	1a 42 3a 01 	mov	&0x013a,r10	
     5342:	32 41       	pop	r2		
-    for(addr=0; addr<max; addr++)
+        n6100_send(p[addr], 1);
     5344:	0a 93       	tst	r10		
     5346:	0a 24       	jz	$+22     	;abs 0x535c
     5348:	0b 43       	clr	r11		
-    
-    n6100_sendcom2(0x2a, 0, 0x83);
     n6100_sendcom2(0x2b, 0, 0x83);
 }
 
 void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char p[])
+{
+    unsigned int addr, max;
     534a:	0f 49       	mov	r9,	r15	
     534c:	0f 5b       	add	r11,	r15	
-    n6100_send(0x2c, 3);
-    
     max = lx*ly;
     for(addr=0; addr<max; addr++)
-    {
-        n6100_send(p[addr], 1);
-    534e:	5e 43       	mov.b	#1,	r14	;r3 As==01
-    5350:	6f 4f       	mov.b	@r15,	r15	
-    5352:	b0 12 64 4d 	call	#0x4d64	
-    n6100_sendcom2(0x2b, y, y+ly-1);
-    
-    n6100_send(0x2c, 3);
-    
-    max = lx*ly;
-    for(addr=0; addr<max; addr++)
-    5356:	1b 53       	inc	r11		
-    5358:	0b 9a       	cmp	r10,	r11	
-    535a:	f7 2b       	jnc	$-16     	;abs 0x534a
     {
         n6100_send(p[addr], 1);
     }
     
+    534e:	5e 43       	mov.b	#1,	r14	;r3 As==01
+    5350:	6f 4f       	mov.b	@r15,	r15	
+    5352:	b0 12 64 4d 	call	#0x4d64	
+    n6100_send(0x2c, 3);
+    
+    max = lx*ly;
+    for(addr=0; addr<max; addr++)
+    {
+        n6100_send(p[addr], 1);
+    5356:	1b 53       	inc	r11		
+    5358:	0b 9a       	cmp	r10,	r11	
+    535a:	f7 2b       	jnc	$-16     	;abs 0x534a
+    }
+    
     P5OUT &= ~SDA;
+    P5OUT |= CSX;
+    
     535c:	f2 f0 fd ff 	and.b	#-3,	&0x0031	;#0xfffd
     5360:	31 00 
-    P5OUT |= CSX;
-    5362:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
-    
     n6100_sendcom2(0x2a, 0, 0x83);
+    5362:	d2 d3 31 00 	bis.b	#1,	&0x0031	;r3 As==01
+    n6100_sendcom2(0x2b, 0, 0x83);
+}
     5366:	7d 40 83 ff 	mov.b	#-125,	r13	;#0xff83
     536a:	4e 43       	clr.b	r14		
     536c:	7f 40 2a 00 	mov.b	#42,	r15	;#0x002a
     5370:	b0 12 e2 4d 	call	#0x4de2	
-    n6100_sendcom2(0x2b, 0, 0x83);
+
     5374:	7d 40 83 ff 	mov.b	#-125,	r13	;#0xff83
     5378:	4e 43       	clr.b	r14		
     537a:	7f 40 2b 00 	mov.b	#43,	r15	;#0x002b
     537e:	b0 12 e2 4d 	call	#0x4de2	
-}
+void lcd_newline(void)
     5382:	38 41       	pop	r8		
     5384:	39 41       	pop	r9		
     5386:	3a 41       	pop	r10		
@@ -5863,82 +5863,82 @@ void lcd_putlogo(unsigned char x, unsigned char y, unsigned char lx, unsigned ch
     538a:	30 41       	ret			
 
 0000538c <lcd_newline>:
-
-void lcd_newline(void)
 {
     if (++LCDLineCount == LCD_NLINE){
+        LCDLineCount = 0; 
+    }
     538c:	5f 42 b6 12 	mov.b	&0x12b6,r15	
     5390:	5f 53       	inc.b	r15		
     5392:	c2 4f b6 12 	mov.b	r15,	&0x12b6	
     5396:	7f 90 10 00 	cmp.b	#16,	r15	;#0x0010
     539a:	02 20       	jnz	$+6      	;abs 0x53a0
-        LCDLineCount = 0; 
-    539c:	c2 43 b6 12 	mov.b	#0,	&0x12b6	;r3 As==00
-    }
     LCDCharCount = 0;
-    53a0:	c2 43 b8 12 	mov.b	#0,	&0x12b8	;r3 As==00
+    539c:	c2 43 b6 12 	mov.b	#0,	&0x12b6	;r3 As==00
 }
+
+    53a0:	c2 43 b8 12 	mov.b	#0,	&0x12b8	;r3 As==00
+void lcd_goto(unsigned char x, unsigned char y)
     53a4:	30 41       	ret			
 
 000053a6 <lcd_goto>:
-
-void lcd_goto(unsigned char x, unsigned char y)
 {
     if (x > LCD_NCHAR-1) x = 0;
+    if (y > LCD_NLINE-1) y = 0;
+    
     53a6:	7f 90 15 00 	cmp.b	#21,	r15	;#0x0015
     53aa:	01 28       	jnc	$+4      	;abs 0x53ae
     53ac:	4f 43       	clr.b	r15		
-    if (y > LCD_NLINE-1) y = 0;
+    LCDCharCount = x;
     53ae:	7e 90 10 00 	cmp.b	#16,	r14	;#0x0010
     53b2:	01 28       	jnc	$+4      	;abs 0x53b6
     53b4:	4e 43       	clr.b	r14		
-    
-    LCDCharCount = x;
-    53b6:	c2 4f b8 12 	mov.b	r15,	&0x12b8	
     LCDLineCount = y;
-    53ba:	c2 4e b6 12 	mov.b	r14,	&0x12b6	
 }
+    53b6:	c2 4f b8 12 	mov.b	r15,	&0x12b8	
+
+    53ba:	c2 4e b6 12 	mov.b	r14,	&0x12b6	
+void lcd_wrchar(unsigned char c)
     53be:	30 41       	ret			
 
 000053c0 <lcd_wrchar>:
-
-void lcd_wrchar(unsigned char c)
 {
+  unsigned int j;
+  unsigned char i, k, v, mask;
     53c0:	0b 12       	push	r11		
     53c2:	0a 12       	push	r10		
     53c4:	09 12       	push	r9		
     53c6:	08 12       	push	r8		
     53c8:	07 12       	push	r7		
     53ca:	4b 4f       	mov.b	r15,	r11	
-  unsigned int j;
-  unsigned char i, k, v, mask;
 
   // Posiciona área para copiar...
   i=6*LCDCharCount;
+  n6100_sendcom2(0x2a, i, i+5);
+  i=8*(LCDLineCount)+2;
     53cc:	5e 42 b8 12 	mov.b	&0x12b8,r14	
     53d0:	4e 5e       	rla.b	r14		
     53d2:	5e 52 b8 12 	add.b	&0x12b8,r14	
     53d6:	4e 5e       	rla.b	r14		
-  n6100_sendcom2(0x2a, i, i+5);
+  n6100_sendcom2(0x2b, i, i+7);
     53d8:	4d 4e       	mov.b	r14,	r13	
     53da:	7d 50 05 00 	add.b	#5,	r13	;#0x0005
     53de:	7f 40 2a 00 	mov.b	#42,	r15	;#0x002a
     53e2:	b0 12 e2 4d 	call	#0x4de2	
-  i=8*(LCDLineCount)+2;
+
     53e6:	5e 42 b6 12 	mov.b	&0x12b6,r14	
     53ea:	4e 5e       	rla.b	r14		
     53ec:	4e 5e       	rla.b	r14		
     53ee:	4e 5e       	rla.b	r14		
-  n6100_sendcom2(0x2b, i, i+7);
+  // Rotina de escrita na memória...
     53f0:	4d 4e       	mov.b	r14,	r13	
     53f2:	7d 50 09 00 	add.b	#9,	r13	;#0x0009
     53f6:	6e 53       	incd.b	r14		
     53f8:	7f 40 2b 00 	mov.b	#43,	r15	;#0x002b
     53fc:	b0 12 e2 4d 	call	#0x4de2	
-
-  // Rotina de escrita na memória...
   mask = 0x01;
   n6100_send(0x2c,2);
+
+  for (k=0; k<8; k++)
     5400:	6e 43       	mov.b	#2,	r14	;r3 As==10
     5402:	7f 40 2c 00 	mov.b	#44,	r15	;#0x002c
     5406:	b0 12 64 4d 	call	#0x4d64	
@@ -5948,29 +5948,29 @@ void lcd_wrchar(unsigned char c)
     5410:	09 59       	rla	r9		
     5412:	09 5f       	add	r15,	r9	
     5414:	78 42       	mov.b	#8,	r8	;r2 As==11
-  n6100_sendcom2(0x2a, i, i+5);
-  i=8*(LCDLineCount)+2;
   n6100_sendcom2(0x2b, i, i+7);
 
   // Rotina de escrita na memória...
   mask = 0x01;
+  n6100_send(0x2c,2);
+
     5416:	5a 43       	mov.b	#1,	r10	;r3 As==01
     5418:	07 49       	mov	r9,	r7	
     541a:	37 50 88 55 	add	#21896,	r7	;#0x5588
     541e:	39 50 8d 55 	add	#21901,	r9	;#0x558d
-    
-    LCDCharCount = x;
     LCDLineCount = y;
 }
 
 void lcd_wrchar(unsigned char c)
+{
+  unsigned int j;
     5422:	0b 47       	mov	r7,	r11	
-  {
-    j = (unsigned int) c * 5;
     for (i=0; i<5; i++)
     {
       v = asciitable[j];
-      if(v & mask) n6100_send(LCDForeColor,0); else n6100_send(LCDBackColor,0);
+      if(v & mask) n6100_send((unsigned char)LCDForeColor,0); else n6100_send((unsigned char)LCDBackColor,0);
+      j += 1;
+    }
     5424:	4e 4a       	mov.b	r10,	r14	
     5426:	6e fb       	and.b	@r11,	r14	
     5428:	11 24       	jz	$+36     	;abs 0x544c
@@ -5978,54 +5978,54 @@ void lcd_wrchar(unsigned char c)
     542c:	5f 42 52 12 	mov.b	&0x1252,r15	
     5430:	b0 12 64 4d 	call	#0x4d64	
     5434:	1b 53       	inc	r11		
-  n6100_send(0x2c,2);
-
   for (k=0; k<8; k++)
   {
     j = (unsigned int) c * 5;
     for (i=0; i<5; i++)
-    5436:	0b 99       	cmp	r9,	r11	
-    5438:	f5 23       	jnz	$-20     	;abs 0x5424
     {
       v = asciitable[j];
-      if(v & mask) n6100_send(LCDForeColor,0); else n6100_send(LCDBackColor,0);
+    5436:	0b 99       	cmp	r9,	r11	
+    5438:	f5 23       	jnz	$-20     	;abs 0x5424
+      if(v & mask) n6100_send((unsigned char)LCDForeColor,0); else n6100_send((unsigned char)LCDBackColor,0);
       j += 1;
     }
-    n6100_send(LCDBackColor,0);
+    n6100_send((unsigned char)LCDBackColor,0);
+    mask <<= 1;
+  }
     543a:	4e 43       	clr.b	r14		
     543c:	5f 42 ba 12 	mov.b	&0x12ba,r15	
     5440:	b0 12 64 4d 	call	#0x4d64	
     5444:	78 53       	add.b	#-1,	r8	;r3 As==11
-
-  // Rotina de escrita na memória...
   mask = 0x01;
   n6100_send(0x2c,2);
 
   for (k=0; k<8; k++)
-    5446:	07 24       	jz	$+16     	;abs 0x5456
-      v = asciitable[j];
-      if(v & mask) n6100_send(LCDForeColor,0); else n6100_send(LCDBackColor,0);
-      j += 1;
-    }
-    n6100_send(LCDBackColor,0);
-    mask <<= 1;
-    5448:	4a 5a       	rla.b	r10		
-    544a:	eb 3f       	jmp	$-40     	;abs 0x5422
   {
     j = (unsigned int) c * 5;
-    for (i=0; i<5; i++)
-    {
-      v = asciitable[j];
-      if(v & mask) n6100_send(LCDForeColor,0); else n6100_send(LCDBackColor,0);
-    544c:	5f 42 ba 12 	mov.b	&0x12ba,r15	
-    5450:	b0 12 64 4d 	call	#0x4d64	
-    5454:	ef 3f       	jmp	$-32     	;abs 0x5434
+    5446:	07 24       	jz	$+16     	;abs 0x5456
       j += 1;
     }
-    n6100_send(LCDBackColor,0);
+    n6100_send((unsigned char)LCDBackColor,0);
     mask <<= 1;
   }
 }
+    5448:	4a 5a       	rla.b	r10		
+    544a:	eb 3f       	jmp	$-40     	;abs 0x5422
+    for (i=0; i<5; i++)
+    {
+      v = asciitable[j];
+      if(v & mask) n6100_send((unsigned char)LCDForeColor,0); else n6100_send((unsigned char)LCDBackColor,0);
+      j += 1;
+    }
+    544c:	5f 42 ba 12 	mov.b	&0x12ba,r15	
+    5450:	b0 12 64 4d 	call	#0x4d64	
+    5454:	ef 3f       	jmp	$-32     	;abs 0x5434
+    n6100_send((unsigned char)LCDBackColor,0);
+    mask <<= 1;
+  }
+}
+
+void lcd_putchar(unsigned char c)
     5456:	37 41       	pop	r7		
     5458:	38 41       	pop	r8		
     545a:	39 41       	pop	r9		
@@ -6034,112 +6034,112 @@ void lcd_wrchar(unsigned char c)
     5460:	30 41       	ret			
 
 00005462 <lcd_putchar>:
-
-void lcd_putchar(unsigned char c)
 {
-    5462:	4e 4f       	mov.b	r15,	r14	
   switch (c)
+  {
+    5462:	4e 4f       	mov.b	r15,	r14	
+    case 10 : lcd_newline();
     5464:	7f 90 0a 00 	cmp.b	#10,	r15	;#0x000a
     5468:	1c 24       	jz	$+58     	;abs 0x54a2
     546a:	7f 90 0d 00 	cmp.b	#13,	r15	;#0x000d
     546e:	23 24       	jz	$+72     	;abs 0x54b6
-  {
-    case 10 : lcd_newline();
               break;
     case 13 : LCDCharCount = 0;
               break;
     default : if (LCDCharCount++ < LCD_NCHAR) lcd_wrchar(c);
+              else
+              {
     5470:	5d 42 b8 12 	mov.b	&0x12b8,r13	
     5474:	4c 4d       	mov.b	r13,	r12	
     5476:	5c 53       	inc.b	r12		
     5478:	c2 4c b8 12 	mov.b	r12,	&0x12b8	
     547c:	7d 90 15 00 	cmp.b	#21,	r13	;#0x0015
     5480:	20 28       	jnc	$+66     	;abs 0x54c2
-    n6100_sendcom2(0x2b, 0, 0x83);
-}
 
 void lcd_newline(void)
 {
     if (++LCDLineCount == LCD_NLINE){
+        LCDLineCount = 0; 
+    }
     5482:	5f 42 b6 12 	mov.b	&0x12b6,r15	
     5486:	5f 53       	inc.b	r15		
     5488:	c2 4f b6 12 	mov.b	r15,	&0x12b6	
     548c:	7f 90 10 00 	cmp.b	#16,	r15	;#0x0010
     5490:	15 24       	jz	$+44     	;abs 0x54bc
-        LCDLineCount = 0; 
-    }
     LCDCharCount = 0;
+}
+
     5492:	c2 43 b8 12 	mov.b	#0,	&0x12b8	;r3 As==00
-              break;
-    default : if (LCDCharCount++ < LCD_NCHAR) lcd_wrchar(c);
               else
               {
                 lcd_newline();
                 lcd_wrchar(c);
+                LCDCharCount++;
+              }
     5496:	4f 4e       	mov.b	r14,	r15	
     5498:	b0 12 c0 53 	call	#0x53c0	
-                LCDCharCount++;
+  }
     549c:	d2 53 b8 12 	inc.b	&0x12b8	
     54a0:	30 41       	ret			
-    n6100_sendcom2(0x2b, 0, 0x83);
-}
 
 void lcd_newline(void)
 {
     if (++LCDLineCount == LCD_NLINE){
+        LCDLineCount = 0; 
+    }
     54a2:	5f 42 b6 12 	mov.b	&0x12b6,r15	
     54a6:	5f 53       	inc.b	r15		
     54a8:	c2 4f b6 12 	mov.b	r15,	&0x12b6	
     54ac:	7f 90 10 00 	cmp.b	#16,	r15	;#0x0010
     54b0:	02 20       	jnz	$+6      	;abs 0x54b6
-        LCDLineCount = 0; 
+    LCDCharCount = 0;
     54b2:	c2 43 b6 12 	mov.b	#0,	&0x12b6	;r3 As==00
-{
-  switch (c)
-  {
-    case 10 : lcd_newline();
-              break;
-    case 13 : LCDCharCount = 0;
-    54b6:	c2 43 b8 12 	mov.b	#0,	&0x12b8	;r3 As==00
-              break;
-    54ba:	30 41       	ret			
-}
-
-void lcd_newline(void)
-{
-    if (++LCDLineCount == LCD_NLINE){
-        LCDLineCount = 0; 
-    54bc:	c2 43 b6 12 	mov.b	#0,	&0x12b6	;r3 As==00
-    54c0:	e8 3f       	jmp	$-46     	;abs 0x5492
   {
     case 10 : lcd_newline();
               break;
     case 13 : LCDCharCount = 0;
               break;
     default : if (LCDCharCount++ < LCD_NCHAR) lcd_wrchar(c);
+    54b6:	c2 43 b8 12 	mov.b	#0,	&0x12b8	;r3 As==00
+              else
+    54ba:	30 41       	ret			
+void lcd_newline(void)
+{
+    if (++LCDLineCount == LCD_NLINE){
+        LCDLineCount = 0; 
+    }
+    LCDCharCount = 0;
+    54bc:	c2 43 b6 12 	mov.b	#0,	&0x12b6	;r3 As==00
+    54c0:	e8 3f       	jmp	$-46     	;abs 0x5492
+              break;
+    case 13 : LCDCharCount = 0;
+              break;
+    default : if (LCDCharCount++ < LCD_NCHAR) lcd_wrchar(c);
+              else
+              {
     54c2:	b0 12 c0 53 	call	#0x53c0	
     54c6:	30 41       	ret			
 
 000054c8 <putchar>:
-                         
-
 // printf para LCDNOKIA
 int putchar(int c)
 {
     lcd_putchar(c);
-    54c8:	b0 12 62 54 	call	#0x5462	
     return 0;
 }
+    54c8:	b0 12 62 54 	call	#0x5462	
+                         
+void lcd_setcolor(unsigned char foreground_color, unsigned char background_color)
     54cc:	0f 43       	clr	r15		
     54ce:	30 41       	ret			
 
 000054d0 <lcd_drawprogressbar>:
-                LCDCharCount++;
-              }
   }
 }
 
-void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogress, int percent){
+void lcd_drawprogressbar(int x, int y, int lx, int ly, unsigned char color, unsigned char colorprogress, int percent){
+    if(ly < 1 || lx < 1 || percent < 0)
+        return;
     54d0:	0b 12       	push	r11		
     54d2:	0a 12       	push	r10		
     54d4:	09 12       	push	r9		
@@ -6149,7 +6149,7 @@ void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogr
     54dc:	08 4d       	mov	r13,	r8	
     54de:	09 4c       	mov	r12,	r9	
     54e0:	1e 41 10 00 	mov	16(r1),	r14	;0x0010(r1)
-    if(ly < 1 || lx < 1 || percent < 0)
+        
     54e4:	0d 43       	clr	r13		
     54e6:	0d 9c       	cmp	r12,	r13	
     54e8:	27 34       	jge	$+80     	;abs 0x5538
@@ -6157,9 +6157,9 @@ void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogr
     54ec:	25 34       	jge	$+76     	;abs 0x5538
     54ee:	0e 9d       	cmp	r13,	r14	
     54f0:	23 38       	jl	$+72     	;abs 0x5538
-        return;
-        
     int lx_progress = (lx * percent) / 100;
+    lcd_fillrect(x, y, lx_progress, ly, color);
+    lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly, colorprogress);
     54f2:	02 12       	push	r2		
     54f4:	32 c2       	dint			
     54f6:	03 43       	nop			
@@ -6170,7 +6170,7 @@ void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogr
     5506:	3a 40 64 00 	mov	#100,	r10	;#0x0064
     550a:	b0 12 24 71 	call	#0x7124	
     550e:	0d 4c       	mov	r12,	r13	
-    lcd_fillrect(x, y, lx_progress, ly,color);
+}
     5510:	4b 4c       	mov.b	r12,	r11	
     5512:	4a 4f       	mov.b	r15,	r10	
     5514:	51 12 0e 00 	push.b	14(r1)		;0x000e(r1)
@@ -6178,7 +6178,7 @@ void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogr
     551a:	4e 47       	mov.b	r7,	r14	
     551c:	b0 12 08 4e 	call	#0x4e08	
     5520:	21 53       	incd	r1		
-    lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly,colorprogress);
+
     5522:	51 12 10 00 	push.b	16(r1)		;0x0010(r1)
     5526:	4c 49       	mov.b	r9,	r12	
     5528:	4d 48       	mov.b	r8,	r13	
@@ -6188,7 +6188,7 @@ void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogr
     5530:	4f 5a       	add.b	r10,	r15	
     5532:	b0 12 08 4e 	call	#0x4e08	
     5536:	21 53       	incd	r1		
-}
+
     5538:	37 41       	pop	r7		
     553a:	38 41       	pop	r8		
     553c:	39 41       	pop	r9		
@@ -6197,70 +6197,68 @@ void lcd_drawprogressbar(int x, int y, int lx, int ly, int color, int colorprogr
     5542:	30 41       	ret			
 
 00005544 <lcd_putdot>:
-
-
 void lcd_putdot(int from, int to){
+    if(from > to) return;
+    lcd_goto(from, LCDLineCount);
     5544:	0b 12       	push	r11		
     5546:	0a 12       	push	r10		
     5548:	0b 4f       	mov	r15,	r11	
     554a:	0a 4e       	mov	r14,	r10	
-    if(from > to) return;
+    
     554c:	0e 9f       	cmp	r15,	r14	
     554e:	17 38       	jl	$+48     	;abs 0x557e
-    lcd_goto(from, LCDLineCount);
+    while(from < to){
     5550:	5f 42 b6 12 	mov.b	&0x12b6,r15	
     5554:	4e 4b       	mov.b	r11,	r14	
-    LCDCharCount = 0;
-}
 
 void lcd_goto(unsigned char x, unsigned char y)
 {
     if (x > LCD_NCHAR-1) x = 0;
+    if (y > LCD_NLINE-1) y = 0;
+    
     5556:	7b 90 15 00 	cmp.b	#21,	r11	;#0x0015
     555a:	01 28       	jnc	$+4      	;abs 0x555e
     555c:	4e 43       	clr.b	r14		
-    if (y > LCD_NLINE-1) y = 0;
+    LCDCharCount = x;
     555e:	7f 90 10 00 	cmp.b	#16,	r15	;#0x0010
     5562:	10 2c       	jc	$+34     	;abs 0x5584
-    
-    LCDCharCount = x;
-    5564:	c2 4e b8 12 	mov.b	r14,	&0x12b8	
     LCDLineCount = y;
-    5568:	c2 4f b6 12 	mov.b	r15,	&0x12b6	
+}
+    5564:	c2 4e b8 12 	mov.b	r14,	&0x12b8	
 
-void lcd_putdot(int from, int to){
+    5568:	c2 4f b6 12 	mov.b	r15,	&0x12b6	
     if(from > to) return;
     lcd_goto(from, LCDLineCount);
     
     while(from < to){
+        lcd_putchar('.');
+        from++;
     556c:	0b 9a       	cmp	r10,	r11	
     556e:	07 34       	jge	$+16     	;abs 0x557e
-        lcd_putchar('.');
+    }
     5570:	7f 40 2e 00 	mov.b	#46,	r15	;#0x002e
     5574:	b0 12 62 54 	call	#0x5462	
-        from++;
+}
     5578:	1b 53       	inc	r11		
-
-void lcd_putdot(int from, int to){
     if(from > to) return;
     lcd_goto(from, LCDLineCount);
     
     while(from < to){
-    557a:	0b 9a       	cmp	r10,	r11	
-    557c:	f9 3b       	jl	$-12     	;abs 0x5570
         lcd_putchar('.');
         from++;
+    557a:	0b 9a       	cmp	r10,	r11	
+    557c:	f9 3b       	jl	$-12     	;abs 0x5570
     }
 }
     557e:	3a 41       	pop	r10		
     5580:	3b 41       	pop	r11		
     5582:	30 41       	ret			
-}
-
 void lcd_goto(unsigned char x, unsigned char y)
 {
     if (x > LCD_NCHAR-1) x = 0;
     if (y > LCD_NLINE-1) y = 0;
+    
+    LCDCharCount = x;
     5584:	4f 43       	clr.b	r15		
     5586:	ee 3f       	jmp	$-34     	;abs 0x5564
 

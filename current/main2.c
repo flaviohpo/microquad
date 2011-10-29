@@ -13,8 +13,8 @@
 #include "menu.h"
 
 // variaveis leitura radio raw
-volatile int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};            // 
-volatile int PPMValue[8] = {0,0,0,0,0,0,0,0};
+int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
+int PPMValue[8] = {0,0,0,0,0,0,0,0};
 
 int main(){
     WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
@@ -22,34 +22,49 @@ int main(){
     setup();    // inicializa perifericos e verifica se precisa calibrar o radio
     lcd_setcolor(BLACK, WHITE);   
     
-    int val = 0;
-    
-    Item *oItem = create_item("item1", 0,0,0,0,0,0,0,&val);
-    MENU *MainMenu = menu_create("MENU1", oItem, 6, 0, 0, 0, 5, 0);
-    val |= menu_add_item(MainMenu, create_item("item2", 0,0,0,0,0,0,0,&val));
-    val |= menu_add_item(MainMenu, create_item("item3", 0,0,0,0,0,0,0,&val)) << 1;
-    val |= menu_add_item(MainMenu, create_item("item4", 0,0,0,0,0,0,0,&val)) << 2;
-    val |= menu_add_item(MainMenu, create_item("item5", 0,0,0,0,0,0,0,&val)) << 4;
-    val |= menu_add_item(MainMenu, create_item("item6", 0,0,0,0,0,0,0,&val)) << 5;
-    val |= menu_add_item(MainMenu, create_item("item7", 0,0,0,0,0,0,0,&val)) << 6;
-    val |= menu_add_item(MainMenu, create_item("item8", 0,0,0,0,0,0,0,&val)) << 7;
-    
-    if(val > 0){
-        printf("%d",val);
-    }
-    
+    int RXminval = 0;
+    int RXmaxval = 256;
+    int BoolVal = CHECKED;  
+    int BoolVal2 = UNCHECKED;  
+          
+    Item *oItem = create_item("CH1", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[0]);
+    MENU *MainMenu = menu_create("RADIO", oItem, 5, 50, 15, 5, 0);
+    menu_add_item(MainMenu, create_item("CH2", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[1]));
+    menu_add_item(MainMenu, create_item("CH3", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[2]));
+    menu_add_item(MainMenu, create_item("CH4", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[3]));
+    menu_add_item(MainMenu, create_item("CH5", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[4]));
+    menu_add_item(MainMenu, create_item("CH6", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[5]));
+    menu_add_item(MainMenu, create_item("CH7", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[6]));
+    menu_add_item(MainMenu, create_item("CH8", ITEMTYPE_VALUE_BAR_R,&RXminval,&RXmaxval,NULL,&PPMValue[7]));
+    menu_add_item(MainMenu, create_item("BOOL", ITEMTYPE_BOOLEAN_R,NULL,NULL,NULL,&BoolVal));
+    menu_add_item(MainMenu, create_item("BOOL", ITEMTYPE_BOOLEAN_R,NULL,NULL,NULL,&BoolVal2));
+     
     draw_menu(MainMenu, 1);
 
+    int i = 0;
+ 
     while(1){
-        MainMenu->SelectedItem = (MainMenu->SelectedItem + 1) % MainMenu->oListItems->Size;
-        delayms(1000);   
-        draw_menu(MainMenu, 0);
-    }
-    
+        while(i<10){
+            MainMenu->SelectedItem = (i);
+            delayms(500);   
+            draw_menu(MainMenu, 0);
+            menu_refresh(MainMenu);
+            i++;
+        }
+        while(i){
+            i--;
+            MainMenu->SelectedItem = (i);
+            delayms(500);   
+            draw_menu(MainMenu, 0);
+            menu_refresh(MainMenu);
+        }
+    }    
     __bis_SR_register(LPM4_bits);
-    
+  
     while(1){
         
+            draw_menu(MainMenu, 0);
+            menu_refresh(MainMenu);    
     }
 }
 
@@ -128,7 +143,7 @@ void timer_a3_init(void){
     TACCTL0 = CM_0 + CCIS_0 + OUTMOD_0 + CCIE;
 
     /* TACCR0, Timer_A Capture/Compare Register 0 */
-    TACCR0 = 4001; //2ms
+    TACCR0 = 4095; //2ms
 
     /* 
      * TACTL, Timer_A3 Control Register
@@ -140,11 +155,13 @@ void timer_a3_init(void){
     TACTL = TASSEL_2 + ID_3 + MC_1;
 }
 
+unsigned int PPM_aux;
+int channel_num, PPM_ch_counter;
 // muito consagred
 interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
-    unsigned int PPM_aux = TAR; // captura aqui pra ser mais exato
+    PPM_aux = TAR; // captura aqui pra ser mais exato
     // aqui eh usado PPM_P1_MASK, pq eh a interrupcao da P1 
-    int channel_num = 0, PPM_ch_counter;
+    channel_num = 0;
     for(PPM_ch_counter = 0x01; PPM_ch_counter <= 0x80; PPM_ch_counter = PPM_ch_counter << 1){
         if(P1IFG & (PPM_ch_counter & PPM_P1MASK)){
             if(!(P1IES & PPM_ch_counter)){ // low to high
@@ -155,10 +172,12 @@ interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
             
                 if(TimeUpEdge[channel_num] > PPM_aux){ // se deu overflow na contagem do timer
                     PPMValue[channel_num] = (TACCR0 - TimeUpEdge[channel_num] + PPM_aux);
+
                 }
                 else{ // se nao deu overflow na contagem do timer
                     PPMValue[channel_num] = (PPM_aux - TimeUpEdge[channel_num]);
                 }
+                PPMValue[channel_num] = PPMValue[channel_num]>>4,
                 P1IES &= ~(PPM_ch_counter & PPM_P1MASK); // configure low to high      
             }
 
