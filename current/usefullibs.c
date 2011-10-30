@@ -11,7 +11,7 @@
 #include "delay.h"
 #endif //ULIBS_AUTO_TEST
 
-Item* create_item(char* label, ITEMTYPE type, int *maxval, int *minval, int *interval, int *val){
+Item* create_item(const char* label, ITEMTYPE type, const int *maxval, const int *minval, const int *interval, int *val){
     Item* oItem = (Item*)malloc(sizeof(Item));
     if(oItem != NULL){
         oItem->Label        =   label;
@@ -26,7 +26,7 @@ Item* create_item(char* label, ITEMTYPE type, int *maxval, int *minval, int *int
 
 /* STACK */
 
-StackItems* stack_items_create(Item* First, char* Label){
+StackItems* stack_items_create(Item* First, const char* Label){
     StackItems* oStack = (StackItems*)malloc(sizeof(StackItems));
     if(oStack != NULL){
         oStack->Label = Label;
@@ -77,7 +77,7 @@ void stack_items_dispose(StackItems* StackItemsHandler){
 
 /* QUEUE */
 
-QueueItems* queue_items_create(Item* First, char* Label){
+QueueItems* queue_items_create(Item* First, const char* Label){
     QueueItems* oQueue = (QueueItems*)malloc(sizeof(QueueItems));
     if(oQueue != NULL){
         oQueue->Label = Label;
@@ -141,7 +141,7 @@ void queue_items_dispose(QueueItems* QueueItemsHandler){
 }
 
 /* LIST */
-ListItems* list_items_create(Item* First, char* Label){
+ListItems* list_items_create(Item* First, const char* Label){
     ListItems* oList = (ListItems*)malloc(sizeof(ListItems));
     if(oList != NULL){
         oList->Label = Label;

@@ -1,922 +1,250 @@
 #include "stdio.h"
 #include "stdlib.h"
+#include "string.h"
 #include "legacymsp430.h"
 #include "msp430f2618.h"
+#include "color.h"
 #include "delay.h"
 #include "analog.h"
 #include "lcd6100.h"
 #include "itg3200.h"
 #include "eeprom.h"
 #include "i2c.h"
+#include "usefullibs.h"
+#include "menu.h"
 #include "microquad.h"
 #include "resources.h"
 
-volatile unsigned int MenuCounter = 0;
-
-// fazer uma struct com bitfield com todos esse flags
-unsigned char low_battery_flag = FALSE;
-unsigned char MenuVisible = FALSE;       // indica se o menu deve ser processado ou nao
-unsigned char MotorArmed = FALSE;        // seguranca, o loop de controle so eh feito quando esta variavei for TRUE
-unsigned char DrawRCInputCheck = FALSE; // serve para desenhar o textos uma vez so
-unsigned char DrawControlRefCheck = FALSE;
-unsigned char ShowSettingsCheck = FALSE;
-unsigned char DrawMotorOutCheck = FALSE; // serve para desenhar o textos uma vez so
-
-MENU_STEPSET MenuStep = DISPLAY;        // gerencia o menu principal
-MENU_STEPSET MenuAnalog = DISPLAY;      // gerencia os canais analog visiveis
-MENU_STEPSET MenuMotor = DISPLAY;      // testa motor output
-MENU_STEPSET MenuPID = DISPLAY;
-MENU_OPTION MenuOption = READY;         // guarda a opcao escolhida no menu principal
-PID_TUNING_OPT PIDMenuOption = CHANGE_P_ROLL;
-
-// variaveis usadas no menu analog graph
-unsigned char AnalogSelect = 7;      // serve para selecionar a entrada no menu analog
-unsigned char AnalogChecked = 0x00;  // verifica se a entrada X deve ser mostrada no grafico
-unsigned char AnalogColours[8] = {BLUE, LIME, RED, YELLOW, ORANGE, MAGENTA, AQUA, WHITE}; 
-char AnalogGraph[8][GRAPH_LENGHT];   // um vetor para cada entrada analogica, guarda as ultimas GRAPH_LENGHT leituras, total = 800B
-
 // variaveis ajuste radio - roll pitch e yaw
-int PPMOffset[4] = {0, 0, 0, 0};
-
-// controle - roll pitch e yaw
-unsigned int Gain[3][3] = {{1, 1, 1}, {0, 0, 0}, {0, 0, 0}};
-int ControlRef[4] = {0, 0, 0, 0};
-unsigned int MotorOut[4] = {0, 0, 0, 0};
-
-// vars sensores
-volatile int GyroValue[3] = {0, 0, 0};
-int AccelValue[3] = {0, 0, 0};
-
-// var menu ajuste do controle
-int StickCounter = 1;
+int PPMOffset[8] = {0,0,0,0,0,0,0,0};
 
 // variaveis leitura radio raw
-volatile unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};            // 
-volatile unsigned int PPMValue[8] = {0,0,0,0,0,0,0,0};
+unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
+int PPMValue[8] = {0,0,0,0,0,0,0,0};
 
-int main(){
+// variaveis sensores
+int AccelValue[3] = {0, 0, 0};
+int GyroValue[3] = {0, 0, 0};
+
+// variaveis do controle
+unsigned int ControlProportional[3] = {0,0,0};
+// for further implementation
+//unsigned int ControlIntegral[3] = {0,0,0};
+//unsigned int ControlDerivative[3] = {0,0,0};
+unsigned int MotorOutput[6] = {0,0,0,0,0,0};
+
+MENU* MainMenu;
+MENU* AnalogMenu;
+MENU* MotorMenu;
+MENU* ControlMenu;
+MENU* RadioMenu;
+MENU* SensorMenu;
+
+PROGRAM_STEP ProgStep;
+
+int main(void){
     WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
-
+        
+    unsigned char MenuDraw = 1;
+    
+    ACTION act = ACTION_NONE;
+    MENU_RESPONSE resp = RESP_NONE;
+    ProgStep = PROCESS_MAIN_MENU;
+    
     setup();
-    
+
     while(1){
-    
-    }
-}
-
-// loop de controle
-void main_loop(){
-    int i;
-    // read channel
-    rx_get_channels();
-    // arm disarm nao tem
-    // read analog
-#ifdef ITG3200
-    // fazer para itg3200
-#else //ITG3200
-    analog_refresh_channel(GYRO_YAW_CH);
-    analog_refresh_channel(GYRO_PITCH_CH);
-    analog_refresh_channel(GYRO_ROLL_CH);
-
-    // adiciona throttle
-    MotorOut[FRONT] = ControlRef[THROTTLE];
-    MotorOut[LEFT] = ControlRef[THROTTLE];
-    MotorOut[RIGHT] = ControlRef[THROTTLE];
-    MotorOut[BACK] = ControlRef[THROTTLE];
-    // adiciona gyro e rc roll
-    AnalogValue[GYRO_ROLL_CH] = (AnalogValue[GYRO_ROLL_CH] >> 2) * Gain[PROPORTIONAL][ROLL] / 100; // passa a leitura do gyro para 10bits
-    ControlRef[ROLL] = ControlRef[ROLL] * ROLL_RC_GAIN / 100;
-    ControlRef[ROLL] += AnalogValue[GYRO_ROLL_CH];
-    
-    MotorOut[LEFT] += ControlRef[ROLL];
-    MotorOut[RIGHT] -= ControlRef[ROLL];
-    // adiciona pitch
-    AnalogValue[GYRO_PITCH_CH] = (AnalogValue[GYRO_PITCH_CH] >> 2) * Gain[PROPORTIONAL][PITCH] / 100; // passa a leitura do gyro para 10bits
-    ControlRef[PITCH] = ControlRef[PITCH] * PITCH_RC_GAIN / 100;
-    ControlRef[PITCH] += AnalogValue[GYRO_PITCH_CH];
-    
-    MotorOut[BACK] += ControlRef[PITCH];
-    MotorOut[FRONT] -= ControlRef[PITCH];
-    // adiciona yaw
-    AnalogValue[GYRO_YAW_CH] = (AnalogValue[GYRO_YAW_CH] >> 2) * Gain[PROPORTIONAL][YAW] / 100; // passa a leitura do gyro para 10bits
-    ControlRef[YAW] = ControlRef[YAW] * YAW_RC_GAIN / 100;
-    ControlRef[YAW] += AnalogValue[GYRO_YAW_CH];
-#endif // ITG3200
-
-// essa parte eh comum para qualquer gyro
-    MotorOut[RIGHT] += ControlRef[YAW];
-    MotorOut[LEFT] += ControlRef[YAW];
-    MotorOut[BACK] -= ControlRef[YAW];
-    MotorOut[FRONT] -= ControlRef[YAW];                
-    // satura low para nao parar de girar
-    for(i = 0; i<4; i++){
-        if(MotorOut[i] < MIN_COMMAND){
-            MotorOut[i] = MIN_COMMAND;
-        }
-    }
-    // envia comando
-    
-}
-
-//--- Get and scale RX channel inputs ---
-void rx_get_channels(void){
-    ControlRef[ROLL] = (PPMValue[ROLL_CH] - PPMOffset[ROLL]) >> 4;
-    ControlRef[YAW] = (PPMValue[YAW_CH] - PPMOffset[YAW]) >> 4;
-    ControlRef[PITCH] = (PPMValue[PITCH_CH] - PPMOffset[PITCH]) >> 4;
-    ControlRef[THROTTLE] = (PPMValue[THROTTLE_CH] - PPMOffset[THROTTLE]) >> 4;
-}
-
-void process_menu(void){
-    int i;
-    switch(MenuStep){
-        case DISPLAY:
-        
-            DrawRCInputCheck = FALSE;
-            DrawControlRefCheck = FALSE;
-            ShowSettingsCheck = FALSE;
-            DrawMotorOutCheck = FALSE;
-            
-            lcd_goto(0,14);
-            printf("DISPLAY             ");
-            
-            lcd_clear(BLACK);
-            lcd_goto(0,0);
-            printf("   MAIN MENU\n\n");
-/*            READY,
-            TEST_MOTORS,
-            RADIO_RAW = 0,
-            ANALOG_MONITOR,
-            CHANGE_PID,
-            RE_CALIBRATE_GYRO,
-            RE_CALIBRATE_RADIO,
-            INITIAL_SETTINGS            */
-            for(i=0; i < MENU_LENGHT; i++){
-                printf("  ");
-                printf(MenuOptionNames[i]);
-                printf("\n");
-            }
-            MenuStep = SELECT;
-            break;
-        
-        case SELECT: // fica neste step a maior parte do tempo
-            lcd_goto(0,14);
-            printf("SELECT %d       ", (int)MenuOption);
-            
-            lcd_goto(0,(int)MenuOption + 2);
-            LCDForeColor = RED;
-            printf(">");
-            LCDForeColor = LIME;
-            
-            // movimento pra baixo e pra cima
-            if(PPMValue[PITCH_CH] < STICK_DOWN_THRESHOLD){
-                MenuStep = WAIT_PITCH_DOWN;
-            }
-            else{
-                if(PPMValue[PITCH_CH] > STICK_UP_THRESHOLD){
-                    MenuStep = WAIT_PITCH_UP;
-                }
-            }
-            
-            // select
-            if(PPMValue[ROLL_CH] > STICK_UP_THRESHOLD){
-                MenuStep = WAIT_ROLL_LEFT;
-            }
-            
-            break;
-        
-        case WAIT_PITCH_DOWN:
-            lcd_goto(0,14);
-            printf("WAIT PITCH DOWN    ");
-            
-            if(PPMValue[PITCH_CH] > STICK_DOWN_THRESHOLD){
-                lcd_goto(0,(int)MenuOption + 2);
-                printf(" ");
-                if((int)MenuOption > 0){
-                    MenuOption = (MENU_OPTION)(MenuOption - 1);
-                }
-                MenuStep = SELECT;
-            }
-            break;
-        
-        case WAIT_PITCH_UP:
-            lcd_goto(0,14);
-            printf("WAIT PITCH UP    ");
-
-            if(PPMValue[PITCH_CH] < STICK_UP_THRESHOLD){
-                lcd_goto(0,(int)MenuOption + 2);
-                printf(" ");
-                if((int)MenuOption < MENU_LENGHT - 1){
-                    MenuOption = (MENU_OPTION)(MenuOption + 1);
-                }
-                MenuStep = SELECT;
-            }
-            break;
-        
-        case WAIT_ROLL_LEFT:
-            lcd_goto(0,14);
-            printf("WAIT ROLL LEFT    ");
-            
-            if(PPMValue[ROLL_CH] < STICK_UP_THRESHOLD){
-                lcd_clear(BLACK);
-                lcd_goto(0,0);  
-                MenuStep = PROCESS_OPTION;
-            }
-            break;
-            
-        case WAIT_CH7_BACK:
-            lcd_goto(0,14);
-            printf("WAIT CH7 BACK    ");
-            
-            if(PPMValue[CH7_CH] < STICK_DOWN_THRESHOLD){
-                MenuStep = DISPLAY;
-            }
-            break;
+        switch(ProgStep){
+            case PROCESS_MAIN_MENU:
+                menu_draw(MainMenu, MenuDraw);
+                MenuDraw = 0;                
+                act = get_radio_action();
+                resp = menu_process(MainMenu, act);
+                switch(resp){                    
+                    case RESP_SUBMENU_IN:
+                        ProgStep = (PROGRAM_STEP)(MainMenu->SelectedItem);
+                        MenuDraw = 1;
+                    break;
                     
-        case PROCESS_OPTION:
-            process_option();
-            break;
-            
-        case WAIT_ROLL_RIGHT:
-            break;    
-    }
-}
-
-void process_option(){
-    int i;
-
-    switch (MenuOption){
-        case RADIO_RAW:
-            draw_rc_inputs();
-            break;
-            
-        case TEST_MOTORS:
-            process_motor_menu();
-            break;
-            
-        case ANALOG_MONITOR:
-            process_analog_menu();
-            break;
-        
-        case CONTROL_REF:
-            rx_get_channels();
-            draw_control_ref();
-            break;
-        
-        case READY:
-            lcd_clear(BLACK);
-            for(i = 5; i >= 0; i--){ // contagem regressiva
-                lcd_goto(8,8);
-                printf("%d", i);
-                delayms(1000);
-            }
-            MotorArmed = TRUE;
-            MenuVisible = FALSE;
-            lcd_clear(BLACK);
-            MenuStep = DISPLAY;
-            break;
-            
-        case INITIAL_SETTINGS:
-            MenuStep = DISPLAY;
-            MenuVisible = FALSE;
-
-            set_defaults();
-                        
-            lcd_clear(BLACK);
-            calibrate_gyro();
-            
-            lcd_clear(BLACK);
-            calibrate_radio();
-                        
-            lcd_clear(BLACK);
-            lcd_goto(0,5);          
-            printf("SETTINGS\nSET TO\nDEFAULTS");
-
-            delayms(2500);
-            MenuVisible = TRUE;
-            break;          
-        
-        case RE_CALIBRATE_GYRO:
-            MenuStep = DISPLAY;
-            MenuVisible = FALSE;
-            calibrate_gyro();
-            MenuVisible = TRUE;
-            break;
-
-        case RE_CALIBRATE_RADIO:
-            MenuStep = DISPLAY;
-            MenuVisible = FALSE;
-            calibrate_radio();
-            MenuVisible = TRUE;
-            break;
-            
-        case CHANGE_PID:
-            process_PID_menu();
-            break;
-            
-        case SHOW_SETTINGS:
-            if(ShowSettingsCheck == FALSE){
-                show_settings();
-                ShowSettingsCheck = TRUE;
-            }
-            break;
-            
-        case SAVE_CURRENT_GAINS:
-            save_current_gains();
-            MenuStep = DISPLAY;
-            break;
-    }
-    
-    if(PPMValue[CH7_CH] > STICK_UP_THRESHOLD){
-        MenuStep = WAIT_CH7_BACK;
-        MenuAnalog = DISPLAY;   // serve para colocar o menu analog na posicao inicial para quando for acessado denovo
-        MenuPID = DISPLAY;
-        analog_graph_clear_all();
-        lcd_clear(BLACK);
-    }
-}
-
-void process_PID_menu(void){
-    int i, j;
-    switch(MenuPID){
-        case DISPLAY:
-            lcd_clear(BLACK);
-        
-            lcd_goto(0,14);
-            printf("DISPLAY             ");
-            
-            lcd_goto(0,0);
-            printf("   PID MENU\n\n");
-/*            READY,
-            TEST_MOTORS,
-            RADIO_RAW = 0,
-            ANALOG_MONITOR,
-            CHANGE_PID,
-            RE_CALIBRATE_GYRO,
-            RE_CALIBRATE_RADIO,
-            INITIAL_SETTINGS            */
-            for(i=0; i<9; i++){
-                printf("  ");
-                printf(PIDMenuOptionNames[i]);
-                printf("\n");
-            }
-            
-            MenuPID = SELECT;
-            break;
-        
-        case SELECT: // fica neste step a maior parte do tempo
-            lcd_goto(0,14);
-            printf("SELECT %d       ", (int)PIDMenuOption);
-            
-            lcd_goto(16,2);
-            for(i=0; i < 3; i++){
-                for(j=0; j<3; j++){
-                    lcd_goto(16, LCDLineCount);
-                    printf("%d  \n",Gain[i][j]);
+                    case RESP_SUBMENU_OUT:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
                 }
-            }
-            
-            lcd_goto(0,(int)PIDMenuOption + 2);
-            LCDForeColor = RED;
-            printf(">");
-            LCDForeColor = LIME;
-            
-            // movimento pra baixo e pra cima
-            if(PPMValue[PITCH_CH] < STICK_DOWN_THRESHOLD){
-                MenuPID = WAIT_PITCH_DOWN;
-            }
-            else{
-                if(PPMValue[PITCH_CH] > STICK_UP_THRESHOLD){
-                    MenuPID = WAIT_PITCH_UP;
-                }
-            }
-            
-            // select
-            if(PPMValue[ROLL_CH] > STICK_UP_THRESHOLD){
-                MenuPID = WAIT_ROLL_LEFT;
-            }
-            else{
-                if(PPMValue[ROLL_CH] < STICK_DOWN_THRESHOLD){
-                    MenuPID = WAIT_ROLL_RIGHT;
-                }
-            }            
-            
-            break;
-        
-        case WAIT_PITCH_DOWN:
-            lcd_goto(0,14);
-            printf("WAIT PITCH DOWN    ");
-            
-            if(PPMValue[PITCH_CH] > STICK_DOWN_THRESHOLD){
-                lcd_goto(0,(int)PIDMenuOption + 2);
-                printf(" ");
-                if((int)PIDMenuOption > 0){
-                    PIDMenuOption = (MENU_OPTION)(PIDMenuOption - 1);
-                }
-                MenuPID = SELECT;
-            }
-            break;
-        
-        case WAIT_PITCH_UP:
-            lcd_goto(0,14);
-            printf("WAIT PITCH UP    ");
-
-            if(PPMValue[PITCH_CH] < STICK_UP_THRESHOLD){
-                lcd_goto(0,(int)PIDMenuOption + 2);
-                printf(" ");
-                if((int)PIDMenuOption < 9 - 1){
-                    PIDMenuOption = (MENU_OPTION)(PIDMenuOption + 1);
-                }
-                MenuPID = SELECT;
-            }
-            break;
-        
-        case WAIT_ROLL_RIGHT:
-            lcd_goto(0,14);
-            printf("WAIT ROLL LEFT    ");
-            
-            delayms(300 - StickCounter);
-            if(StickCounter < 256){
-                StickCounter = (StickCounter * 4);
-            }
-            
-            if(Gain[(int)PIDMenuOption >> 4][(int)PIDMenuOption & 0x0F] > 0){
-                Gain[(int)PIDMenuOption >> 4][(int)PIDMenuOption & 0x0F]--;                
-            }
-            
-            if(PPMValue[ROLL_CH] > STICK_DOWN_THRESHOLD){
-                
-                StickCounter = 1;
-            }
-            MenuPID = SELECT;
             break;
             
-        case WAIT_ROLL_LEFT:
-            lcd_goto(0,14);
-            printf("WAIT ROLL LEFT    ");
-            
-            delayms(300 - StickCounter);
-            if(StickCounter < 256){
-                StickCounter = (StickCounter * 4);
-            }
-            
-            Gain[(int)PIDMenuOption >> 4][(int)PIDMenuOption & 0x0F]++;
-            
-            if(PPMValue[ROLL_CH] < STICK_UP_THRESHOLD){
-                StickCounter = 1;
-            }
-            MenuPID = SELECT;
-            break;
-            
-        case WAIT_CH7_BACK:
-            lcd_goto(0,14);
-            printf("WAIT CH7 BACK    ");
-            
-            if(PPMValue[CH7_CH] < STICK_DOWN_THRESHOLD){
-                MenuPID = DISPLAY;
-            }
-            break;
+            case PROCESS_ANALOG_MENU:
+                analog_refresh_all();
+                menu_draw(AnalogMenu, MenuDraw);
+                MenuDraw = 0;
+                menu_refresh(AnalogMenu);
+                act = get_radio_action();
+                resp = menu_process(AnalogMenu, act);
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(AnalogMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
+                        }
+                    break;
                     
-        case PROCESS_OPTION:
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
+                }
             break;
-               
-    }
-}
-
-// juntar os pontos
-void draw_analog_graph(void){
-    int i, k, j, y;
-    for(i = 0; i < 8; i++){
-        if((1 << i) & AnalogChecked){
-            // mostra escrito o valor
-            lcd_goto(0, i + 2);
-            printf("%d   ", AnalogValue[i]);
-            // apaga
-            for(k = 0; k < (GRAPH_LENGHT - 1); k++){
-                lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] ,BLACK);
-                j = AnalogGraph[i][k]; // posicao atual
-                y = AnalogGraph[i][k+1]; // proxima posicao
-                if(j != y){ // se agora ta mais alto q depois
-                    if(j < y){
-                        y--; 
-                        while(j++ < y){
-                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,BLACK);
+            
+            case PROCESS_MOTOR_MENU:
+                menu_draw(MotorMenu, MenuDraw);
+                MenuDraw = 0;
+                menu_refresh(MotorMenu);
+                act = get_radio_action();
+                resp = menu_process(MotorMenu, act);
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(MotorMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
                         }
-                    }
-                    else{
-                        y++;
-                        while(j-- > y){
-                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,BLACK);
+                        else{ // calibrate index
+                            
                         }
-                    }
+                    break;
+                    
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
                 }
-                AnalogGraph[i][k] = AnalogGraph[i][k+1];
-            } 
-            // apaga ultimo
-            lcd_drawpoint(GRAPH_LENGHT - 1 + GRAPH_OFFSETX, AnalogGraph[i][GRAPH_LENGHT - 1] ,BLACK);
+            break;
             
-            /* shifta
-            for(k = 0; k < (GRAPH_LENGHT - 1); k++){
-                AnalogGraph[i][k] = AnalogGraph[i][k+1];
-            }*/
-            
-            // insere mais um valor
-            AnalogGraph[i][GRAPH_LENGHT - 1] = GRAPH_OFFSET - ((AnalogValue[i] >> 6) & 0xFF);
-            
-            // redesenha
-            for(k = 0; k < (GRAPH_LENGHT - 1); k++){
-                lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] ,AnalogColours[i]);
-                j = AnalogGraph[i][k]; // posicao atual
-                y = AnalogGraph[i][k+1]; // proxima posicao
-                if(j != y){ // se agora ta mais alto q depois
-                    if(j < y){
-                        y--; 
-                        while(j++ < y){
-                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,AnalogColours[i]);
+            case PROCESS_SENSOR_MENU:
+                menu_draw(SensorMenu, MenuDraw);
+                MenuDraw = 0;
+                menu_refresh(SensorMenu);
+                act = get_radio_action();
+                resp = menu_process(SensorMenu, act);
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(SensorMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
                         }
-                    }
-                    else{
-                        y++;
-                        while(j-- > y){
-                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,AnalogColours[i]);
+                    break;
+                    
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
+                }
+            break;
+            
+            case PROCESS_RADIO_MENU:
+                menu_draw(RadioMenu, MenuDraw);
+                MenuDraw = 0;
+                menu_refresh(RadioMenu);
+                act = get_radio_action();
+                resp = menu_process(RadioMenu, act);
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(RadioMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
                         }
-                    }
+                    break;
+                    
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
                 }
-            } 
-            // desenha ultimo
-            lcd_drawpoint(GRAPH_LENGHT - 1 + GRAPH_OFFSETX, AnalogGraph[i][GRAPH_LENGHT - 1] ,AnalogColours[i]);
+            break;
             
+            case PROCESS_CONTROL_MENU:
+                menu_draw(ControlMenu, MenuDraw);
+                MenuDraw = 0;
+                menu_refresh(ControlMenu);
+                act = get_radio_action();
+                resp = menu_process(ControlMenu, act);
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(ControlMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
+                        }
+                    break;
+                    
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
+                }
+            break;
+            
+            case PROCESS_CONTROL:
+            break;
         }
     }
 }
 
-void show_settings(void){
-    lcd_clear(BLACK);
-    lcd_goto(4,0);
-    printf("SETTINGS\n\n");
-    
-    printf("P Pitch");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[PROPORTIONAL][PITCH]);
-    
-    printf("P Roll");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[PROPORTIONAL][ROLL]);
-    
-    printf("P Yaw");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[PROPORTIONAL][YAW]);
-    
-    printf("D Pitch");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[DERIVATIVE][PITCH]);
-    
-    printf("D Roll");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[DERIVATIVE][ROLL]);
-    
-    printf("D Yaw");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[DERIVATIVE][YAW]);
-    
-    printf("I Pitch");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[INTEGRAL][PITCH]);
-    
-    printf("I Roll");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[INTEGRAL][ROLL]);
-    
-    printf("I Yaw");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", Gain[INTEGRAL][YAW]);
-        
-    printf("Pitch Offset");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", PPMOffset[PITCH]);
-    
-    printf("Roll Offset");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", PPMOffset[ROLL]);
-    
-    printf("Yaw Offset");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", PPMOffset[YAW]);
-    
-    printf("Throt. Offset");
-    lcd_putdot(LCDCharCount, 16);
-    printf("%d\n", PPMOffset[THROTTLE]);
-    
-}
 
-void analog_graph_clear(int i){
-    int k, j, y;
-    // apaga o valor
-    lcd_goto(0,i+2);
-    printf("    ");
-    // apaga o grafico
-    for(k = 0; k < (GRAPH_LENGHT - 1); k++){
-        lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] ,BLACK);
-        j = AnalogGraph[i][k]; // posicao atual
-        y = AnalogGraph[i][k+1]; // proxima posicao
-        if(j != y){ // se agora ta mais alto q depois
-            if(j < y){
-                y--; 
-                while(j++ < y){
-                    lcd_drawpoint(k+GRAPH_OFFSETX, j ,BLACK);
-                }
-            }
-            else{
-                y++;
-                while(j-- > y){
-                    lcd_drawpoint(k+GRAPH_OFFSETX, j ,BLACK);
-                }
-            }
-        }
-        //AnalogGraph[i][k] = AnalogGraph[i][k+1];
-    } 
-    // apaga ultimo
-    lcd_drawpoint(GRAPH_LENGHT - 1 + GRAPH_OFFSETX, AnalogGraph[i][GRAPH_LENGHT - 1] ,BLACK);
-}
-
-void draw_motors_bar(void){
-    int i = 0, k = 0, h = 0;
-    if(DrawMotorOutCheck == FALSE){
-        lcd_goto(0,2);
-        for(i = 0; i < 6; i++){
-            printf("M[%d]:\n", i);
-        }
-        DrawMotorOutCheck = TRUE;
-    }
-
-    for(i = 0; i < 6; i++){
-        lcd_goto(7, i + 2);
-        printf("%d  ", MotorOut[i]);
-
-        k = 21 + (8 * i); //posicao inicial em y
-        
-        lcd_drawprogressbar(80,k,45,4,WHITE, BLUE, MotorOut[i]);
-    }
-}
-
-void process_motor_menu(void){
-    draw_motors_bar();
-    switch(MenuMotor){
-        case DISPLAY:
-            lcd_goto(4,0);
-            printf("MOTOR OUT   ");
-
-            // status
-            lcd_goto(0,14);
-            printf("DISPLAY             ");
-
-            refresh_analog_menu();
-            MenuMotor = SELECT;
-            break;
-            
-        case SELECT:
-            lcd_goto(0,14);
-            printf("SELECT            ");
-
-            // move para os lados
-            if(PPMValue[ROLL_CH] > STICK_UP_THRESHOLD){
-                MenuMotor = WAIT_ROLL_LEFT;
-            }
-            else{
-                if(PPMValue[ROLL_CH] < STICK_DOWN_THRESHOLD){
-                    MenuMotor = WAIT_ROLL_RIGHT;
-                }
-            }
-            
-            // check uncheck
-            if(PPMValue[PITCH_CH] < STICK_DOWN_THRESHOLD){
-                MenuMotor = WAIT_PITCH_DOWN;
-            }
-            else{
-                if(PPMValue[PITCH_CH] > STICK_UP_THRESHOLD){
-                    MenuMotor = WAIT_PITCH_UP;
-                }
-            }
-            
-            break;
-            
-        case WAIT_PITCH_DOWN:
-            lcd_goto(0,14);
-            printf("WAIT PITCH DOWN    ");
-
-            if(PPMValue[PITCH_CH] > STICK_DOWN_THRESHOLD){
-                MenuMotor = DISPLAY;
-            }
-            break;
-            
-        case WAIT_PITCH_UP:
-            lcd_goto(0,14);
-            printf("WAIT PITCH UP    ");
-
-            if(PPMValue[PITCH_CH] < STICK_UP_THRESHOLD){
-                MenuAnalog = DISPLAY;
-            }
-            break;
-            
-        case WAIT_ROLL_RIGHT:
-                lcd_goto(0,14);
-                printf("WAIT ROLL RIGHT ");
-
-                if(PPMValue[ROLL_CH] > STICK_DOWN_THRESHOLD){
-                    if(AnalogSelect > 0){
-                        AnalogSelect--;
-                    }
-                    MenuAnalog = DISPLAY;
-                }
-            break;
-            
-        case WAIT_ROLL_LEFT:
-                lcd_goto(0,14);
-                printf("WAIT ROLL LEFT   ");
-        
-                if(PPMValue[ROLL_CH] < STICK_UP_THRESHOLD){
-                   if(AnalogSelect < 7){
-                        AnalogSelect++;
-                    }
-                    MenuMotor = DISPLAY;
-                }
-            break;
-            
-        case PROCESS_OPTION:
-            break;
-            
-        case WAIT_CH7_BACK:
-            break;
-    }   
-}
-
-void process_analog_menu(void){
-    draw_analog_graph();
-    switch(MenuAnalog){
-        case DISPLAY:
-            lcd_goto(4,0);
-            printf("ANALOG GRAPH   ");
-            
-            lcd_goto(0,14);
-            printf("DISPLAY             ");
-
-            refresh_analog_menu();
-            MenuAnalog = SELECT;
-            break;
-            
-        case SELECT:
-            lcd_goto(0,14);
-            printf("SELECT            ");
-
-            // move para os lados
-            if(PPMValue[ROLL_CH] > STICK_UP_THRESHOLD){
-                MenuAnalog = WAIT_ROLL_LEFT;
-            }
-            else{
-                if(PPMValue[ROLL_CH] < STICK_DOWN_THRESHOLD){
-                    MenuAnalog = WAIT_ROLL_RIGHT;
-                }
-            }
-            
-            // check uncheck
-            if(PPMValue[PITCH_CH] < STICK_DOWN_THRESHOLD){
-                MenuAnalog = WAIT_PITCH_DOWN;
-            }
-            else{
-                if(PPMValue[PITCH_CH] > STICK_UP_THRESHOLD){
-                    MenuAnalog = WAIT_PITCH_UP;
-                }
-            }
-            
-            break;
-            
-        case WAIT_PITCH_DOWN:
-            lcd_goto(0,14);
-            printf("WAIT PITCH DOWN    ");
-
-            if(PPMValue[PITCH_CH] > STICK_DOWN_THRESHOLD){
-                AnalogChecked = AnalogChecked^(1<<AnalogSelect);
-                MenuAnalog = DISPLAY;
-            }
-            break;
-            
-        case WAIT_PITCH_UP:
-            lcd_goto(0,14);
-            printf("WAIT PITCH UP    ");
-
-            if(PPMValue[PITCH_CH] < STICK_UP_THRESHOLD){
-                AnalogChecked = AnalogChecked^(1<<AnalogSelect);
-                analog_graph_clear(AnalogSelect);
-                MenuAnalog = DISPLAY;
-            }
-            break;
-            
-        case WAIT_ROLL_RIGHT:
-                lcd_goto(0,14);
-                printf("WAIT ROLL RIGHT ");
-
-                if(PPMValue[ROLL_CH] > STICK_DOWN_THRESHOLD){
-                    if(AnalogSelect > 0){
-                        AnalogSelect--;
-                    }
-                    MenuAnalog = DISPLAY;
-                }
-            break;
-            
-        case WAIT_ROLL_LEFT:
-                lcd_goto(0,14);
-                printf("WAIT ROLL LEFT   ");
-        
-                if(PPMValue[ROLL_CH] < STICK_UP_THRESHOLD){
-                   if(AnalogSelect < 7){
-                        AnalogSelect++;
-                    }
-                    MenuAnalog = DISPLAY;
-
-                }
-            break;
-            
-        case PROCESS_OPTION:
-            break;
-            
-        case WAIT_CH7_BACK:
-            break;
-    }
-}
-
-// ok
-void refresh_analog_menu(void){
-    int i;
-    lcd_goto(1,12);
-    for(i = 0; i < 8; i++){             // para as 8 entradas analogicas
-        if((1 << i) & AnalogChecked){   // se a entrada analogica estiver visible
-            LCDBackColor = LIME;          // a cor do fundo muda para azul
-            LCDForeColor = BLACK;
-        }
-        else{                           // senao
-            LCDBackColor = BLACK;         // a cor do fundo muda para preto
-            LCDForeColor = LIME;
-        }
-        
-        if(AnalogSelect == i){          // se o cursor estiver em cima   
-            LCDForeColor = RED;           // a cor da letra muda para vermelho 
-        }                                                                
-        else{                           // se nao                        
-            if(LCDBackColor == LIME){
-                LCDForeColor = BLACK;
-            }
-        }                               
-        
-        printf("%d",i);
-        // ajusta as cores para o normal
-        LCDForeColor = LIME;
-        LCDBackColor = BLACK;
-        printf(" ");
-    }
-    printf("                    ");
-}
-
-interrupt (TIMERA0_VECTOR) TIMERA0_ISR_HOOK(void){
+interrupt (TIMERA0_VECTOR) TIMERA0_ISR_HOOK(void){ // 2ms
     // ta livre
 }
 
 // ok
-void clock_init(void)
-{
-    /* 
-     * Basic Clock System Control 2
-     * 
-     * SELM_0 -- DCOCLK
-     * DIVM_0 -- Divide by 1
-     * ~SELS -- DCOCLK
-     * DIVS_0 -- Divide by 1
-     * ~DCOR -- DCO uses internal resistor
-     * 
-     * Note: ~<BIT> indicates that <BIT> has value zero
-     */
+void clock_init(void){
     BCSCTL2 = SELM_0 + DIVM_0 + DIVS_0;
-    
     DCOCTL = 0x77;      
-        /* 
-     * Basic Clock System Control 1
-     * 
-     * XT2OFF -- Disable XT2CLK
-     * XTS -- High Frequency
-     * DIVA_0 -- Divide by 1
-     */
-    BCSCTL1 = 0xcf;     
-
-    /* 
-     * Basic Clock System Control 3
-     * 
-     * XT2S_3 -- Digital input signal
-     * LFXT1S_2 -- If XTS = 0, XT1 = VLOCLK ; If XTS = 1, XT1 = 3 - 16-MHz crystal or resonator
-     * XCAP_0 -- ~1 pF
-     */
-    BCSCTL3 = 0xa0;
+    BCSCTL1 = 0xCF;     
+    BCSCTL3 = 0xA0;
 }
 
 // ok
-void P1_init(){
+void P1_init(void){
     /* Port 1 Output Register */
     P1OUT = PPM_P1MASK;
     /* Port 1 Resistor Enable Register */
@@ -929,24 +257,21 @@ void P1_init(){
     P1IE = PPM_P1MASK;
 }
 
-void P2_init(){ // p2 eh interruption do gyro
+void P2_init(void){ // p2 eh interruption do gyro
 #ifdef ITG3200
-    /* Port 1 Output Register */
+    /* Port 2 Output Register */
     P2OUT = 0x01;
-    /* Port 1 Resistor Enable Register */
-    P1REN = 0x01;
-    /* Port 1 Interrupt Edge Select Register */
-    P1IES = 0; // subida
-    /* Port 1 Interrupt Flag Register */
-    P1IFG = 0;
-    /* Port 1 Interrupt Enable Register */
-    P1IE = 0x01;
+    /* Port 2 Resistor Enable Register */
+    P2REN = 0x01;
+    /* Port 2 Interrupt Edge Select Register */
+    P2IES = 0; // subida
+    /* Port 2 Interrupt Flag Register */
+    P2IFG = 0;
+    /* Port 2 Interrupt Enable Register */
+    P2IE = 0x01;
 #endif
 }
 
-// TIMERA: base para leitura dos canais do receptor e interrupt de 2ms
-// TIMERB: PWM output, sem interruption (conta 3ms)
-// 4000 = 2ms, 2000 = 1ms 
 void timer_init(void){
     /* 
      * TBCCTL1, Capture/Compare Control Register 1
@@ -967,12 +292,12 @@ void timer_init(void){
     TBCCR0 = 5025;
 
     /* TBCCR1, Timer_B Capture/Compare Register 1 */
-    TBCCR1 = 0; 
-    TBCCR2 = 0; 
-    TBCCR3 = 0; 
-    TBCCR4 = 0; 
-    TBCCR5 = 0; 
-    TBCCR6 = 0; 
+    TBCCR1 = 2000; 
+    TBCCR2 = 2000; 
+    TBCCR3 = 2000; 
+    TBCCR4 = 2000; 
+    TBCCR5 = 2000; 
+    TBCCR6 = 2000; 
 
     /* 
      * TBCTL, Timer_B3 Control Register
@@ -1000,7 +325,7 @@ void timer_init(void){
      * 
      * Note: ~<BIT> indicates that <BIT> has value zero
      */
-    TACCTL0 = CM_0 + CCIS_0 + OUTMOD_0 + CCIE;
+    TACCTL0 = CM_0 + CCIS_0 + OUTMOD_0;
 
     /* TACCR0, Timer_A Capture/Compare Register 0 */
     TACCR0 = 4001; //2ms
@@ -1014,11 +339,14 @@ void timer_init(void){
     P2DIR |= 0x08;
 }
 
+
+unsigned int PPM_aux;
+int channel_num, PPM_ch_counter;
 // muito consagred
 interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
-    unsigned int PPM_aux = TAR; // captura aqui pra ser mais exato
+    PPM_aux = TAR; // captura aqui pra ser mais exato
     // aqui eh usado PPM_P1_MASK, pq eh a interrupcao da P1 
-    int channel_num = 0, PPM_ch_counter;
+    channel_num = 0;
     for(PPM_ch_counter = 0x01; PPM_ch_counter <= 0x80; PPM_ch_counter = PPM_ch_counter << 1){
         if(P1IFG & (PPM_ch_counter & PPM_P1MASK)){
             if(!(P1IES & PPM_ch_counter)){ // low to high
@@ -1026,436 +354,39 @@ interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
                 P1IES |= (PPM_ch_counter & PPM_P1MASK); // configura high to low
             }
             else{ // high to low
-                PPMValue[channel_num] = (PPM_aux - TimeUpEdge[channel_num]);
+            
+                if(TimeUpEdge[channel_num] > PPM_aux){ // se deu overflow na contagem do timer
+                    PPMValue[channel_num] = (TACCR0 - TimeUpEdge[channel_num] + PPM_aux);
+                }
+                else{ // se nao deu overflow na contagem do timer
+                    PPMValue[channel_num] = (PPM_aux - TimeUpEdge[channel_num]);
+                }
                 P1IES &= ~(PPM_ch_counter & PPM_P1MASK); // configure low to high      
             }
-
             P1IFG &= ~(PPM_ch_counter & PPM_P1MASK); // apaga o interruption flag da P1.7
-
         }
         channel_num++;
     }
 }
 
+
 interrupt (PORT2_VECTOR) PORT2_ISR_HOOK(void){
-#ifdef ITG3200
-    int varaux = 0;
-    if(ITG3200Done){
-        if(ITG3200_getX(&varaux)){
-            // fazer
-        }
-        GyroValue[GYRO_ROLL] = varaux;
-        
-        if(ITG3200_getY(&varaux)){
-            // fazer        
-        }
-        GyroValue[GYRO_PITCH] = varaux;
-        
-        if(ITG3200_getZ(&varaux)){
-            // fazer        
-        }
-        GyroValue[GYRO_YAW] = varaux;
-        
-    }
-#endif
+
     P2IFG = 0x00;
 }
-    
-// consagred
-void calibrate_gyro(void){
-    int i, k;
-    //samples
-    unsigned int AnalogMean[3][15]; //15 * 15 samples = 225 
-    
-    lcd_clear(BLACK);
-    lcd_goto(0,0);
-    printf("\nCALIBRATE GYRO");
-    
-    AnalogOffset[GYRO_ROLL] = 0;
-    AnalogOffset[GYRO_PITCH] = 0;
-    AnalogOffset[GYRO_YAW] = 0;
-    
-#ifdef ITG3200
-    // fazer
-#else //ITG3200
-    for(i = 0; i < 3; i++){
-        for(k = 0; k < 15; k++){
-            AnalogMean[i][k] = 0;
-        }
-    }
-#endif //ITG3200
-    
-    for(i = 0; i < 15; i++){
-        for(k = 0; k < 15; k++){
-            delayms(10);
-            lcd_goto(15,7);
-            printf("%d  ",i*k);
-#ifdef ITG3200
-    // fazer
-#else // ITG3200
-            analog_refresh_all();
-            AnalogMean[GYRO_ROLL][i] += AnalogValue[GYRO_ROLL];
-            AnalogMean[GYRO_PITCH][i] += AnalogValue[GYRO_PITCH];
-            AnalogMean[GYRO_YAW][i] += AnalogValue[GYRO_YAW];
-#endif // ITG3200
-        }
-        AnalogMean[GYRO_ROLL][i] = AnalogMean[GYRO_ROLL][i] / 15;
-        AnalogMean[GYRO_PITCH][i] = AnalogMean[GYRO_PITCH][i] / 15;
-        AnalogMean[GYRO_YAW][i] = AnalogMean[GYRO_YAW][i] / 15;
-    }
-    
-    for(i = 0; i < 15; i++){
-#ifdef ITG3200
-    // fazer
-#else // ITG3200
-        AnalogOffset[GYRO_YAW] += AnalogMean[GYRO_YAW][i];
-        AnalogOffset[GYRO_ROLL] += AnalogMean[GYRO_ROLL][i];
-        AnalogOffset[GYRO_PITCH] += AnalogMean[GYRO_PITCH][i];
-#endif // ITG3200
-    }
-#ifdef ITG3200
-    // fazer
-#else // ITG3200
-    AnalogOffset[GYRO_YAW] = AnalogOffset[GYRO_YAW] / 15;
-    AnalogOffset[GYRO_PITCH] = AnalogOffset[GYRO_PITCH] / 15;
-    AnalogOffset[GYRO_ROLL] = AnalogOffset[GYRO_ROLL] / 15;
-#endif // ITG3200
-    lcd_goto(2,8);
-#ifdef ITG3200
-    // fazer
-#else // ITG3200
-    printf("\nCalibration complete\nPITCH: %d\nROLL: %d\nYAW: %d", AnalogOffset[GYRO_PITCH], AnalogOffset[GYRO_ROLL], AnalogOffset[GYRO_YAW]);
-#endif // ITG3200
-    printf("\nCalibration complete\n     sorry\nnot implemented");
-    delayms(1000);
-}
 
-// consagred
-void calibrate_radio(void){
-    
-    int k;
-    
-    if(MotorArmed == 1 ){ // nao faz se os motores estiverem armados
-        return;
-    }
-    
-    PPMOffset[YAW] = 0;
-    PPMOffset[ROLL] = 0;
-    PPMOffset[PITCH] = 0;
-    PPMOffset[THROTTLE] = 0;        
-    
-    for(k = 5; k > 0; k--){
-        draw_rc_inputs();
-        lcd_goto(0, 14);
-        printf("%d ", k);
-        delayms(500);
-        
-        // amostra
-        PPMOffset[YAW] += PPMValue[YAW_CH];
-        PPMOffset[ROLL] += PPMValue[ROLL_CH];
-        PPMOffset[PITCH] += PPMValue[PITCH_CH];
-        PPMOffset[THROTTLE] += PPMValue[THROTTLE_CH];
-    }
-    
-    PPMOffset[YAW] /= 5;
-    PPMOffset[ROLL] /= 5;
-    PPMOffset[PITCH] /= 5;
-    PPMOffset[THROTTLE] /= 5;
-    
-    lcd_clear(BLACK);
-    lcd_goto(2,1);
-    
-    printf(" OFFSETS\n\n ROLL: %d\n PITCH: %d\n YAW: %d\n THROTTLE: %d\n\n", PPMOffset[ROLL], PPMOffset[PITCH], PPMOffset[YAW], PPMOffset[THROTTLE]);
-    delayms(1000);
-}
-
-void load_eeprom_values(void){
-    twobytes ValorAux;
-
-    i2c_change_slaveaddress(EEPROM_I2C_ADDR);    
-#ifdef SIXTEEN_BIT_EEPROM
-    //-------------- PROPORTIONAL
-    
-    i2c_read16_multiples(_ROLL_P, ValorAux.uc, 2);
-    Gain[PROPORTIONAL][ROLL] = ValorAux.i;                        
-    
-    delayms(100);
-    
-    i2c_read16_multiples(_PITCH_P, ValorAux.uc, 2);
-    Gain[PROPORTIONAL][PITCH] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_read16_multiples(_YAW_P, ValorAux.uc, 2);
-    Gain[PROPORTIONAL][YAW] = ValorAux.i;
-    
-    delayms(100);
-    
-    //------------------ derivative
-       
-        i2c_read16_multiples(_ROLL_D, ValorAux.uc, 2);
-    Gain[DERIVATIVE][ROLL] = ValorAux.i;                        
-    
-    delayms(100);
-    
-    i2c_read16_multiples(_PITCH_D, ValorAux.uc, 2);
-    Gain[DERIVATIVE][PITCH] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_read16_multiples(_YAW_D, ValorAux.uc, 2);
-    Gain[DERIVATIVE][YAW] = ValorAux.i;
-    
-    delayms(100);
-    
-    //--------------------- INTEGRAL
-    
-    i2c_read16_multiples(_ROLL_I, ValorAux.uc, 2);
-    Gain[INTEGRAL][ROLL] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_read16_multiples(_PITCH_I, ValorAux.uc, 2);
-    Gain[INTEGRAL][PITCH] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_read16_multiples(_YAW_I, ValorAux.uc, 2);
-    Gain[INTEGRAL][YAW] = ValorAux.i;
-    
-    delayms(100);
-#else
-    //-------------- PROPORTIONAL
-    
-    i2c_wread_one_buffer(_ROLL_P, ValorAux.uc, 2);
-    Gain[PROPORTIONAL][ROLL] = ValorAux.i;                        
-    
-    delayms(100);
-    
-    i2c_wread_one_buffer(_PITCH_P, ValorAux.uc, 2);
-    Gain[PROPORTIONAL][PITCH] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_wread_one_buffer(_YAW_P, ValorAux.uc, 2);
-    Gain[PROPORTIONAL][YAW] = ValorAux.i;
-    
-    delayms(100);
-    
-    //------------------ derivative
-       
-    i2c_wread_one_buffer(_ROLL_D, ValorAux.uc, 2);
-    Gain[DERIVATIVE][ROLL] = ValorAux.i;                        
-    
-    delayms(100);
-    
-    i2c_wread_one_buffer(_PITCH_D, ValorAux.uc, 2);
-    Gain[DERIVATIVE][PITCH] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_wread_one_buffer(_YAW_D, ValorAux.uc, 2);
-    Gain[DERIVATIVE][YAW] = ValorAux.i;
-    
-    delayms(100);
-    
-    //--------------------- INTEGRAL
-    
-    i2c_wread_one_buffer(_ROLL_I, ValorAux.uc, 2);
-    Gain[INTEGRAL][ROLL] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_wread_one_buffer(_PITCH_I, ValorAux.uc, 2);
-    Gain[INTEGRAL][PITCH] = ValorAux.i;
-    
-    delayms(100);
-    
-    i2c_wread_one_buffer(_YAW_I, ValorAux.uc, 2);
-    Gain[INTEGRAL][YAW] = ValorAux.i;
-    
-    delayms(100);
-#endif
-    printf("\nPARAMS LOADED.");
-}
-
-// consagred
-void save_current_gains(void){
-    twobytes ValorAux;
-        
-    if(EEPROMFound){
-#ifdef SIXTEEN_BIT_EEPROM
-        //proportional
-        ValorAux.i = Gain[PROPORTIONAL][PITCH];
-        i2c_write16_multiples(_PITCH_P, ValorAux.uc, 2);
-        delayms(100);   
-        
-        ValorAux.i = Gain[PROPORTIONAL][ROLL];
-        i2c_write16_multiples(_ROLL_P, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[PROPORTIONAL][YAW];
-        i2c_write16_multiples(_YAW_P, ValorAux.uc, 2);
-        delayms(100);
-        //derivative
-        ValorAux.i = Gain[DERIVATIVE][PITCH];
-        i2c_write16_multiples(_PITCH_D, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[DERIVATIVE][ROLL];
-        i2c_write16_multiples(_ROLL_D, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[DERIVATIVE][YAW];
-        i2c_write16_multiples(_YAW_D, ValorAux.uc, 2);
-        delayms(100);
-        //integral
-        ValorAux.i = Gain[INTEGRAL][PITCH];
-        i2c_write16_multiples(_PITCH_I, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[INTEGRAL][ROLL];
-        i2c_write16_multiples(_ROLL_I, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[INTEGRAL][YAW];
-        i2c_write16_multiples(_YAW_I, ValorAux.uc, 2);
-        delayms(100);
-#else
-        //proportional
-        ValorAux.i = Gain[PROPORTIONAL][PITCH];
-        i2c_write_one_buffer(_PITCH_P, ValorAux.uc, 2);
-        delayms(100);   
-        
-        ValorAux.i = Gain[PROPORTIONAL][ROLL];
-        i2c_write_one_buffer(_ROLL_P, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[PROPORTIONAL][YAW];
-        i2c_write_one_buffer(_YAW_P, ValorAux.uc, 2);
-        delayms(100);
-        //derivative
-        ValorAux.i = Gain[DERIVATIVE][PITCH];
-        i2c_write_one_buffer(_PITCH_D, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[DERIVATIVE][ROLL];
-        i2c_write_one_buffer(_ROLL_D, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[DERIVATIVE][YAW];
-        i2c_write_one_buffer(_YAW_D, ValorAux.uc, 2);
-        delayms(100);
-        //integral
-        ValorAux.i = Gain[INTEGRAL][PITCH];
-        i2c_write_one_buffer(_PITCH_I, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[INTEGRAL][ROLL];
-        i2c_write_one_buffer(_ROLL_I, ValorAux.uc, 2);
-        delayms(100);
-        
-        ValorAux.i = Gain[INTEGRAL][YAW];
-        i2c_write_one_buffer(_YAW_I, ValorAux.uc, 2);
-        delayms(100);
-#endif
-        printf("\nDefault params saved.");
-    }
-    else{
-        printf("\nDefault params. not\n saved");
-    }
-}
-
-// consagred
-void draw_control_ref(void){
-    int i = 0, k = 0, h = 0;
-    //250 max 120 min
-    if(DrawControlRefCheck == FALSE){
-        lcd_clear(BLACK);
-        lcd_goto(0,0);
-        printf(" Control Reference ");
-        lcd_goto(0,2);
-        printf(" PITCH:\n ROLL:\n YAW:\n THROTTLE:"); // conferir a ordem
-        DrawControlRefCheck = TRUE;
-    }
-    for(i = 0; i < 4; i++){
-       
-        lcd_goto(11,i+2);
-        printf("%d  ", ControlRef[i]);
-       
-        k = 21 + (8 * i); //posicao inicial em y
-        
-        if(ControlRef[i] > 130){
-            h=100;
-        }
-        else{
-            if(i == 3){
-                h = (ControlRef[i]) * 10 / 13;
-            }
-            else{
-                h = (ControlRef[i] + 60) * 10 / 11;
-            }
-        }
-        
-        lcd_drawprogressbar(90,k,35,4,WHITE, BLUE, h);
-    }
-}
-
-// consagred
-void draw_rc_inputs(){
-    int i = 0, k = 0, h = 0;
-    if(DrawRCInputCheck == FALSE){
-        lcd_goto(0,0);
-        printf("     RC inputs");
-        lcd_goto(0,2);
-        for(i = 0; i < 8; i++){
-            printf("ch[%d]:\n", i);
-        }
-        DrawRCInputCheck = TRUE;
-    }
-    
-    for(i = 0; i < 8; i++){
-        lcd_goto(7,i+2);
-        printf("%d  ", PPMValue[i]);
-  
-        k = 21 + (8 * i); //posicao inicial em y
-        
-        if(PPMValue[i] > 3750){
-            h=100;
-        }
-        else{
-            if(PPMValue[i] < 1751){
-                h = 0;
-            }
-            else{
-                h = ((PPMValue[i] - 1750))/ 21;
-            }
-        }
-        
-        lcd_drawprogressbar(80,k,45,4,WHITE, BLUE, h);
-    }    
-}
-
-// consagred
-int find_first(int startaddress){
-    for(; startaddress < 255; startaddress++){
-        if(!i2c_find_device(startaddress)){
-            return startaddress;
-        }
-    }   
-    return 0;
-}
-
-void setup(){
-    unsigned int i = 0, j = 0;
+void setup(void){   
+    //P2DIR |= 0x08;
+    //P2OUT |= 0x08;
     
     clock_init();
     timer_init(); // inicia com 0 ppm no ESC (ESC fica esperando sinal valido beep --- beep --- beep)
+
     lcd_init(LCDBackColor);
     
     P1_init(); // ppm receiver interrupt
     P2_init(); // itg3200 sample interrupt
-    
+
     // iluminacao progressiva do LCD
     while(TACCR1 < LCD_MAX_BRIGHT){
         TACCR1 = TACCR1 + 1;
@@ -1463,148 +394,78 @@ void setup(){
     }
     
     analog_init(); // config registradores
-    
     eint(); // habilita interrupt
     
-    battery_check();
-    
-    // calibra ESC
-    if(PPMValue[THROTTLE_CH] > STICK_UP_THRESHOLD){
-        esc_calibration();
-        lcd_clear(BLACK);
-    }
-    
-    set_motor(THROTTLE_MIN, THROTTLE_MIN, THROTTLE_MIN, THROTTLE_MIN); // set all motors throttle min
-
-    i2c_config(ITG_I2C_ADDR);
-    ITG3200Found = !(i2c_find_device(ITG_I2C_ADDR));
-    
-#ifdef ITG3200
-    if(ITG3200Found){
-        lcd_goto(0,0);
-        printf("\nITG3200 found.");
-        if(ITG3200_init()){
-            printf("\nITG3200 init failled.");
-            delayms(4000);
-        }
-    }
-    else{
-        
-        LCDForeColor = RED;
-        printf("\nITG3200 not found.");
-        LCDForeColor = LIME;
-    }
-    printf("\nADDR. %d", ITG_I2C_ADDR);
-#endif //ITG3200
-
-    i2c_config(EEPROM_I2C_ADDR);
-    EEPROMFound = !(i2c_find_device(EEPROM_I2C_ADDR));
-    
-    if(EEPROMFound){
-        printf("\nEEPROM found.");
-        printf("\nADDR. %d", EEPROM_I2C_ADDR);
-        load_eeprom_values();
-    }
-    else{
-        LCDForeColor = RED;
-        printf("\nEEPROM not found.");
-        printf("\nADDR. %d", ITG_I2C_ADDR);
-        LCDForeColor = LIME;
-        set_defaults();
-    }
-    
-    delayms(3000);
-    
-    // inicializa os vetores para desenhar graficos dos analog input
-    for(i = 0; i < 8; i++){
-        for(j = 0; j<100; j++){
-            AnalogGraph[i][j] = GRAPH_OFFSET;
-        }
-    }
-
-    lcd_clear(BLACK);
-    
-    //calibrate_radio();
-    //calibrate_gyro();
+    menu_init();
     
 }
 
-void analog_graph_clear_all(void){
-    int i;
-    for(i = 0; i < 8; i++){
-        analog_graph_clear(i);
-    }
+void menu_init(void){
+    MainMenu = menu_create(str_mainmenu, create_item(str_analogmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, NULL, NULL, &val_arrow_center, NULL);
+    menu_add_item(MainMenu, create_item(str_radiomenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_motormenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_controlmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_sensormenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_letsfly, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    // analog menu
+    AnalogMenu = menu_create(str_analogmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(AnalogMenu, create_item(str_analogch0, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[0]));
+    menu_add_item(AnalogMenu, create_item(str_analogch1, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[1]));
+    menu_add_item(AnalogMenu, create_item(str_analogch2, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[2]));
+    menu_add_item(AnalogMenu, create_item(str_analogch3, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[3]));
+    menu_add_item(AnalogMenu, create_item(str_analogch4, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[4]));
+    menu_add_item(AnalogMenu, create_item(str_analogch5, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[5]));    
+    menu_add_item(AnalogMenu, create_item(str_analogch6, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[6]));    
+    menu_add_item(AnalogMenu, create_item(str_analogch7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[7]));    
+    // control menu
+    ControlMenu = menu_create(str_controlmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(ControlMenu, create_item(str_yawp, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportional[YAW_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_pitchp, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportional[PITCH_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_rollp, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportional[ROLL_INDEX]));        
+    // radio menu
+    RadioMenu = menu_create(str_radiomenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(RadioMenu, create_item(str_radioch0, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[0]));
+    menu_add_item(RadioMenu, create_item(str_radioch1, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[1]));
+    menu_add_item(RadioMenu, create_item(str_radioch2, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[2]));
+    menu_add_item(RadioMenu, create_item(str_radioch3, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[3]));
+    menu_add_item(RadioMenu, create_item(str_radioch4, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[4]));
+    menu_add_item(RadioMenu, create_item(str_radioch5, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[5]));    
+    menu_add_item(RadioMenu, create_item(str_radioch6, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[6]));    
+    menu_add_item(RadioMenu, create_item(str_radioch7, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[7]));
+    menu_add_item(RadioMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
+    // motor menu
+    
+    MotorMenu = menu_create(str_motormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(MotorMenu, create_item(str_motor1, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[0]));
+    menu_add_item(MotorMenu, create_item(str_motor2, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[1]));
+    menu_add_item(MotorMenu, create_item(str_motor3, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[2]));
+    menu_add_item(MotorMenu, create_item(str_motor4, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[3]));
+    menu_add_item(MotorMenu, create_item(str_motor5, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[4]));
+    menu_add_item(MotorMenu, create_item(str_motor6, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[5]));    
+    menu_add_item(MotorMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
+    // sensor menu
+    SensorMenu = menu_create(str_sensormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(SensorMenu, create_item(str_accelx, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_X_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_accely, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Y_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_accelz, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Z_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_gyrox, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_X_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_gyroy, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Y_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_gyroz, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Z_INDEX]));    
+    menu_add_item(SensorMenu, create_item(str_graph, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
 }
 
-void set_defaults(void){
-
-    Gain[PROPORTIONAL][PITCH] = PITCH_P_DEFAULT;
-    Gain[PROPORTIONAL][ROLL] = ROLL_P_DEFAULT;
-    Gain[PROPORTIONAL][YAW] = YAW_P_DEFAULT;
-    
-    Gain[DERIVATIVE][PITCH] = PITCH_D_DEFAULT;
-    Gain[DERIVATIVE][ROLL] = ROLL_D_DEFAULT;
-    Gain[DERIVATIVE][YAW] = YAW_D_DEFAULT;
-    
-    Gain[INTEGRAL][PITCH] = PITCH_I_DEFAULT;
-    Gain[INTEGRAL][ROLL] = ROLL_I_DEFAULT;
-    Gain[INTEGRAL][YAW] = YAW_I_DEFAULT;
-    
-    save_current_gains();
-}
-
-void esc_calibration(void){
-    int i;
-    
-    lcd_goto(0,0);
-    printf("WARNING\nTAKE ALL PROPS OFF");
-    printf("PUT THROTTLE DOWN\nTO CANCEL\n");
-    printf("\nESC CALIBRATION\n6s left to start!.");
-    for(i = 0; i < 6; i++){
-        printf(".");
-        delayms(1000);
+ACTION get_radio_action(void){
+    if(PPMValue[RADIO_ROLL_CH] > STICK_UPPER_THRESHOLD){
+        return ACTION_RIGHT;
     }
-    if(PPMValue[THROTTLE_CH] > STICK_UP_THRESHOLD){
-        set_motor(4000, 4000, 4000, 4000);
-        printf("\nAll motors full throttle.");
-        delayms(2500);
-        printf("\nESC calibrated.");
-        delayms(2000);
-    }   
-}
-
-void battery_check(void){
-#ifdef BATTERY_CHECK
-    if(AnalogValue[BATTERY_CH] < LOW_BAT){
-        lcd_init(BLACK);
-        lcd_goto(5,5);
-        LCDForeColor = RED;
-        printf("LOW BATTERY");
-        P5DIR |= 0x10;
-        
-        while(1){
-            delayms(1000);
-            TACCR1 = 0;
-            P5OUT |= 0x10;
-            delayms(1000);
-            TACCR1 = LCD_MAX_BRIGHT;
-            P5OUT &= ~0x10;
-        }
-    }    
-#endif
-}
-
-inline void set_motor(int m1, int m2, int m3, int m4){
-    if(m1 < 4001 && m1 > 1999){
-        TBCCR1 = m1; 
+    if(PPMValue[RADIO_ROLL_CH] < STICK_LOWER_THRESHOLD){
+        return ACTION_LEFT;
     }
-    if(m2 < 4001 && m2 > 1999){
-        TBCCR2 = m2; 
+    if(PPMValue[RADIO_PITCH_CH] < STICK_LOWER_THRESHOLD){
+        return ACTION_UP;
     }
-    if(m3 < 4001 && m3 > 1999){
-        TBCCR3 = m3; 
+    if(PPMValue[RADIO_PITCH_CH] > STICK_UPPER_THRESHOLD){
+        return ACTION_DOWN;
     }
-    if(m4 < 4001 && m4 > 1999){
-        TBCCR4 = m4; 
-    }
+    return ACTION_NONE;
 }

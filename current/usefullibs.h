@@ -22,20 +22,20 @@ typedef enum{
     ITEMTYPE_VALUE_BAR_RW   =   MASK_READ | MASK_WRITE | MASK_VALUE | MASK_BAR,
     ITEMTYPE_VALUE_BAR_R    =   MASK_READ | MASK_VALUE | MASK_BAR,
     ITEMTYPE_BOOLEAN_RW     =   MASK_READ | MASK_WRITE | MASK_BOOL,
-    ITEMTYPE_BOOLEAN_R      =   MASK_READ | MASK_BOOL
+    ITEMTYPE_BOOLEAN_R      =   MASK_READ | MASK_BOOL,
 }ITEMTYPE;
 
 typedef struct{
-    char *Label;    
+    const char *Label;    
     int *Value; // o valor eh uma referencia de algum lugar da memoria    
-    int *MaxVal;
-    int *MinVal;
-    int *Interval;
+    const int *MaxVal;
+    const int *MinVal;
+    const int *Interval;
     ITEMTYPE ItemType;
 }Item;
 
 // podia fazer um __atributte__ pra nao permitir valor != de ponteiro e ITEMTYPE deve ser valido
-Item* create_item(char* label, ITEMTYPE type, int *minval, int *maxval, int *interval, int *val);
+Item* create_item(const char* label, ITEMTYPE type, const int *minval, const int *maxval, const int *interval, int *val);
 
 /* PILHA - LIFO */
 
@@ -47,7 +47,7 @@ struct StackNode{
 typedef struct StackNode* _StackNodePtr;
 
 typedef struct{
-    char* Label;
+    const char* Label;
     uint16 Size;
     _StackNodePtr Top;
 }StackItems;
@@ -56,7 +56,7 @@ void stack_items_dispose(StackItems* StackItemsHandler);
 uchar stack_items_push(StackItems* StackItemsHandler, Item* Value);
 uchar stack_items_pop(StackItems* StackItemsHandler);
 _StackNodePtr stack_itemsGet_top(StackItems* StackItemsHandler);
-StackItems* stack_items_create(Item* FirstItem, char* Label);
+StackItems* stack_items_create(Item* FirstItem, const char* Label);
 
 /* QUEUE - FIFO */
 struct QueueNode{
@@ -69,14 +69,14 @@ typedef struct QueueNode* _QueueNodePtr;
 typedef struct{
     _QueueNodePtr First;
     _QueueNodePtr Last;
-    char *Label;
+    const char *Label;
     uint16 Size;
 }QueueItems;
 
 void queue_items_dispose(QueueItems* QueueItemsHandler);
 uchar queue_items_pop(QueueItems* QueueItemsHandler);
 uchar queue_items_push(QueueItems* QueueItemsHandler, Item* Value);
-QueueItems* queue_items_create(Item* First, char* Label);
+QueueItems* queue_items_create(Item* First, const char* Label);
 _QueueNodePtr queue_items_getLast(QueueItems* QueueItemsHandler);
 _QueueNodePtr queue_items_getFirst(QueueItems* QueueItemsHandler);
 
@@ -90,14 +90,14 @@ typedef struct ListNode* _ListNodePtr;
 
 typedef struct{
     _ListNodePtr First;
-    char *Label;
+    const char *Label;
     uint16 Size;
 }ListItems;
 
 void list_items_dispose(ListItems* ListItemsHandler);
 uchar list_items_insert(ListItems* ListItemsHandler, Item* Value, uint16 index);
 uchar list_items_remove(ListItems* ListItemsHandler, uint16 index);
-ListItems* list_items_create(Item* First, char* Label);
+ListItems* list_items_create(Item* First, const char* Label);
 _ListNodePtr list_items_get_node(ListItems* ListItemsHandler, uint16 index);
 Item* list_items_get_item(ListItems* ListItemsHandler, uint16 index);
 

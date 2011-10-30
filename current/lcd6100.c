@@ -502,12 +502,14 @@ void lcd_putchar(unsigned char c)
 }
 
 void lcd_drawprogressbar(int x, int y, int lx, int ly, unsigned char color, unsigned char colorprogress, int percent){
-    if(ly < 1 || lx < 1 || percent < 0)
+    if(ly < 1 || lx < 1 || percent < 0 || percent > 100){
         return;
-        
-    int lx_progress = (lx * percent) / 100;
-    lcd_fillrect(x, y, lx_progress, ly, color);
-    lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly, colorprogress);
+    }
+    else{        
+        int lx_progress = (lx * percent) / 100;
+        lcd_fillrect(x, y, lx_progress, ly, color);
+        lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly, colorprogress);
+    }
 }
 
 

@@ -1,6 +1,7 @@
 #include "stdio.h"
-#include "delay.h"
 #include "stdlib.h"
+#include "string.h"
+#include "delay.h"
 #include "color.h"
 #include "lcd6100.h"
 #include "shorttypes.h"
@@ -12,7 +13,9 @@
 #define SETALEFT    27
 #define SETARIGHT   26
 
-MENU* menu_create(char *tittle, Item *FirstItem, uchar janelasize, uchar barsposh, uchar valueposh, uchar arrowposh, uchar barslen){
+// remark: arrowpositionH must never be NULL or ZERO.
+// se o menu contem items diferentes de SUBMENUS, nenhum parametro deve ser NULL.
+MENU* menu_create(const char *tittle, Item *FirstItem,  const uchar *janelasize,  const uchar *barsposh,  const uchar *valueposh,  const uchar *arrowposh,  const uchar *barslen){
     MENU* oMenu = (MENU*)malloc(sizeof(MENU));
     if(oMenu != NULL){
         oMenu->oListItems = list_items_create(FirstItem, tittle);
@@ -23,6 +26,7 @@ MENU* menu_create(char *tittle, Item *FirstItem, uchar janelasize, uchar barspos
         oMenu->BarsLenght = barslen;
         oMenu->SelectedItem = 0;
         oMenu->FirstShowed = 0;
+        oMenu->eMenuState = STATE_IDLE;
     }
     return oMenu;
 }
@@ -32,40 +36,55 @@ uchar menu_add_item(MENU* oMenu, Item *it){
     return result;
 }
 
+// remark: menus que contem somente SUBMENUS nao dever rodar esta rotina
 void menu_refresh(MENU* oMenu){
+    
     int i = oMenu->FirstShowed;
-    unsigned int barPercent = 0;
+    unsigned int valor;
+
     Item* oItem;
-    while(i < (oMenu->FirstShowed + oMenu->JanelaSize) && i < oMenu->oListItems->Size){
+    
+    // varre todos os items visiveis
+    while((i < (oMenu->FirstShowed + *(oMenu->JanelaSize))) && (i < oMenu->oListItems->Size)){
         oItem = list_items_get_item(oMenu->oListItems,i);
-        // bar
+        // se possuir barra
         if((oItem->ItemType & MASK_READ) && (oItem->ItemType & MASK_BAR)){
-            barPercent = ((((*(oItem->Value) - *(oItem->MinVal)) * 10) / (*(oItem->MaxVal) - *(oItem->MinVal))) * 10);
-            lcd_drawprogressbar(oMenu->BarsPositionH, 20+(8*(i-oMenu->FirstShowed)), oMenu->ValuePositionH*6 - oMenu->BarsPositionH, 4, RED, BLACK, 100-barPercent);
+            // fazer            
+            lcd_drawprogressbar(*(oMenu->BarsPositionH), 20+(8*(i-oMenu->FirstShowed)), *(oMenu->BarsLenght), 4, RED, BLACK, 50);
         }
-        else{
-            lcd_fillrect(oMenu->BarsPositionH,20+(8*(i-oMenu->FirstShowed)), oMenu->ValuePositionH*6 - oMenu->BarsPositionH, 4, LCDBackColor);
+        else{ // se nao apaga o lugar da barra
+            lcd_fillrect(*(oMenu->BarsPositionH),20+(8*(i-oMenu->FirstShowed)), *(oMenu->BarsLenght), 4, LCDBackColor);
         }
-        lcd_goto(oMenu->ValuePositionH, 2+i-oMenu->FirstShowed);
-        if(oItem->ItemType & MASK_READ){ // if is value or bool readable
-            if(oItem->ItemType & MASK_VALUE){
+
+        lcd_goto(*(oMenu->ValuePositionH), 2+i-oMenu->FirstShowed); // move para posicao di valor
+        if(((oItem->ItemType) & MASK_READ) == MASK_READ){ // if is value or bool readable
+        //if(1){
+            if((oItem->ItemType & MASK_VALUE) == MASK_VALUE){ // se for um valor
+            //if(1){
                 // valor
-                printf("%d    ",*(oItem->Value));
+                valor = *(oItem->Value);                
+                printf("%d",valor);
+                
+                while(valor){       // da o numero de espacos necessarios pra chegar no final
+                    valor = valor / 10;
+                    printf(" ");
+                }
+
             }
-            else{
-                if(oItem->ItemType & MASK_BOOL){
-                    printf("%c",*(oItem->Value));
+            else{   // se nao for valor
+                if((oItem->ItemType & MASK_BOOL) == MASK_BOOL){ // se for um boolean
+                    printf("%c    ",*(oItem->Value));
+                }
+                else{ // se for submenu so apaga
+                    printf("     ");
                 }
             }
-        }
-        else{ // so sobrou submenu
-            printf("     ");
         }
         i++;
     }
 }
 
-void draw_menu(MENU* oMenu, uchar clear){
+void menu_draw(MENU* oMenu, uchar clear){
     uint16 i = 0;
     
     uchar SetaCima = 1;
@@ -81,32 +100,36 @@ void draw_menu(MENU* oMenu, uchar clear){
     if(oMenu->SelectedItem < oMenu->FirstShowed && oMenu->FirstShowed > 0){
         oMenu->FirstShowed = oMenu->SelectedItem;
     }
-    if(oMenu->SelectedItem >= (oMenu->FirstShowed + oMenu->JanelaSize) && oMenu->SelectedItem < oMenu->oListItems->Size){
-        oMenu->FirstShowed = oMenu->SelectedItem - oMenu->JanelaSize + 1;
+    // verifica se o selected item ta fora da janela
+    if(oMenu->SelectedItem >= (oMenu->FirstShowed + *(oMenu->JanelaSize)) && oMenu->SelectedItem < oMenu->oListItems->Size){
+        oMenu->FirstShowed = oMenu->SelectedItem - *(oMenu->JanelaSize) + 1;
     }
+    // config seta cima
     if(oMenu->FirstShowed == 0){
         SetaCima = 0;    
     }
-    if((oMenu->JanelaSize + oMenu->FirstShowed) >= oMenu->oListItems->Size){
+    // config seta baixo
+    if((*(oMenu->JanelaSize) + oMenu->FirstShowed) >= oMenu->oListItems->Size){
         SetaBaixo = 0;
     }
-    for(i = oMenu->FirstShowed; i < oMenu->FirstShowed + oMenu->JanelaSize; i++){
+    
+    // anda do i = primeiro mostrado (0) ate o ultimo da janela
+    for(i = oMenu->FirstShowed; i < oMenu->FirstShowed + *(oMenu->JanelaSize); i++){
         if(i < oMenu->oListItems->Size){
             lcd_goto(0, 2 + i - oMenu->FirstShowed);
             if(i == oMenu->SelectedItem){
-                printf("%c",SETARIGHT);
-                printf(" ");
+                printf("%c ",SETARIGHT);
             }
             else{
                 printf("  ");    
             }
+            // mostra o label do item
             printf(list_items_get_node(oMenu->oListItems, i)->Value->Label);
             LCDLineCount++;
         }
-
     }
 
-    lcd_goto(oMenu->ArrowPositionH, 1);
+    lcd_goto(*(oMenu->ArrowPositionH), 1);
     if(SetaCima){
         printf("%c",SETACIMA);
     }
@@ -114,13 +137,23 @@ void draw_menu(MENU* oMenu, uchar clear){
         printf(" ");
     }
     
-    lcd_goto(oMenu->ArrowPositionH, 2 * oMenu->JanelaSize + 3);
+    // BUG: desenhou uma seta ao lado direito do MenuTittle quand era pra ta la em baixo
+    // desenha NADA na mesma posicao quando nao deve desenhar seta
+    // ha! ja sei, eh porque a continha da maior do q era pra dar
+    lcd_goto(*(oMenu->ArrowPositionH), LCD_NLINE - 1);
     if(SetaBaixo){
         printf("%c",SETABAIXO);
     }
     else{
         printf(" ");
     }
+    
+    lcd_goto(0,LCD_NLINE - 1);
+    printf("%d/%d",oMenu->SelectedItem + 1, oMenu->oListItems->Size);
+    
+    lcd_goto(LCD_NCHAR - 1, LCD_NLINE - 1);
+    printf("%d",(int)oMenu->eMenuState);
+    
 }
 
 MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
@@ -134,7 +167,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
                 
                 case ACTION_UP:
-                    oMenu->eMenuState = STATE_WAIT_DOWN;
+                    oMenu->eMenuState = STATE_WAIT_BACK;
                     if(oMenu->SelectedItem > 0){
                         (oMenu->SelectedItem)--;
                         result = RESP_NONE;
@@ -145,8 +178,8 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
                 
                 case ACTION_DOWN:
-                    oMenu->eMenuState = STATE_WAIT_UP;
-                    if(oMenu->SelectedItem < oMenu->oListItems->Size){
+                    oMenu->eMenuState = STATE_WAIT_BACK;
+                    if(oMenu->SelectedItem < oMenu->oListItems->Size - 1){
                         (oMenu->SelectedItem)++;
                         result = RESP_DONE;
                     }
@@ -156,7 +189,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
         
                 case ACTION_LEFT:
-                    oMenu->eMenuState = STATE_WAIT_RIGHT;
+                    oMenu->eMenuState = STATE_WAIT_BACK;
                     if(oItem->ItemType & (MASK_VALUE | MASK_BAR) & MASK_WRITE){
                         if(*(oItem->Value - *(oItem->Interval)) > (*(oItem->MinVal))){
                             *(oItem->Value) = *(oItem->Value) - *(oItem->Interval);
@@ -172,13 +205,14 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                             result = RESP_DONE;
                         }
                         else{ // submenu
-                            result = RESP_SUBMENU_OUT;
+                            oMenu->eMenuState = STATE_WAIT_SUBMENU_OUT;
+                            result = RESP_BUSY;
                         }
                     }
                 break;
                 
                 case ACTION_RIGHT:
-                    oMenu->eMenuState = STATE_WAIT_LEFT;
+                    oMenu->eMenuState = STATE_WAIT_BACK;
                     if(oItem->ItemType & (MASK_VALUE | MASK_BAR) & MASK_WRITE){
                         if(*(oItem->Value + *(oItem->Interval)) < (*(oItem->MaxVal))){
                             *(oItem->Value) = *(oItem->Value) + *(oItem->Interval);
@@ -194,7 +228,8 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                             result = RESP_DONE;
                         }
                         else{ // submenu
-                            result = RESP_SUBMENU_IN;
+                            oMenu->eMenuState = STATE_WAIT_SUBMENU_IN;
+                            result = RESP_BUSY;
                         }
                     }
                 break;
@@ -202,8 +237,8 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                     
         break;
         
-        case STATE_WAIT_UP:
-            if(act == ACTION_UP){
+        case STATE_WAIT_BACK:
+            if(act == ACTION_NONE){
                 oMenu->eMenuState = STATE_IDLE;
                 result = RESP_NONE;
             }
@@ -212,35 +247,25 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
             }
         break;
         
-        case STATE_WAIT_DOWN:
-            if(act == ACTION_DOWN){
+        case STATE_WAIT_SUBMENU_IN:
+            if(act == ACTION_NONE){
                 oMenu->eMenuState = STATE_IDLE;
-                result = RESP_NONE;
+                result = RESP_SUBMENU_IN;
             }
             else{
                 result = RESP_BUSY;
             }
         break;
         
-        case STATE_WAIT_LEFT:
-            if(act == ACTION_LEFT){
+        case STATE_WAIT_SUBMENU_OUT:
+            if(act == ACTION_NONE){
                 oMenu->eMenuState = STATE_IDLE;
-                result = RESP_NONE;
-            }
-            else{
-                result = RESP_BUSY;
-            }
-        break;
-        
-        case STATE_WAIT_RIGHT:
-            if(act == ACTION_RIGHT){
-                oMenu->eMenuState = STATE_IDLE;
-                result = RESP_NONE;
+                result = RESP_SUBMENU_OUT;
             }
             else{
                 result = RESP_BUSY;
             }
         break;
     }
-    return 1;
+    return result;
 }
