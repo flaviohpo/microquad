@@ -23,15 +23,19 @@ unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
 int PPMValue[8] = {0,0,0,0,0,0,0,0};
 
 // variaveis sensores
-int AccelValue[3] = {0, 0, 0};
-int GyroValue[3] = {0, 0, 0};
+int AccelValue[3] = {0,0,0};
+int AccelOffset[3] = {0,0,0};
+int GyroValue[3] = {0,0,0};
+int GyroOffset[3] = {0,0,0};
+
+volatile unsigned char ControlIFG = 0; // interrupt flag for control loop
 
 // variaveis do controle
-unsigned int ControlProportional[3] = {0,0,0};
+unsigned int ControlProportional[3] = {1,1,1};
 // for further implementation
 //unsigned int ControlIntegral[3] = {0,0,0};
 //unsigned int ControlDerivative[3] = {0,0,0};
-unsigned int MotorOutput[6] = {0,0,0,0,0,0};
+int MotorOutput[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
 
 MENU* MainMenu;
 MENU* AnalogMenu;
@@ -45,14 +49,22 @@ PROGRAM_STEP ProgStep;
 int main(void){
     WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
         
-    unsigned char MenuDraw = 1;
+    unsigned char MenuDraw = 0;
     
     ACTION act = ACTION_NONE;
     MENU_RESPONSE resp = RESP_NONE;
     ProgStep = PROCESS_MAIN_MENU;
     
     setup();
-
+    
+    menu_draw(MainMenu, 1);
+    
+    // iluminacao progressiva do LCD
+    while(TACCR1 < LCD_MAX_BRIGHT){
+        TACCR1 = TACCR1 + 1;
+        delayus(1200);
+    }
+    
     while(1){
         switch(ProgStep){
             case PROCESS_MAIN_MENU:
@@ -66,6 +78,7 @@ int main(void){
                         MenuDraw = 1;
                     break;
                     
+                    case RESP_EMERGENCY:
                     case RESP_SUBMENU_OUT:
                     case RESP_NONE:          
                     case RESP_BUSY:
@@ -79,7 +92,7 @@ int main(void){
                     break;
                 }
             break;
-            
+                       
             case PROCESS_ANALOG_MENU:
                 analog_refresh_all();
                 menu_draw(AnalogMenu, MenuDraw);
@@ -96,6 +109,19 @@ int main(void){
                     break;
                     
                     case RESP_SUBMENU_IN:
+                        if(AnalogMenu->SelectedItem == CALIBR_INDEX){
+                            analog_calibrate_channel(0);
+                            analog_calibrate_channel(1);
+                            analog_calibrate_channel(2);
+                            analog_calibrate_channel(3);
+                            analog_calibrate_channel(4);
+                            analog_calibrate_channel(5);
+                            analog_calibrate_channel(6);
+                            analog_calibrate_channel(7);
+                        }                    
+                    break;                    
+                    
+                    case RESP_EMERGENCY:
                     case RESP_NONE:          
                     case RESP_BUSY:
                     case RESP_SEL_MIN_LIMIT:
@@ -111,13 +137,19 @@ int main(void){
             
             case PROCESS_MOTOR_MENU:
                 menu_draw(MotorMenu, MenuDraw);
+                if(MenuDraw == 1){
+                    set_all_motors(MIN_MOTOR);
+                }
                 MenuDraw = 0;
+                set_motor_output();
                 menu_refresh(MotorMenu);
                 act = get_radio_action();
                 resp = menu_process(MotorMenu, act);
+                
                 switch(resp){
                     case RESP_SUBMENU_OUT:
                         if(MotorMenu->SelectedItem == RETURN_INDEX){
+                            set_all_motors(MIN_MOTOR);
                             ProgStep = PROCESS_MAIN_MENU;
                             MenuDraw = 1;
                         }
@@ -126,6 +158,13 @@ int main(void){
                         }
                     break;
                     
+                    case RESP_EMERGENCY:
+                        set_all_motors(MIN_MOTOR);
+                        screen_flash(RED, 200, 2);
+                        ProgStep = PROCESS_MAIN_MENU;
+                        MenuDraw = 1;
+                    break;
+                        
                     case RESP_SUBMENU_IN:
                     case RESP_NONE:          
                     case RESP_BUSY:
@@ -154,6 +193,7 @@ int main(void){
                         }
                     break;
                     
+                    case RESP_EMERGENCY:
                     case RESP_SUBMENU_IN:
                     case RESP_NONE:          
                     case RESP_BUSY:
@@ -183,6 +223,12 @@ int main(void){
                     break;
                     
                     case RESP_SUBMENU_IN:
+                        if(RadioMenu->SelectedItem == CALIBR_INDEX){
+                            calibrate_radio();
+                        }                    
+                    break;                    
+                    
+                    case RESP_EMERGENCY:
                     case RESP_NONE:          
                     case RESP_BUSY:
                     case RESP_SEL_MIN_LIMIT:
@@ -210,6 +256,7 @@ int main(void){
                         }
                     break;
                     
+                    case RESP_EMERGENCY:
                     case RESP_SUBMENU_IN:
                     case RESP_NONE:          
                     case RESP_BUSY:
@@ -224,18 +271,68 @@ int main(void){
                 }
             break;
             
+            case PROCESS_OPTION_MENU:
+            break;
+            
             case PROCESS_CONTROL:
+                if(TACCR1 > 0){ //apaga tela
+                    TACCR1 = TACCR1 - 1;
+                    delayus(1000);
+                }
+                else{
+                    ControlLoop();
+                }
+
+                if(ControlIFG == 1){ // essa variavel eh setada de 2.5 em 2.5ms da um loop de  400hz
+                    ControlIFG = 0;
+                    // faz um loop do controle
+                }
+                act = get_radio_action();
+                resp = menu_process(ControlMenu, act);
+                switch(resp){
+                    case RESP_EMERGENCY:
+                        ProgStep = PROCESS_MAIN_MENU;
+                        set_all_motors(MIN_MOTOR);
+                        screen_flash(BLACK,500,2);
+                        MenuDraw = 1;
+                    break;
+                    case RESP_SUBMENU_OUT:                    
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
+                }
             break;
         }
     }
 }
 
-
-interrupt (TIMERA0_VECTOR) TIMERA0_ISR_HOOK(void){ // 2ms
-    // ta livre
+// delay
+interrupt (TIMERA1_VECTOR) TIMERA1_ISR_HOOK(void){ // 2ms
+    int i = 10;
+    do{
+        i--;
+        if(TimeDelay[i] > 0){
+            TimeDelay[i]--;
+        }
+    }while(i);
+    // ver no datasheet se tem q zerar o flag da interrupt
+    TACTL &= ~0x01;
 }
 
-// ok
+interrupt (TIMERB1_VECTOR) TIMERB1_ISR_HOOK(void){ // 2.5ms
+    ControlIFG = 1;
+    TBCTL &= ~0x01;
+}
+
+// tudo para 16MHz
 void clock_init(void){
     BCSCTL2 = SELM_0 + DIVM_0 + DIVS_0;
     DCOCTL = 0x77;      
@@ -272,6 +369,15 @@ void P2_init(void){ // p2 eh interruption do gyro
 #endif
 }
 
+void set_motor_output(void){
+    TBCCR1 = constrain(MotorOutput[0], 0, MAX_MOTOR);
+    TBCCR2 = constrain(MotorOutput[1], 0, MAX_MOTOR);
+    TBCCR3 = constrain(MotorOutput[2], 0, MAX_MOTOR);
+    TBCCR4 = constrain(MotorOutput[3], 0, MAX_MOTOR);
+    TBCCR5 = constrain(MotorOutput[4], 0, MAX_MOTOR);
+    TBCCR6 = constrain(MotorOutput[5], 0, MAX_MOTOR);
+}
+
 void timer_init(void){
     /* 
      * TBCCTL1, Capture/Compare Control Register 1
@@ -289,15 +395,15 @@ void timer_init(void){
     TBCCTL6 = CM_0 + CCIS_0 + CLLD_0 + OUTMOD_7;
 
     /* TBCCR0, Timer_B Capture/Compare Register 0 */
-    TBCCR0 = 5025;
+    TBCCR0 = 4512; // 2.5ms = 400hz
 
     /* TBCCR1, Timer_B Capture/Compare Register 1 */
-    TBCCR1 = 2000; 
-    TBCCR2 = 2000; 
-    TBCCR3 = 2000; 
-    TBCCR4 = 2000; 
-    TBCCR5 = 2000; 
-    TBCCR6 = 2000; 
+    TBCCR1 = 0; 
+    TBCCR2 = 0; 
+    TBCCR3 = 0; 
+    TBCCR4 = 0; 
+    TBCCR5 = 0; 
+    TBCCR6 = 0; 
 
     /* 
      * TBCTL, Timer_B3 Control Register
@@ -332,7 +438,7 @@ void timer_init(void){
 
     TACCTL1 = CM_0 + CCIS_0 + OUTMOD_7;
 
-    TACTL = TASSEL_1 + ID_3 + MC_1;
+    TACTL = TASSEL_1 + ID_3 + MC_1 + TAIE;
     TACCR1 = 0;
 
     P2SEL |= 0x08;
@@ -378,26 +484,46 @@ interrupt (PORT2_VECTOR) PORT2_ISR_HOOK(void){
 void setup(void){   
     //P2DIR |= 0x08;
     //P2OUT |= 0x08;
+    int i = 100;
     
     clock_init();
     timer_init(); // inicia com 0 ppm no ESC (ESC fica esperando sinal valido beep --- beep --- beep)
-
-    lcd_init(LCDBackColor);
     
     P1_init(); // ppm receiver interrupt
     P2_init(); // itg3200 sample interrupt
-
-    // iluminacao progressiva do LCD
-    while(TACCR1 < LCD_MAX_BRIGHT){
-        TACCR1 = TACCR1 + 1;
-        delayus(1200);
-    }
     
-    analog_init(); // config registradores
     eint(); // habilita interrupt
+    
+    set_delay(1,400);
+    while(!get_delay(1));
+        
+    // calibra esc
+    if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
+        while(i--){
+            set_all_motors(PPMValue[RADIO_THROTTLE_CH]);
+            delayms(80);
+        }       
+    }
+    else{
+        set_all_motors(MIN_MOTOR);
+    }
     
     menu_init();
     
+    lcd_init(LCDBackColor);
+
+    analog_init(); // config registradores        
+    analog_calibrate_channel(0);
+    analog_calibrate_channel(1);
+    analog_calibrate_channel(2);
+    analog_calibrate_channel(3);
+    analog_calibrate_channel(4);
+    analog_calibrate_channel(5);
+    analog_calibrate_channel(6);
+    analog_calibrate_channel(7);
+        
+    calibrate_radio();
+        
 }
 
 void menu_init(void){
@@ -406,9 +532,11 @@ void menu_init(void){
     menu_add_item(MainMenu, create_item(str_motormenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_controlmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_sensormenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_optionmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     menu_add_item(MainMenu, create_item(str_letsfly, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     // analog menu
     AnalogMenu = menu_create(str_analogmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(AnalogMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(AnalogMenu, create_item(str_analogch0, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[0]));
     menu_add_item(AnalogMenu, create_item(str_analogch1, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[1]));
     menu_add_item(AnalogMenu, create_item(str_analogch2, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[2]));
@@ -417,13 +545,24 @@ void menu_init(void){
     menu_add_item(AnalogMenu, create_item(str_analogch5, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[5]));    
     menu_add_item(AnalogMenu, create_item(str_analogch6, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[6]));    
     menu_add_item(AnalogMenu, create_item(str_analogch7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[7]));    
+    
+    menu_add_item(AnalogMenu, create_item(str_analogof0, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[0]));
+    menu_add_item(AnalogMenu, create_item(str_analogof1, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[1]));
+    menu_add_item(AnalogMenu, create_item(str_analogof2, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[2]));
+    menu_add_item(AnalogMenu, create_item(str_analogof3, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[3]));
+    menu_add_item(AnalogMenu, create_item(str_analogof4, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[4]));
+    menu_add_item(AnalogMenu, create_item(str_analogof5, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[5]));    
+    menu_add_item(AnalogMenu, create_item(str_analogof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[6]));    
+    menu_add_item(AnalogMenu, create_item(str_analogof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[7]));    
     // control menu
     ControlMenu = menu_create(str_controlmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
-    menu_add_item(ControlMenu, create_item(str_yawp, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportional[YAW_INDEX]));
-    menu_add_item(ControlMenu, create_item(str_pitchp, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportional[PITCH_INDEX]));
-    menu_add_item(ControlMenu, create_item(str_rollp, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportional[ROLL_INDEX]));        
+    menu_add_item(ControlMenu, create_item(str_yawp, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportional[YAW_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_pitchp, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportional[PITCH_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_rollp, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportional[ROLL_INDEX]));        
     // radio menu
-    RadioMenu = menu_create(str_radiomenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    RadioMenu = menu_create(str_radiomenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(RadioMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
+        
     menu_add_item(RadioMenu, create_item(str_radioch0, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[0]));
     menu_add_item(RadioMenu, create_item(str_radioch1, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[1]));
     menu_add_item(RadioMenu, create_item(str_radioch2, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[2]));
@@ -432,16 +571,25 @@ void menu_init(void){
     menu_add_item(RadioMenu, create_item(str_radioch5, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[5]));    
     menu_add_item(RadioMenu, create_item(str_radioch6, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[6]));    
     menu_add_item(RadioMenu, create_item(str_radioch7, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[7]));
-    menu_add_item(RadioMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
+    
+    menu_add_item(RadioMenu, create_item(str_radioof0, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[0]));
+    menu_add_item(RadioMenu, create_item(str_radioof1, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[1]));
+    menu_add_item(RadioMenu, create_item(str_radioof2, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[2]));
+    menu_add_item(RadioMenu, create_item(str_radioof3, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[3]));
+    menu_add_item(RadioMenu, create_item(str_radioof4, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[4]));
+    menu_add_item(RadioMenu, create_item(str_radioof5, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[5]));    
+    menu_add_item(RadioMenu, create_item(str_radioof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[6]));    
+    menu_add_item(RadioMenu, create_item(str_radioof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[7]));
+    
     // motor menu
     
     MotorMenu = menu_create(str_motormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
-    menu_add_item(MotorMenu, create_item(str_motor1, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[0]));
-    menu_add_item(MotorMenu, create_item(str_motor2, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[1]));
-    menu_add_item(MotorMenu, create_item(str_motor3, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[2]));
-    menu_add_item(MotorMenu, create_item(str_motor4, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[3]));
-    menu_add_item(MotorMenu, create_item(str_motor5, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[4]));
-    menu_add_item(MotorMenu, create_item(str_motor6, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, NULL, (int*)&MotorOutput[5]));    
+    menu_add_item(MotorMenu, create_item(str_motor1, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[0]));
+    menu_add_item(MotorMenu, create_item(str_motor2, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[1]));
+    menu_add_item(MotorMenu, create_item(str_motor3, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[2]));
+    menu_add_item(MotorMenu, create_item(str_motor4, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[3]));
+    menu_add_item(MotorMenu, create_item(str_motor5, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[4]));
+    menu_add_item(MotorMenu, create_item(str_motor6, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[5]));    
     menu_add_item(MotorMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     // sensor menu
     SensorMenu = menu_create(str_sensormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
@@ -455,6 +603,11 @@ void menu_init(void){
 }
 
 ACTION get_radio_action(void){
+    // highest priority
+    if(PPMValue[5] > STICK_UPPER_THRESHOLD){
+        return ACTION_EMERGENCY;
+    }
+        
     if(PPMValue[RADIO_ROLL_CH] > STICK_UPPER_THRESHOLD){
         return ACTION_RIGHT;
     }
@@ -468,4 +621,97 @@ ACTION get_radio_action(void){
         return ACTION_DOWN;
     }
     return ACTION_NONE;
+}
+
+void set_all_motors(unsigned int val){
+    MotorOutput[0] = val;
+    MotorOutput[1] = val;
+    MotorOutput[2] = val;
+    MotorOutput[3] = val;
+    MotorOutput[4] = val;
+    MotorOutput[5] = val;
+    
+    set_motor_output();
+}
+
+void screen_flash(int Color, int interval, int times){
+    // iluminacao progressiva do LCD
+    TACCR1 = 0;
+    lcd_clear(Color);
+    while(times--){    
+        while(TACCR1 < LCD_MAX_BRIGHT){
+            TACCR1 = TACCR1 + 1;
+            delayus(interval);
+        }
+        while(TACCR1 > 0){
+            TACCR1 = TACCR1 - 1;
+            delayus(interval);
+        }
+    }
+    lcd_clear(LCDBackColor);
+    while(TACCR1 < LCD_MAX_BRIGHT){
+        TACCR1 = TACCR1 + 1;
+        delayus(interval);
+    }
+}
+
+void calibrate_radio(void){
+    unsigned i = 8, j = 8;
+    do{
+        i--;
+        PPMOffset[i] = 0;
+    }while(i);
+    i=8;
+    do{
+        i--;
+        do{
+            j--;
+            PPMOffset[j] += PPMValue[j];
+        }while(j);
+        j=8;
+        delayms(50);
+    }while(i);
+    i=8;
+    do{
+        i--;
+        PPMOffset[i] = PPMOffset[i] >> 3;
+    }while(i);
+}
+
+void ControlLoop(void){
+    analog_refresh_all();
+    
+    if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
+           
+        MotorOutput[MOTOR_RIGHT] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> 2;
+        MotorOutput[MOTOR_RIGHT] += (AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]);
+        
+        MotorOutput[MOTOR_LEFT] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_LEFT] += (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> 2;
+        MotorOutput[MOTOR_LEFT] -= (AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]);
+            
+        MotorOutput[MOTOR_FRONT] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_FRONT] += (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> 2;
+        MotorOutput[MOTOR_FRONT] += (AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]);
+        
+        MotorOutput[MOTOR_BACK] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_BACK] -= (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> 2;
+        MotorOutput[MOTOR_BACK] -= (AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]);
+                
+        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
+        MotorOutput[MOTOR_LEFT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
+        MotorOutput[MOTOR_RIGHT] += (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
+        MotorOutput[MOTOR_LEFT] += (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
+
+        MotorOutput[MOTOR_FRONT] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
+        MotorOutput[MOTOR_BACK] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
+        MotorOutput[MOTOR_FRONT] -= (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
+        MotorOutput[MOTOR_BACK] -= (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
+
+        set_motor_output();
+    }
+    else{
+        set_all_motors(MIN_MOTOR);
+    }
 }

@@ -11,7 +11,7 @@
 #include "delay.h"
 #endif //ULIBS_AUTO_TEST
 
-Item* create_item(const char* label, ITEMTYPE type, const int *maxval, const int *minval, const int *interval, int *val){
+Item* create_item(const char* label, ITEMTYPE type, const int *minval, const int *maxval, const int *interval, int *val){
     Item* oItem = (Item*)malloc(sizeof(Item));
     if(oItem != NULL){
         oItem->Label        =   label;

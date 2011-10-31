@@ -9,7 +9,14 @@
 // **                                                            **
 // ****************************************************************
 //
+
+#define TIMEDELAY_LEN 10
+
+extern unsigned int TimeDelay[TIMEDELAY_LEN];
+
 void delay2us(void);
 void delay5us(void);
 void delayus(unsigned int tempo);
 void delayms(unsigned int tempo);
+void set_delay(unsigned int position, unsigned int time);
+unsigned char get_delay(unsigned int position);

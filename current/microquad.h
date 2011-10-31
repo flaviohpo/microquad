@@ -1,9 +1,26 @@
-#define Constrain(val,min,max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
+#define constrain(val,min,max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
 
 //#define ITG3200
 
+#define BATTERY_ACH             7 
+#define GYRO_YAW_ACH            3
+#define GYRO_PITCH_ACH          1
+#define GYRO_ROLL_ACH           0
+#define ACCELX_ACH              5
+#define ACCELY_ACH              4
+#define ACCELZ_ACH              3
+
 #define LCD_MAX_BRIGHT          2500
 #define PPM_P1MASK              0xFF
+
+#define MIN_MOTOR               2000
+#define MAX_MOTOR               4000
+#define MIN_MOTOR_WORK          2450
+
+#define MOTOR_FRONT             2
+#define MOTOR_BACK              1
+#define MOTOR_RIGHT             3
+#define MOTOR_LEFT              0
 
 #define STICK_UPPER_THRESHOLD   3200
 #define STICK_LOWER_THRESHOLD   2300
@@ -18,8 +35,11 @@
 #define RADIO_MENU_INDEX        1
 #define MOTOR_MENU_INDEX        2
 #define SENSOR_MENU_INDEX       4
-#define LETSFLY_INDEX           5
+#define OPTION_MENU_INDEX       5
+#define LETSFLY_INDEX           6
 
+#define CALIBR_INDEX            1
+#define GYRO_CALIBR_INDEX       13
 #define RETURN_INDEX            0
 
 #define YAW_INDEX               0
@@ -40,6 +60,7 @@ typedef enum{
     PROCESS_MOTOR_MENU          = MOTOR_MENU_INDEX,
     PROCESS_SENSOR_MENU         = SENSOR_MENU_INDEX,
     PROCESS_RADIO_MENU          = RADIO_MENU_INDEX,
+    PROCESS_OPTION_MENU         = OPTION_MENU_INDEX,
     PROCESS_CONTROL_MENU        = CONTROL_MENU_INDEX,
     PROCESS_CONTROL             = LETSFLY_INDEX
 }PROGRAM_STEP;
@@ -50,5 +71,10 @@ void timer_init(void);
 void P2_init(void);
 void P1_init(void);
 void clock_init(void);
+void set_motor_output(void);
+void set_all_motors(unsigned int val);
+void screen_flash(int Color, int interval, int times);
+void calibrate_radio(void);
+void ControlLoop(void);
 int main(void);
 ACTION get_radio_action(void);

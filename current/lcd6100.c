@@ -33,8 +33,8 @@
 
 unsigned char LCDLineCount = 0;
 unsigned char LCDCharCount = 0;
-unsigned char LCDBackColor = BLACK;
-unsigned char LCDForeColor = LIME;
+unsigned char LCDBackColor = WHITE;
+unsigned char LCDForeColor = MARROON;
 
 const char asciitable[640] = {
                             0x00,0x00,0x00,0x00,0x00,    // NULL char...

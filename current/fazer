@@ -1,10 +1,8 @@
 imagem de entrada e uma barrinha de loading com um console pra mostrar o que ta fazendo
 guardar tempo de voo ( detectar quando a bateria foi carregada para inciar automaticamente uma nova contagem )
 melhorar controle
-implementar menus pela usefulibs
 descobrir valores default pro PID
 adicionar acelerometro e controle da camera
 fazer opções para inverter o gyro
 deixar somente 2 modos de voo
-fazer logica para apagar o lcd quando sai voando
 opcao para inverter radio, gyro e accel mudando a cor do valor (talvez trocando fundo por fore)

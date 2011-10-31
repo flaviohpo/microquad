@@ -50,6 +50,13 @@ void menu_refresh(MENU* oMenu){
         // se possuir barra
         if((oItem->ItemType & MASK_READ) && (oItem->ItemType & MASK_BAR)){
             // fazer            
+            /*
+            #define min 2150
+            #define max 3839
+            #define d (max-min)/100
+            n = x/d;
+            if(n >100) n = 100;
+                */
             lcd_drawprogressbar(*(oMenu->BarsPositionH), 20+(8*(i-oMenu->FirstShowed)), *(oMenu->BarsLenght), 4, RED, BLACK, 50);
         }
         else{ // se nao apaga o lugar da barra
@@ -57,14 +64,13 @@ void menu_refresh(MENU* oMenu){
         }
 
         lcd_goto(*(oMenu->ValuePositionH), 2+i-oMenu->FirstShowed); // move para posicao di valor
-        if(((oItem->ItemType) & MASK_READ) == MASK_READ){ // if is value or bool readable
+        if(((oItem->ItemType) & MASK_READ) != 0){ // if is value or bool readable
         //if(1){
-            if((oItem->ItemType & MASK_VALUE) == MASK_VALUE){ // se for um valor
+            if(((oItem->ItemType) & MASK_VALUE) != 0){ // se for um valor
             //if(1){
                 // valor
-                valor = *(oItem->Value);                
-                printf("%d",valor);
-                
+                printf("%d",*(oItem->Value));
+                valor = 10000 - *(oItem->Value);                
                 while(valor){       // da o numero de espacos necessarios pra chegar no final
                     valor = valor / 10;
                     printf(" ");
@@ -129,6 +135,9 @@ void menu_draw(MENU* oMenu, uchar clear){
         }
     }
 
+    lcd_goto(0,LCD_NLINE - 1);
+    printf("%d/%d  ",oMenu->SelectedItem + 1, oMenu->oListItems->Size);
+    
     lcd_goto(*(oMenu->ArrowPositionH), 1);
     if(SetaCima){
         printf("%c",SETACIMA);
@@ -148,9 +157,6 @@ void menu_draw(MENU* oMenu, uchar clear){
         printf(" ");
     }
     
-    lcd_goto(0,LCD_NLINE - 1);
-    printf("%d/%d",oMenu->SelectedItem + 1, oMenu->oListItems->Size);
-    
     lcd_goto(LCD_NCHAR - 1, LCD_NLINE - 1);
     printf("%d",(int)oMenu->eMenuState);
     
@@ -163,10 +169,14 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
         case STATE_IDLE:
             switch(act){
                 case ACTION_NONE:
+                break;
                 
+                case ACTION_EMERGENCY:
+                    result =  RESP_EMERGENCY;                  
                 break;
                 
                 case ACTION_UP:
+                    set_delay(0, 50);
                     oMenu->eMenuState = STATE_WAIT_BACK;
                     if(oMenu->SelectedItem > 0){
                         (oMenu->SelectedItem)--;
@@ -178,6 +188,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
                 
                 case ACTION_DOWN:
+                    set_delay(0, 50);
                     oMenu->eMenuState = STATE_WAIT_BACK;
                     if(oMenu->SelectedItem < oMenu->oListItems->Size - 1){
                         (oMenu->SelectedItem)++;
@@ -189,9 +200,10 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
         
                 case ACTION_LEFT:
+                    set_delay(0, 50);
                     oMenu->eMenuState = STATE_WAIT_BACK;
-                    if(oItem->ItemType & (MASK_VALUE | MASK_BAR) & MASK_WRITE){
-                        if(*(oItem->Value - *(oItem->Interval)) > (*(oItem->MinVal))){
+                    if((oItem->ItemType == ITEMTYPE_VALUE_RW) || (oItem->ItemType == ITEMTYPE_BAR_RW) || (oItem->ItemType == ITEMTYPE_VALUE_BAR_RW)){
+                        if(*(oItem->Value) - *(oItem->Interval) > *(oItem->MinVal)){
                             *(oItem->Value) = *(oItem->Value) - *(oItem->Interval);
                             result = RESP_DONE;
                         }
@@ -200,7 +212,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                         }
                     }
                     else{
-                        if(oItem->ItemType & MASK_BOOL & MASK_WRITE){
+                        if(oItem->ItemType == ITEMTYPE_BOOLEAN_RW){
                             *(oItem->Value) = UNCHECKED;
                             result = RESP_DONE;
                         }
@@ -212,9 +224,10 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
                 
                 case ACTION_RIGHT:
+                    set_delay(0, 50);
                     oMenu->eMenuState = STATE_WAIT_BACK;
-                    if(oItem->ItemType & (MASK_VALUE | MASK_BAR) & MASK_WRITE){
-                        if(*(oItem->Value + *(oItem->Interval)) < (*(oItem->MaxVal))){
+                    if((oItem->ItemType == ITEMTYPE_VALUE_RW) || (oItem->ItemType == ITEMTYPE_BAR_RW) || (oItem->ItemType == ITEMTYPE_VALUE_BAR_RW)){
+                        if(*(oItem->Value) + *(oItem->Interval) < *(oItem->MaxVal)){
                             *(oItem->Value) = *(oItem->Value) + *(oItem->Interval);
                             result = RESP_DONE;
                         }
@@ -223,7 +236,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                         }
                     }
                     else{
-                        if(oItem->ItemType & MASK_BOOL & MASK_WRITE){
+                        if(oItem->ItemType == ITEMTYPE_BOOLEAN_RW){
                             *(oItem->Value) = CHECKED;
                             result = RESP_DONE;
                         }
@@ -238,7 +251,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
         break;
         
         case STATE_WAIT_BACK:
-            if(act == ACTION_NONE){
+            if((act == ACTION_NONE) || (get_delay(0))){
                 oMenu->eMenuState = STATE_IDLE;
                 result = RESP_NONE;
             }

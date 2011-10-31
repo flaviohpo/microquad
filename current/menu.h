@@ -18,6 +18,7 @@
 
 typedef enum{
     ACTION_NONE = 0,
+    ACTION_EMERGENCY,
     ACTION_UP,
     ACTION_DOWN,
     ACTION_LEFT,
@@ -42,7 +43,8 @@ typedef enum{
     RESP_DONE,
     RESP_SUBMENU_IN,
     RESP_SUBMENU_OUT,
-    RESP_BUSY
+    RESP_BUSY,
+    RESP_EMERGENCY
 }MENU_RESPONSE;
 
 typedef struct{
