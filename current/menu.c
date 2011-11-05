@@ -41,7 +41,8 @@ void menu_refresh(MENU* oMenu){
     
     int i = oMenu->FirstShowed;
     unsigned int valor;
-
+    int min, max, d, p;
+    
     Item* oItem;
     
     // varre todos os items visiveis
@@ -49,15 +50,14 @@ void menu_refresh(MENU* oMenu){
         oItem = list_items_get_item(oMenu->oListItems,i);
         // se possuir barra
         if((oItem->ItemType & MASK_READ) && (oItem->ItemType & MASK_BAR)){
-            // fazer            
-            /*
-            #define min 2150
-            #define max 3839
-            #define d (max-min)/100
-            n = x/d;
-            if(n >100) n = 100;
-                */
-            lcd_drawprogressbar(*(oMenu->BarsPositionH), 20+(8*(i-oMenu->FirstShowed)), *(oMenu->BarsLenght), 4, RED, BLACK, 50);
+            min = *(oItem->MinVal);
+            max = *(oItem->MaxVal);
+            d = (max-min)/100;
+            p = (*(oItem->Value)-*(oItem->MinVal))/d;
+            if(p > 100){
+                p = 100;
+            }
+            lcd_drawprogressbar(*(oMenu->BarsPositionH), 20+(8*(i-oMenu->FirstShowed)), *(oMenu->BarsLenght), 4, RED, BLACK, p);
         }
         else{ // se nao apaga o lugar da barra
             lcd_fillrect(*(oMenu->BarsPositionH),20+(8*(i-oMenu->FirstShowed)), *(oMenu->BarsLenght), 4, LCDBackColor);
@@ -176,7 +176,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
                 
                 case ACTION_UP:
-                    set_delay(0, 50);
+                    set_delay(DELAY_STICK_INDEX, STICK_DELAY);
                     oMenu->eMenuState = STATE_WAIT_BACK;
                     if(oMenu->SelectedItem > 0){
                         (oMenu->SelectedItem)--;
@@ -188,7 +188,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
                 
                 case ACTION_DOWN:
-                    set_delay(0, 50);
+                    set_delay(DELAY_STICK_INDEX, STICK_DELAY);
                     oMenu->eMenuState = STATE_WAIT_BACK;
                     if(oMenu->SelectedItem < oMenu->oListItems->Size - 1){
                         (oMenu->SelectedItem)++;
@@ -200,10 +200,10 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
         
                 case ACTION_LEFT:
-                    set_delay(0, 50);
+                    set_delay(DELAY_STICK_INDEX, 50);
                     oMenu->eMenuState = STATE_WAIT_BACK;
                     if((oItem->ItemType == ITEMTYPE_VALUE_RW) || (oItem->ItemType == ITEMTYPE_BAR_RW) || (oItem->ItemType == ITEMTYPE_VALUE_BAR_RW)){
-                        if(*(oItem->Value) - *(oItem->Interval) > *(oItem->MinVal)){
+                        if(*(oItem->Value) - *(oItem->Interval) >= *(oItem->MinVal)){
                             *(oItem->Value) = *(oItem->Value) - *(oItem->Interval);
                             result = RESP_DONE;
                         }
@@ -224,10 +224,10 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                 break;
                 
                 case ACTION_RIGHT:
-                    set_delay(0, 50);
+                    set_delay(DELAY_STICK_INDEX, 50);
                     oMenu->eMenuState = STATE_WAIT_BACK;
                     if((oItem->ItemType == ITEMTYPE_VALUE_RW) || (oItem->ItemType == ITEMTYPE_BAR_RW) || (oItem->ItemType == ITEMTYPE_VALUE_BAR_RW)){
-                        if(*(oItem->Value) + *(oItem->Interval) < *(oItem->MaxVal)){
+                        if(*(oItem->Value) + *(oItem->Interval) <= *(oItem->MaxVal)){
                             *(oItem->Value) = *(oItem->Value) + *(oItem->Interval);
                             result = RESP_DONE;
                         }
@@ -240,7 +240,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                             *(oItem->Value) = CHECKED;
                             result = RESP_DONE;
                         }
-                        else{ // submenu
+                        else{ // submenu ou readabble value
                             oMenu->eMenuState = STATE_WAIT_SUBMENU_IN;
                             result = RESP_BUSY;
                         }
@@ -251,7 +251,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
         break;
         
         case STATE_WAIT_BACK:
-            if((act == ACTION_NONE) || (get_delay(0))){
+            if((act == ACTION_NONE) || (get_delay(DELAY_STICK_INDEX))){
                 oMenu->eMenuState = STATE_IDLE;
                 result = RESP_NONE;
             }

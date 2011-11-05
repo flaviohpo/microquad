@@ -13,8 +13,9 @@
 
 #include "shorttypes.h"
 
-#define CHECKED     23
-#define UNCHECKED   22
+#define CHECKED                 23
+#define UNCHECKED               22
+#define STICK_DELAY             25
 
 typedef enum{
     ACTION_NONE = 0,

@@ -6,3 +6,12 @@ adicionar acelerometro e controle da camera
 fazer opções para inverter o gyro
 deixar somente 2 modos de voo
 opcao para inverter radio, gyro e accel mudando a cor do valor (talvez trocando fundo por fore)
+
+#define min 2150
+#define max 3839
+#define d (max-min)/100
+n = x/d;
+if(n >100) n = 100;
+
+n = result
+x = input

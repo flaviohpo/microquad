@@ -10,7 +10,10 @@
 // ****************************************************************
 //
 
-#define TIMEDELAY_LEN 10
+#define TIMEDELAY_LEN 15
+
+#define DELAY_STICK_INDEX       0
+#define DELAY_SECONDS_INDEX     1
 
 extern unsigned int TimeDelay[TIMEDELAY_LEN];
 

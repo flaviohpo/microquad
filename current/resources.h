@@ -10,8 +10,11 @@ const char* str_radiomenu     = "RADIO VIEW";
 const char* str_controlmenu   = "CONTROL CONFIG.";
 const char* str_motormenu     = "MOTOR CONTROL";
 const char* str_sensormenu    = "SENSOR VIEW";
-const char* str_optionmenu    = "PREFERENCES";
+const char* str_optionmenu    = "OPTIONS";
 const char* str_letsfly       = "FLY!";
+
+const char* str_rstdefault      = "RESET SET.";
+const char* str_grava           = "SAVE  SET.";
 
 const char* str_analogch0     = "ACH0";
 const char* str_analogch1     = "ACH1";
@@ -65,9 +68,17 @@ const char* str_motor5        = "ESC5";
 const char* str_motor6        = "ESC6";
 const char* str_calibrate     = "CALI";
 
-const char* str_yawp          = "YAWP";
-const char* str_pitchp        = "PITP";
-const char* str_rollp         = "ROLP";
+const char* str_yawrefdiv       = "YARD";
+const char* str_pitchrefdiv     = "PIRD";
+const char* str_rollrefdiv      = "RORD";
+
+const char* str_yawpm          = "YAPM";
+const char* str_pitchpm        = "PIPM";
+const char* str_rollpm         = "ROPM";
+
+const char* str_yawpd          = "YAPD";
+const char* str_pitchpd        = "PIPD";
+const char* str_rollpd         = "ROPD";
 
 const char* str_accelx        = "ACCX";
 const char* str_accely        = "ACCY";
@@ -102,3 +113,5 @@ const uchar val_bar_position_center   = 50;
 const uchar val_bar_position_right    = 70;
 const uchar val_value_position_right  = 15;
 const uchar val_value_position_center = 7;
+const int val_max_int                 = 35767;
+const uint val_max_uint               = 65534;

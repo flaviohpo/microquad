@@ -34,7 +34,7 @@
 unsigned char LCDLineCount = 0;
 unsigned char LCDCharCount = 0;
 unsigned char LCDBackColor = WHITE;
-unsigned char LCDForeColor = MARROON;
+unsigned char LCDForeColor = BLACK;
 
 const char asciitable[640] = {
                             0x00,0x00,0x00,0x00,0x00,    // NULL char...
@@ -502,10 +502,18 @@ void lcd_putchar(unsigned char c)
 }
 
 void lcd_drawprogressbar(int x, int y, int lx, int ly, unsigned char color, unsigned char colorprogress, int percent){
-    if(ly < 1 || lx < 1 || percent < 0 || percent > 100){
+    if(ly < 1 || lx < 1){
         return;
     }
     else{        
+        if(percent < 0){
+            percent = 0;
+        }
+        else{
+            if(percent > 100){
+                percent = 100;
+            }
+        }
         int lx_progress = (lx * percent) / 100;
         lcd_fillrect(x, y, lx_progress, ly, color);
         lcd_fillrect(x + lx_progress, y, lx - lx_progress, ly, colorprogress);

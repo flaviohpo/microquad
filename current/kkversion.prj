@@ -29,13 +29,11 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="710" placement="0:1:-1:-1:-8:-30:125:125:1125:421" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" linenum="26" placement="0:1:-1:-1:-8:-30:0:0:1004:300" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\resources.h" linenum="70" placement="0:1:-1:-1:-8:-30:25:25:1029:325" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" linenum="61" placement="2:3:-1:-1:-8:-30:50:50:1054:350" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.c" linenum="13" placement="0:1:-1:-1:-8:-30:75:75:1079:375" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.h" linenum="22" placement="0:1:-1:-1:-8:-30:100:100:1104:400" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.h" linenum="7" placement="0:1:-1:-1:-8:-30:125:125:1129:425" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.c" linenum="6" placement="0:1:-1:-1:-8:-30:0:0:1004:300" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="800" placement="2:3:-1:-1:-8:-30:75:75:1075:371" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" linenum="22" placement="0:1:-1:-1:-8:-30:50:50:1054:350" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\eeprom.h" linenum="25" placement="0:1:-1:-1:-8:-30:100:100:1104:400" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.h" linenum="16" placement="0:1:-1:-1:-8:-30:125:125:1129:425" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" linenum="243" placement="0:1:-1:-1:-8:-30:0:0:1004:300" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\resources.h" linenum="15" placement="0:1:-1:-1:-8:-30:25:25:1029:325" />
 </workspace>
 

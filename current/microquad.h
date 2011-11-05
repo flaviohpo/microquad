@@ -1,6 +1,25 @@
 #define constrain(val,min,max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
 
+//#define TEST_LOOP_PERIOD
+
 //#define ITG3200
+
+#define MIN_BATTERY           2360
+#define MAX_BATTERY           3300
+// battery colors
+#define BATTERY_YELLOW        2900
+#define BATTERY_RED           2700
+#define BATTERY_CHECK_DELAY   2000
+
+#define YAW_PROPORTIONAL_MUL    2
+#define PITCH_PROPORTIONAL_MUL  1
+#define ROLL_PROPORTIONAL_MUL   1
+#define YAW_PROPORTIONAL_DIV    2
+#define PITCH_PROPORTIONAL_DIV  2
+#define ROLL_PROPORTIONAL_DIV   2
+#define YAW_REF_DIV             0
+#define PITCH_REF_DIV           2
+#define ROLL_REF_DIV            2
 
 #define BATTERY_ACH             7 
 #define GYRO_YAW_ACH            3
@@ -46,6 +65,9 @@
 #define PITCH_INDEX             1
 #define ROLL_INDEX              2
 
+#define SAVE_INDEX              1
+#define RESET_INDEX             2
+
 #define ACCEL_X_INDEX           0
 #define ACCEL_Y_INDEX           1
 #define ACCEL_Z_INDEX           2
@@ -65,6 +87,9 @@ typedef enum{
     PROCESS_CONTROL             = LETSFLY_INDEX
 }PROGRAM_STEP;
 
+unsigned char save_params(void);
+unsigned char load_params(void);
+unsigned char reset_defaults(void);
 void menu_init(void);
 void setup(void);
 void timer_init(void);
@@ -78,3 +103,4 @@ void calibrate_radio(void);
 void ControlLoop(void);
 int main(void);
 ACTION get_radio_action(void);
+

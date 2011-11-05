@@ -31,11 +31,25 @@ int GyroOffset[3] = {0,0,0};
 volatile unsigned char ControlIFG = 0; // interrupt flag for control loop
 
 // variaveis do controle
-unsigned int ControlProportional[3] = {1,1,1};
 // for further implementation
-//unsigned int ControlIntegral[3] = {0,0,0};
-//unsigned int ControlDerivative[3] = {0,0,0};
+//unsigned int ControlIntegralMul[3] = {0,0,0};
+//unsigned int ControlIntegralDiv[3] = {0,0,0};
+//unsigned int ControlDerivativeMul[3] = {0,0,0};
+//unsigned int ControlDerivativeDiv[3] = {0,0,0};
+unsigned int ControlProportionalMul[3] = {YAW_PROPORTIONAL_MUL, PITCH_PROPORTIONAL_MUL, ROLL_PROPORTIONAL_MUL};
+unsigned int ControlProportionalDiv[3] = {YAW_PROPORTIONAL_DIV, PITCH_PROPORTIONAL_DIV, ROLL_PROPORTIONAL_DIV};
+unsigned int ControlReferenceDiv[3] = {YAW_REF_DIV, PITCH_REF_DIV, ROLL_REF_DIV};
+//unsigned int ControlResult[3] = {0,0,0};
+//int ControlReference[3] = {0,0,0};
+
 int MotorOutput[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
+
+// general purpose
+unsigned int FlightTime = 0; // guarda ate 9h de voo
+
+// frase de entrada?
+// imagem de entrada?
+// sinais luminosos?
 
 MENU* MainMenu;
 MENU* AnalogMenu;
@@ -43,6 +57,7 @@ MENU* MotorMenu;
 MENU* ControlMenu;
 MENU* RadioMenu;
 MENU* SensorMenu;
+MENU* OptionMenu;
 
 PROGRAM_STEP ProgStep;
 
@@ -50,7 +65,8 @@ int main(void){
     WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
         
     unsigned char MenuDraw = 0;
-    
+    unsigned int BatteryColor = LIME;
+
     ACTION act = ACTION_NONE;
     MENU_RESPONSE resp = RESP_NONE;
     ProgStep = PROCESS_MAIN_MENU;
@@ -66,9 +82,30 @@ int main(void){
     }
     
     while(1){
+        
+        analog_refresh_all();
+        
         switch(ProgStep){
             case PROCESS_MAIN_MENU:
                 menu_draw(MainMenu, MenuDraw);
+                if(get_delay(1)){
+                    if(AnalogValue[BATTERY_ACH] < BATTERY_RED){
+                        BatteryColor = RED;
+                    }      
+                    if(BatteryColor != RED){
+                        if(AnalogValue[BATTERY_ACH] < BATTERY_YELLOW){
+                            BatteryColor = YELLOW;
+                        }
+                    }
+                    //draw batterybar
+                    lcd_drawprogressbar(108, 2, 20, 4, BatteryColor, BLACK, ((AnalogValue[BATTERY_ACH]-MIN_BATTERY)/((MAX_BATTERY-MIN_BATTERY)/100)));                                
+                    set_delay(1, BATTERY_CHECK_DELAY);
+                    
+                    //print flighttime
+                    lcd_goto(11,0);
+                    printf("%ds", FlightTime);
+                }
+
                 MenuDraw = 0;                
                 act = get_radio_action();
                 resp = menu_process(MainMenu, act);
@@ -77,7 +114,6 @@ int main(void){
                         ProgStep = (PROGRAM_STEP)(MainMenu->SelectedItem);
                         MenuDraw = 1;
                     break;
-                    
                     case RESP_EMERGENCY:
                     case RESP_SUBMENU_OUT:
                     case RESP_NONE:          
@@ -94,7 +130,6 @@ int main(void){
             break;
                        
             case PROCESS_ANALOG_MENU:
-                analog_refresh_all();
                 menu_draw(AnalogMenu, MenuDraw);
                 MenuDraw = 0;
                 menu_refresh(AnalogMenu);
@@ -272,6 +307,41 @@ int main(void){
             break;
             
             case PROCESS_OPTION_MENU:
+                menu_draw(OptionMenu, MenuDraw);
+                MenuDraw = 0;
+                act = get_radio_action();
+                resp = menu_process(OptionMenu, act);
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        ProgStep = PROCESS_MAIN_MENU;
+                        MenuDraw = 1;
+                    break;
+                    case RESP_SUBMENU_IN:
+                        switch(OptionMenu->SelectedItem){
+                            case SAVE_INDEX:
+                                if(save_params()){
+                                    // error processing 
+                                }
+                            break;
+                            
+                            case RESET_INDEX:
+                                reset_defaults();
+                            break;
+                        }
+                        
+                    break;
+                    case RESP_EMERGENCY:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
+                }
             break;
             
             case PROCESS_CONTROL:
@@ -280,6 +350,12 @@ int main(void){
                     delayus(1000);
                 }
                 else{
+                    /*
+                        tempo loop = 2960 - 2793 = 167
+                        timerA counter = 4001 = 2ms
+                        1 count = 0.5us
+                        loop = 0.5 * 167us = 82.5us = 12kHz
+                    */
                     ControlLoop();
                 }
 
@@ -287,6 +363,7 @@ int main(void){
                     ControlIFG = 0;
                     // faz um loop do controle
                 }
+                    
                 act = get_radio_action();
                 resp = menu_process(ControlMenu, act);
                 switch(resp){
@@ -508,10 +585,6 @@ void setup(void){
         set_all_motors(MIN_MOTOR);
     }
     
-    menu_init();
-    
-    lcd_init(LCDBackColor);
-
     analog_init(); // config registradores        
     analog_calibrate_channel(0);
     analog_calibrate_channel(1);
@@ -523,11 +596,19 @@ void setup(void){
     analog_calibrate_channel(7);
         
     calibrate_radio();
+        /*
+    if(load_params()){
         
+    }
+        */
+    menu_init();
+    
+    lcd_init(LCDBackColor);
+    
 }
 
 void menu_init(void){
-    MainMenu = menu_create(str_mainmenu, create_item(str_analogmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, NULL, NULL, &val_arrow_center, NULL);
+    MainMenu = menu_create(str_mainmenu, create_item(str_analogmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, NULL, NULL, &val_arrow_center, NULL);
     menu_add_item(MainMenu, create_item(str_radiomenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_motormenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_controlmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
@@ -535,16 +616,16 @@ void menu_init(void){
     menu_add_item(MainMenu, create_item(str_optionmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     menu_add_item(MainMenu, create_item(str_letsfly, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     // analog menu
-    AnalogMenu = menu_create(str_analogmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    AnalogMenu = menu_create(str_analogmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(AnalogMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
-    menu_add_item(AnalogMenu, create_item(str_analogch0, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[0]));
-    menu_add_item(AnalogMenu, create_item(str_analogch1, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[1]));
-    menu_add_item(AnalogMenu, create_item(str_analogch2, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[2]));
-    menu_add_item(AnalogMenu, create_item(str_analogch3, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[3]));
-    menu_add_item(AnalogMenu, create_item(str_analogch4, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[4]));
-    menu_add_item(AnalogMenu, create_item(str_analogch5, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[5]));    
-    menu_add_item(AnalogMenu, create_item(str_analogch6, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[6]));    
-    menu_add_item(AnalogMenu, create_item(str_analogch7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[7]));    
+    menu_add_item(AnalogMenu, create_item(str_analogch0, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[0]));
+    menu_add_item(AnalogMenu, create_item(str_analogch1, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[1]));
+    menu_add_item(AnalogMenu, create_item(str_analogch2, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[2]));
+    menu_add_item(AnalogMenu, create_item(str_analogch3, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[3]));
+    menu_add_item(AnalogMenu, create_item(str_analogch4, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[4]));
+    menu_add_item(AnalogMenu, create_item(str_analogch5, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[5]));    
+    menu_add_item(AnalogMenu, create_item(str_analogch6, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[6]));    
+    menu_add_item(AnalogMenu, create_item(str_analogch7, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[7]));    
     
     menu_add_item(AnalogMenu, create_item(str_analogof0, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[0]));
     menu_add_item(AnalogMenu, create_item(str_analogof1, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[1]));
@@ -555,22 +636,30 @@ void menu_init(void){
     menu_add_item(AnalogMenu, create_item(str_analogof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[6]));    
     menu_add_item(AnalogMenu, create_item(str_analogof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[7]));    
     // control menu
-    ControlMenu = menu_create(str_controlmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
-    menu_add_item(ControlMenu, create_item(str_yawp, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportional[YAW_INDEX]));
-    menu_add_item(ControlMenu, create_item(str_pitchp, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportional[PITCH_INDEX]));
-    menu_add_item(ControlMenu, create_item(str_rollp, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportional[ROLL_INDEX]));        
+    ControlMenu = menu_create(str_controlmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(ControlMenu, create_item(str_yawpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[YAW_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_pitchpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[PITCH_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_rollpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[ROLL_INDEX]));        
+    menu_add_item(ControlMenu, create_item(str_yawpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[YAW_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_pitchpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[PITCH_INDEX]));
+    menu_add_item(ControlMenu, create_item(str_rollpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[ROLL_INDEX]));        
+    
+    menu_add_item(ControlMenu, create_item(str_yawrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[YAW_INDEX]));        
+    menu_add_item(ControlMenu, create_item(str_pitchrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[PITCH_INDEX]));        
+    menu_add_item(ControlMenu, create_item(str_rollrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[ROLL_INDEX]));        
+    
     // radio menu
     RadioMenu = menu_create(str_radiomenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(RadioMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
         
-    menu_add_item(RadioMenu, create_item(str_radioch0, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[0]));
-    menu_add_item(RadioMenu, create_item(str_radioch1, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[1]));
-    menu_add_item(RadioMenu, create_item(str_radioch2, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[2]));
-    menu_add_item(RadioMenu, create_item(str_radioch3, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[3]));
-    menu_add_item(RadioMenu, create_item(str_radioch4, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[4]));
-    menu_add_item(RadioMenu, create_item(str_radioch5, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[5]));    
-    menu_add_item(RadioMenu, create_item(str_radioch6, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[6]));    
-    menu_add_item(RadioMenu, create_item(str_radioch7, ITEMTYPE_VALUE_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[7]));
+    menu_add_item(RadioMenu, create_item(str_radioch0, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[0]));
+    menu_add_item(RadioMenu, create_item(str_radioch1, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[1]));
+    menu_add_item(RadioMenu, create_item(str_radioch2, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[2]));
+    menu_add_item(RadioMenu, create_item(str_radioch3, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[3]));
+    menu_add_item(RadioMenu, create_item(str_radioch4, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[4]));
+    menu_add_item(RadioMenu, create_item(str_radioch5, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[5]));    
+    menu_add_item(RadioMenu, create_item(str_radioch6, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[6]));    
+    menu_add_item(RadioMenu, create_item(str_radioch7, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[7]));
     
     menu_add_item(RadioMenu, create_item(str_radioof0, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[0]));
     menu_add_item(RadioMenu, create_item(str_radioof1, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[1]));
@@ -580,26 +669,28 @@ void menu_init(void){
     menu_add_item(RadioMenu, create_item(str_radioof5, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[5]));    
     menu_add_item(RadioMenu, create_item(str_radioof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[6]));    
     menu_add_item(RadioMenu, create_item(str_radioof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[7]));
-    
-    // motor menu
-    
-    MotorMenu = menu_create(str_motormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
-    menu_add_item(MotorMenu, create_item(str_motor1, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[0]));
-    menu_add_item(MotorMenu, create_item(str_motor2, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[1]));
-    menu_add_item(MotorMenu, create_item(str_motor3, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[2]));
-    menu_add_item(MotorMenu, create_item(str_motor4, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[3]));
-    menu_add_item(MotorMenu, create_item(str_motor5, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[4]));
-    menu_add_item(MotorMenu, create_item(str_motor6, ITEMTYPE_VALUE_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[5]));    
+    // motor menu    
+    MotorMenu = menu_create(str_motormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(MotorMenu, create_item(str_motor1, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[0]));
+    menu_add_item(MotorMenu, create_item(str_motor2, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[1]));
+    menu_add_item(MotorMenu, create_item(str_motor3, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[2]));
+    menu_add_item(MotorMenu, create_item(str_motor4, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[3]));
+    menu_add_item(MotorMenu, create_item(str_motor5, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[4]));
+    menu_add_item(MotorMenu, create_item(str_motor6, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[5]));    
     menu_add_item(MotorMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     // sensor menu
-    SensorMenu = menu_create(str_sensormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
-    menu_add_item(SensorMenu, create_item(str_accelx, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_X_INDEX]));
-    menu_add_item(SensorMenu, create_item(str_accely, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Y_INDEX]));
-    menu_add_item(SensorMenu, create_item(str_accelz, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Z_INDEX]));
-    menu_add_item(SensorMenu, create_item(str_gyrox, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_X_INDEX]));
-    menu_add_item(SensorMenu, create_item(str_gyroy, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Y_INDEX]));
-    menu_add_item(SensorMenu, create_item(str_gyroz, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Z_INDEX]));    
+    SensorMenu = menu_create(str_sensormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(SensorMenu, create_item(str_accelx, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_X_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_accely, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Y_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_accelz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Z_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_gyrox, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_X_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_gyroy, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Y_INDEX]));
+    menu_add_item(SensorMenu, create_item(str_gyroz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Z_INDEX]));    
     menu_add_item(SensorMenu, create_item(str_graph, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
+    // option menu
+    OptionMenu = menu_create(str_optionmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(OptionMenu, create_item(str_grava, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
+    menu_add_item(OptionMenu, create_item(str_rstdefault, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
 }
 
 ACTION get_radio_action(void){
@@ -636,19 +727,19 @@ void set_all_motors(unsigned int val){
 
 void screen_flash(int Color, int interval, int times){
     // iluminacao progressiva do LCD
-    TACCR1 = 0;
-    lcd_clear(Color);
     while(times--){    
-        while(TACCR1 < LCD_MAX_BRIGHT){
-            TACCR1 = TACCR1 + 1;
-            delayus(interval);
-        }
         while(TACCR1 > 0){
             TACCR1 = TACCR1 - 1;
             delayus(interval);
         }
+        if(Color != 256){
+            lcd_clear(Color);
+        }
+        while(TACCR1 < LCD_MAX_BRIGHT){
+            TACCR1 = TACCR1 + 1;
+            delayus(interval);
+        }
     }
-    lcd_clear(LCDBackColor);
     while(TACCR1 < LCD_MAX_BRIGHT){
         TACCR1 = TACCR1 + 1;
         delayus(interval);
@@ -678,40 +769,221 @@ void calibrate_radio(void){
     }while(i);
 }
 
+#ifdef TEST_LOOP_PERIOD
+unsigned int tempoloop = 0;
+unsigned int tempoloop2 = 0;
+#endif // TEST_LOOP_PERIOD
+
 void ControlLoop(void){
-    analog_refresh_all();
-    
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
-           
+  
+        // maximo de 9h de voo podem ser registradas antes de dar overflow
+        if(get_delay(DELAY_SECONDS_INDEX)){
+            set_delay(DELAY_SECONDS_INDEX, 500);
+            FlightTime++;
+        }
+
+        // testa o tempo do loop        
+        #ifdef TEST_LOOP_PERIOD
+        if(tempoloop == 0){
+            set_delay(14,10);
+            tempoloop = TAR;
+        }
+        else{
+            tempoloop2 = TAR;
+            lcd_clear(WHITE);
+            lcd_goto(5,5);
+            printf("%d\n%d\n%d", tempoloop, tempoloop2, TimeDelay[14]);
+            while(1);
+        }
+        #endif // TEST_LOOP_PERIOD
+        // aqui acontece uma coisa muito estranha, quando eu coloco o ControlReferenceDiv[ROLL_INDEX] da merda!        
+        // pro pitch tbm aconteceu no meio do prof ele perdeu a ref do controle
         MotorOutput[MOTOR_RIGHT] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> 2;
-        MotorOutput[MOTOR_RIGHT] += (AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]);
+        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> 2; 
+        MotorOutput[MOTOR_RIGHT] += ((AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]) * 5) >> 2;
         
         MotorOutput[MOTOR_LEFT] = PPMValue[RADIO_THROTTLE_CH];
         MotorOutput[MOTOR_LEFT] += (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> 2;
-        MotorOutput[MOTOR_LEFT] -= (AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]);
+        MotorOutput[MOTOR_LEFT] -= ((AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]) * 5) >> 2;
             
         MotorOutput[MOTOR_FRONT] = PPMValue[RADIO_THROTTLE_CH];
         MotorOutput[MOTOR_FRONT] += (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> 2;
-        MotorOutput[MOTOR_FRONT] += (AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]);
+        MotorOutput[MOTOR_FRONT] += ((AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]) * 5) >> 2;
         
         MotorOutput[MOTOR_BACK] = PPMValue[RADIO_THROTTLE_CH];
         MotorOutput[MOTOR_BACK] -= (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> 2;
-        MotorOutput[MOTOR_BACK] -= (AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]);
+        MotorOutput[MOTOR_BACK] -= ((AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]) * 5) >> 2;
                 
-        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
-        MotorOutput[MOTOR_LEFT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
-        MotorOutput[MOTOR_RIGHT] += (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
-        MotorOutput[MOTOR_LEFT] += (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
+        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_LEFT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_RIGHT] -= (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) * 2;
+        MotorOutput[MOTOR_LEFT] -= (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) * 2;
 
-        MotorOutput[MOTOR_FRONT] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
-        MotorOutput[MOTOR_BACK] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> 2;
-        MotorOutput[MOTOR_FRONT] -= (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
-        MotorOutput[MOTOR_BACK] -= (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) >> 1;
+        MotorOutput[MOTOR_FRONT] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_BACK] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_FRONT] += (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) * 2;
+        MotorOutput[MOTOR_BACK] += (AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) * 2;
 
         set_motor_output();
     }
     else{
         set_all_motors(MIN_MOTOR);
     }
+}
+/*
+void ControlLoop(void){
+    if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
+        // controle proporcional
+        ControlResult[YAW_INDEX] = ((AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) * ControlProportionalMul[YAW_INDEX]) >> ControlProportionalDiv[YAW_INDEX];
+        ControlResult[ROLL_INDEX] = ((AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]) * ControlProportionalMul[ROLL_INDEX]) >> ControlProportionalDiv[ROLL_INDEX];
+        ControlResult[PITCH_INDEX] = ((AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]) * ControlProportionalMul[PITCH_INDEX]) >> ControlProportionalDiv[PITCH_INDEX];
+        // referencia           
+        ControlReference[YAW_INDEX] = (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> ControlReferenceDiv[YAW_INDEX];
+        ControlReference[PITCH_INDEX] = (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> ControlReferenceDiv[PITCH_INDEX];
+        ControlReference[ROLL_INDEX] = (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> ControlReferenceDiv[ROLL_INDEX];
+        // mixing
+        MotorOutput[MOTOR_RIGHT] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_RIGHT] -= ControlReference[ROLL_INDEX];
+        MotorOutput[MOTOR_RIGHT] += ControlResult[ROLL_INDEX];
+        
+        MotorOutput[MOTOR_LEFT] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_LEFT] += ControlReference[ROLL_INDEX];
+        MotorOutput[MOTOR_LEFT] -= ControlResult[ROLL_INDEX];
+            
+        MotorOutput[MOTOR_FRONT] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_FRONT] += ControlReference[PITCH_INDEX];
+        MotorOutput[MOTOR_FRONT] += ControlResult[PITCH_INDEX];
+        
+        MotorOutput[MOTOR_BACK] = PPMValue[RADIO_THROTTLE_CH];
+        MotorOutput[MOTOR_BACK] -= ControlReference[PITCH_INDEX];
+        MotorOutput[MOTOR_BACK] -= ControlResult[PITCH_INDEX];
+                
+        MotorOutput[MOTOR_RIGHT] -= ControlReference[YAW_INDEX];
+        MotorOutput[MOTOR_LEFT] -= ControlReference[YAW_INDEX];
+        MotorOutput[MOTOR_RIGHT] -= ControlResult[YAW_INDEX];
+        MotorOutput[MOTOR_LEFT] -= ControlResult[YAW_INDEX];
+
+        MotorOutput[MOTOR_FRONT] += ControlReference[YAW_INDEX];
+        MotorOutput[MOTOR_BACK] += ControlReference[YAW_INDEX];
+        MotorOutput[MOTOR_FRONT] += ControlResult[YAW_INDEX];
+        MotorOutput[MOTOR_BACK] += ControlResult[YAW_INDEX];
+
+        set_motor_output();
+    }
+    else{
+        set_all_motors(MIN_MOTOR);
+    }
+}
+*/
+// result 1 = fail
+// result 0 = success
+unsigned char save_params(void){
+    unsigned char result = 0;
+    twobytes VarAux;
+    
+    i2c_config(EEPROM_I2C_ADDR);
+    result = i2c_find_device(EEPROM_I2C_ADDR);
+    if(!result){
+        
+        VarAux.i = 0xAA;
+        result |= i2c_write_one_buffer(ADDR_VALIDATION, VarAux.uc, 2);
+        delayms(100);
+        
+        VarAux.ui = FlightTime;
+        result |= i2c_write_one_buffer(ADDR_FLIGHT_TIME, VarAux.uc, 2);
+        delayms(100);
+        
+        VarAux.i = ControlProportionalMul[PITCH_INDEX];
+        result |= i2c_write_one_buffer(ADDR_P_PITCH_MUL, VarAux.uc, 2);
+        delayms(100);
+        
+        VarAux.i = ControlProportionalMul[ROLL_INDEX];
+        result |= i2c_write_one_buffer(ADDR_P_ROLL_MUL, VarAux.uc, 2);
+        delayms(100);
+        
+        VarAux.i = ControlProportionalMul[YAW_INDEX];
+        result |= i2c_write_one_buffer(ADDR_P_YAW_MUL, VarAux.uc, 2);
+        delayms(100);
+
+        VarAux.i = ControlProportionalDiv[PITCH_INDEX];
+        result |= i2c_write_one_buffer(ADDR_P_PITCH_DIV, VarAux.uc, 2);
+        delayms(100);
+
+        VarAux.i = ControlProportionalDiv[ROLL_INDEX];
+        result |= i2c_write_one_buffer(ADDR_P_ROLL_DIV, VarAux.uc, 2);
+        delayms(100);
+
+        VarAux.i = ControlProportionalDiv[YAW_INDEX];
+        result |= i2c_write_one_buffer(ADDR_P_YAW_DIV, VarAux.uc, 2);
+        delayms(100);
+        
+        screen_flash(256, 200, 2);
+    }
+    
+    return result;
+}
+
+unsigned char load_params(void){
+    unsigned char result = 0;
+    twobytes VarAux;
+    
+    i2c_config(EEPROM_I2C_ADDR);
+    result = i2c_find_device(EEPROM_I2C_ADDR);
+    if(!result){
+        i2c_wread_one_buffer(ADDR_VALIDATION, VarAux.uc, 2);
+        if(VarAux.i == 0xAA){
+            delayms(50);
+            result |= i2c_wread_one_buffer(ADDR_FLIGHT_TIME, VarAux.uc, 2);
+            FlightTime = VarAux.i;
+            
+            delayms(50);
+            result |= i2c_wread_one_buffer(ADDR_P_PITCH_MUL, VarAux.uc, 2);
+            ControlProportionalMul[PITCH_INDEX] = VarAux.i;
+            
+            delayms(50);
+            result |= i2c_wread_one_buffer(ADDR_P_ROLL_MUL, VarAux.uc, 2);
+            ControlProportionalMul[ROLL_INDEX] = VarAux.i;
+                        
+            delayms(50);
+            result |= i2c_wread_one_buffer(ADDR_P_YAW_MUL, VarAux.uc, 2);
+            ControlProportionalMul[YAW_INDEX] = VarAux.i;
+            
+            delayms(50);
+            result |= i2c_wread_one_buffer(ADDR_P_PITCH_DIV, VarAux.uc, 2);
+            ControlProportionalDiv[PITCH_INDEX] = VarAux.i;
+            
+            delayms(50);
+            result |= i2c_wread_one_buffer(ADDR_P_ROLL_DIV, VarAux.uc, 2);
+            ControlProportionalDiv[ROLL_INDEX] = VarAux.i;
+            
+            delayms(50);
+            result |= i2c_wread_one_buffer(ADDR_P_YAW_DIV, VarAux.uc, 2);
+            ControlProportionalDiv[YAW_INDEX] = VarAux.i;
+            
+            screen_flash(256, 200, 5);
+        }    
+        else{
+            result |= reset_defaults();
+        }    
+    }
+    
+    return result;
+    
+}
+    
+unsigned char reset_defaults(void){
+    FlightTime = 0;
+    ControlProportionalMul[YAW_INDEX] = YAW_PROPORTIONAL_MUL;
+    ControlProportionalMul[PITCH_INDEX] = PITCH_PROPORTIONAL_MUL;
+    ControlProportionalMul[ROLL_INDEX] = ROLL_PROPORTIONAL_MUL;    
+    ControlProportionalDiv[YAW_INDEX] = YAW_PROPORTIONAL_DIV;
+    ControlProportionalDiv[PITCH_INDEX] = PITCH_PROPORTIONAL_DIV;
+    ControlProportionalDiv[ROLL_INDEX] = ROLL_PROPORTIONAL_DIV;
+    ControlReferenceDiv[YAW_INDEX] = YAW_REF_DIV;
+    ControlReferenceDiv[PITCH_INDEX] = PITCH_REF_DIV;
+    ControlReferenceDiv[ROLL_INDEX] = ROLL_REF_DIV;
+    
+    return (save_params());
+    
 }
