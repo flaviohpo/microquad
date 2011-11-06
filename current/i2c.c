@@ -10,7 +10,7 @@ void i2c_config(unsigned char slave_add)
   UCB0CTL0 = 0x0f;
 
   // Ajustando velocidade...  
-  UCB0BR0 = 40;
+  UCB0BR0 = 0xFF;
   UCB0BR1 = 0x00;
 
   P3SEL |= 0x02 | 0x04; // confi pins

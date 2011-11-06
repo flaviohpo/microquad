@@ -42,7 +42,7 @@ unsigned int ControlReferenceDiv[3] = {YAW_REF_DIV, PITCH_REF_DIV, ROLL_REF_DIV}
 //unsigned int ControlResult[3] = {0,0,0};
 //int ControlReference[3] = {0,0,0};
 
-int MotorOutput[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
+unsigned int MotorOutput[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
 
 // general purpose
 unsigned int FlightTime = 0; // guarda ate 9h de voo
@@ -350,18 +350,11 @@ int main(void){
                     delayus(1000);
                 }
                 else{
-                    /*
-                        tempo loop = 2960 - 2793 = 167
-                        timerA counter = 4001 = 2ms
-                        1 count = 0.5us
-                        loop = 0.5 * 167us = 82.5us = 12kHz
-                    */
-                    ControlLoop();
-                }
-
-                if(ControlIFG == 1){ // essa variavel eh setada de 2.5 em 2.5ms da um loop de  400hz
-                    ControlIFG = 0;
-                    // faz um loop do controle
+                    if(ControlIFG == 1){ // essa variavel eh setada de 2.5 em 2.5ms da um loop de  400hz
+                        ControlIFG = 0;
+                        // faz um loop do controle
+                        ControlLoop();
+                    }                                      
                 }
                     
                 act = get_radio_action();
@@ -490,7 +483,7 @@ void timer_init(void){
      * ID_3 -- Divider - /8
      * MC_1 -- Up Mode
      */
-    TBCTL = TBCLGRP_0 + CNTL_0 + TBSSEL_1 + ID_3 + MC_1;
+    TBCTL = TBCLGRP_0 + CNTL_0 + TBSSEL_1 + ID_3 + MC_1 + TBIE;
     
     /* configura saidas do timerB - P4.1 a P4.6*/
     P4SEL = 0x7E;
@@ -596,11 +589,11 @@ void setup(void){
     analog_calibrate_channel(7);
         
     calibrate_radio();
-        /*
+        
     if(load_params()){
         
     }
-        */
+        
     menu_init();
     
     lcd_init(LCDBackColor);
@@ -663,7 +656,7 @@ void menu_init(void){
     
     menu_add_item(RadioMenu, create_item(str_radioof0, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[0]));
     menu_add_item(RadioMenu, create_item(str_radioof1, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[1]));
-    menu_add_item(RadioMenu, create_item(str_radioof2, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[2]));
+     menu_add_item(RadioMenu, create_item(str_radioof2, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[2]));
     menu_add_item(RadioMenu, create_item(str_radioof3, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[3]));
     menu_add_item(RadioMenu, create_item(str_radioof4, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[4]));
     menu_add_item(RadioMenu, create_item(str_radioof5, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[5]));    
@@ -799,20 +792,20 @@ void ControlLoop(void){
         #endif // TEST_LOOP_PERIOD
         // aqui acontece uma coisa muito estranha, quando eu coloco o ControlReferenceDiv[ROLL_INDEX] da merda!        
         // pro pitch tbm aconteceu no meio do prof ele perdeu a ref do controle
-        MotorOutput[MOTOR_RIGHT] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> 2; 
+        MotorOutput[MOTOR_RIGHT] = (PPMValue[RADIO_THROTTLE_CH] >> 1) << 1;
+        MotorOutput[MOTOR_RIGHT] -= ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * 5) >> 4; 
         MotorOutput[MOTOR_RIGHT] += ((AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]) * 5) >> 2;
         
-        MotorOutput[MOTOR_LEFT] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_LEFT] += (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> 2;
+        MotorOutput[MOTOR_LEFT] = (PPMValue[RADIO_THROTTLE_CH] >> 1) << 1;
+        MotorOutput[MOTOR_LEFT] += ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * 5) >> 4;
         MotorOutput[MOTOR_LEFT] -= ((AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]) * 5) >> 2;
             
-        MotorOutput[MOTOR_FRONT] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_FRONT] += (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> 2;
+        MotorOutput[MOTOR_FRONT] = (PPMValue[RADIO_THROTTLE_CH] >> 1) << 1;
+        MotorOutput[MOTOR_FRONT] += ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * 5) >> 4;
         MotorOutput[MOTOR_FRONT] += ((AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]) * 5) >> 2;
         
-        MotorOutput[MOTOR_BACK] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_BACK] -= (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> 2;
+        MotorOutput[MOTOR_BACK] = (PPMValue[RADIO_THROTTLE_CH] >> 1) << 1;
+        MotorOutput[MOTOR_BACK] -= ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * 5) >> 4;
         MotorOutput[MOTOR_BACK] -= ((AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]) * 5) >> 2;
                 
         MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
@@ -831,51 +824,7 @@ void ControlLoop(void){
         set_all_motors(MIN_MOTOR);
     }
 }
-/*
-void ControlLoop(void){
-    if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
-        // controle proporcional
-        ControlResult[YAW_INDEX] = ((AnalogValue[GYRO_YAW_ACH] - AnalogOffset[GYRO_YAW_ACH]) * ControlProportionalMul[YAW_INDEX]) >> ControlProportionalDiv[YAW_INDEX];
-        ControlResult[ROLL_INDEX] = ((AnalogValue[GYRO_ROLL_ACH] - AnalogOffset[GYRO_ROLL_ACH]) * ControlProportionalMul[ROLL_INDEX]) >> ControlProportionalDiv[ROLL_INDEX];
-        ControlResult[PITCH_INDEX] = ((AnalogValue[GYRO_PITCH_ACH] - AnalogOffset[GYRO_PITCH_ACH]) * ControlProportionalMul[PITCH_INDEX]) >> ControlProportionalDiv[PITCH_INDEX];
-        // referencia           
-        ControlReference[YAW_INDEX] = (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) >> ControlReferenceDiv[YAW_INDEX];
-        ControlReference[PITCH_INDEX] = (PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) >> ControlReferenceDiv[PITCH_INDEX];
-        ControlReference[ROLL_INDEX] = (PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) >> ControlReferenceDiv[ROLL_INDEX];
-        // mixing
-        MotorOutput[MOTOR_RIGHT] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_RIGHT] -= ControlReference[ROLL_INDEX];
-        MotorOutput[MOTOR_RIGHT] += ControlResult[ROLL_INDEX];
-        
-        MotorOutput[MOTOR_LEFT] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_LEFT] += ControlReference[ROLL_INDEX];
-        MotorOutput[MOTOR_LEFT] -= ControlResult[ROLL_INDEX];
-            
-        MotorOutput[MOTOR_FRONT] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_FRONT] += ControlReference[PITCH_INDEX];
-        MotorOutput[MOTOR_FRONT] += ControlResult[PITCH_INDEX];
-        
-        MotorOutput[MOTOR_BACK] = PPMValue[RADIO_THROTTLE_CH];
-        MotorOutput[MOTOR_BACK] -= ControlReference[PITCH_INDEX];
-        MotorOutput[MOTOR_BACK] -= ControlResult[PITCH_INDEX];
-                
-        MotorOutput[MOTOR_RIGHT] -= ControlReference[YAW_INDEX];
-        MotorOutput[MOTOR_LEFT] -= ControlReference[YAW_INDEX];
-        MotorOutput[MOTOR_RIGHT] -= ControlResult[YAW_INDEX];
-        MotorOutput[MOTOR_LEFT] -= ControlResult[YAW_INDEX];
 
-        MotorOutput[MOTOR_FRONT] += ControlReference[YAW_INDEX];
-        MotorOutput[MOTOR_BACK] += ControlReference[YAW_INDEX];
-        MotorOutput[MOTOR_FRONT] += ControlResult[YAW_INDEX];
-        MotorOutput[MOTOR_BACK] += ControlResult[YAW_INDEX];
-
-        set_motor_output();
-    }
-    else{
-        set_all_motors(MIN_MOTOR);
-    }
-}
-*/
 // result 1 = fail
 // result 0 = success
 unsigned char save_params(void){
