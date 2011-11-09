@@ -12,7 +12,7 @@
 #include "msp430f2618.h"
 #include "delay.h"
 
-unsigned int TimeDelay[TIMEDELAY_LEN];
+unsigned volatile int TimeDelay[TIMEDELAY_LEN];
 
 void delay2us(void)
 {

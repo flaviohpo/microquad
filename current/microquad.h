@@ -4,11 +4,18 @@
 
 //#define ITG3200
 
-#define MIN_BATTERY           2360
+#define BUZZER                0x10
+#define BUZZER_ON()          (P2OUT |= BUZZER)
+#define BUZZER_OFF()         (P2OUT &= ~BUZZER)
+#define BUZZER_TOOGLE()      (P2OUT ^= BUZZER)
+#define ENABLE_BUZZER()      (P2DIR |= BUZZER)
+#define DISABLE_BUZZER()     (P2DIR &=~ BUZZER)
+
+#define MIN_BATTERY           2650
 #define MAX_BATTERY           3300
 // battery colors
-#define BATTERY_YELLOW        2900
-#define BATTERY_RED           2700
+#define BATTERY_YELLOW        3050
+#define BATTERY_RED           2850
 #define BATTERY_CHECK_DELAY   2000
 
 #define YAW_PROPORTIONAL_MUL    2
@@ -22,7 +29,7 @@
 #define ROLL_REF_DIV            2
 
 #define BATTERY_ACH             7 
-#define GYRO_YAW_ACH            3
+#define GYRO_YAW_ACH            2
 #define GYRO_PITCH_ACH          1
 #define GYRO_ROLL_ACH           0
 #define ACCELX_ACH              5
@@ -72,9 +79,9 @@
 #define ACCEL_Y_INDEX           1
 #define ACCEL_Z_INDEX           2
 
-#define GYRO_X_INDEX            0
+#define GYRO_X_INDEX            2
 #define GYRO_Y_INDEX            1
-#define GYRO_Z_INDEX            2
+#define GYRO_Z_INDEX            0
 
 typedef enum{
     PROCESS_MAIN_MENU           = 0xFF,
@@ -90,6 +97,7 @@ typedef enum{
 unsigned char save_params(void);
 unsigned char load_params(void);
 unsigned char reset_defaults(void);
+void adjust_readings(void);
 void menu_init(void);
 void setup(void);
 void timer_init(void);
@@ -100,7 +108,7 @@ void set_motor_output(void);
 void set_all_motors(unsigned int val);
 void screen_flash(int Color, int interval, int times);
 void calibrate_radio(void);
-void ControlLoop(void);
+void control_loop(void);
 int main(void);
 ACTION get_radio_action(void);
 

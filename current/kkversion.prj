@@ -1,5 +1,5 @@
 <project version="Crimson Editor 3.60">
-	<category name="KKsource" expanded="yes">
+	<category name="KKsource" expanded="no">
 		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\QuadControllerV4_5\QuadControllerV4_5\QuadControllerV4_5.asm" />
 		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\XXcontroller_KR_v1_5\XXcontrol_KR.c" />
 	</category>
@@ -29,11 +29,5 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="800" placement="2:3:-1:-1:-8:-30:75:75:1075:371" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" linenum="22" placement="0:1:-1:-1:-8:-30:50:50:1054:350" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\eeprom.h" linenum="25" placement="0:1:-1:-1:-8:-30:100:100:1104:400" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.h" linenum="16" placement="0:1:-1:-1:-8:-30:125:125:1129:425" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" linenum="243" placement="0:1:-1:-1:-8:-30:0:0:1004:300" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\resources.h" linenum="15" placement="0:1:-1:-1:-8:-30:25:25:1029:325" />
 </workspace>
 
