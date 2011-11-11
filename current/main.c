@@ -13,6 +13,7 @@ fazer PID
 utilizar as variaveis ao inves das constantes
 
 */
+
 #include "stdio.h"
 #include "stdlib.h"
 #include "string.h"
@@ -57,6 +58,7 @@ int ControlOldSample[3] = {0, 0, 0};
 //int ControlReference[3] = {0,0,0};
 
 unsigned int MotorOutput[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
+unsigned int MotorOutputOld[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
 
 // general purpose
 unsigned int FlightTime = 0; // guarda ate 9h de voo
@@ -758,7 +760,7 @@ void calibrate_radio(void){
 unsigned int tempoloop = 0;
 unsigned int tempoloop2 = 0;
 #endif // TEST_LOOP_PERIOD
-
+/*
 void control_loop(void){
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
         // derivativo
@@ -795,7 +797,7 @@ void control_loop(void){
         MotorOutput[MOTOR_BACK] += ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) * 3) >> 1;
 
         // derivativo
-        /*
+#ifdef DERIVATIVO        
         MotorOutput[MOTOR_RIGHT] -= (ControlOldSample[ROLL_INDEX]) * 1;
         MotorOutput[MOTOR_LEFT] += (ControlOldSample[ROLL_INDEX]) * 1;
         
@@ -806,12 +808,15 @@ void control_loop(void){
         MotorOutput[MOTOR_LEFT] += (ControlOldSample[YAW_INDEX]) * 1;
         MotorOutput[MOTOR_FRONT] -= (ControlOldSample[YAW_INDEX]) * 1;
         MotorOutput[MOTOR_BACK] -= (ControlOldSample[YAW_INDEX]) * 1;
-        */
+#endif
         set_motor_output();
         
         ControlOldSample[YAW_INDEX] = GyroValue[YAW_INDEX];
         ControlOldSample[PITCH_INDEX] = GyroValue[PITCH_INDEX];
         ControlOldSample[ROLL_INDEX] = GyroValue[ROLL_INDEX];
+        
+        // filter gyro
+        
         
         // maximo de 9h de voo podem ser registradas antes de dar overflow
         if(get_delay(DELAY_SECONDS_INDEX)){
@@ -838,6 +843,61 @@ void control_loop(void){
         set_all_motors(MIN_MOTOR);
     }
 }
+*/
+void control_loop(void){
+    if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
+        
+        ThrottleFiltered = (ThrottleFiltered * 7 + PPMValue[RADIO_THROTTLE_CH]) >> 3;
+        
+        // lowpass no gyro        
+        GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] * 3 + AnalogValue[GYRO_ROLL_ACH]) >> 2;
+        GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] * 3 + AnalogValue[GYRO_PITCH_ACH]) >> 2;
+        GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] * 3 + AnalogValue[GYRO_YAW_ACH]) >> 2;
+        
+        MotorOutput[MOTOR_RIGHT] = ThrottleFiltered;
+        MotorOutput[MOTOR_RIGHT] -= ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * 5) >> 4; 
+        MotorOutput[MOTOR_RIGHT] += ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH]) * 5) >> 2;
+        
+        MotorOutput[MOTOR_LEFT] = ThrottleFiltered;
+        MotorOutput[MOTOR_LEFT] += ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * 5) >> 4;
+        MotorOutput[MOTOR_LEFT] -= ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH]) * 5) >> 2;
+            
+        MotorOutput[MOTOR_FRONT] = ThrottleFiltered;
+        MotorOutput[MOTOR_FRONT] += ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * 5) >> 4;
+        MotorOutput[MOTOR_FRONT] += ((GyroValue[PITCH_INDEX] - AnalogOffset[GYRO_PITCH_ACH]) * 5) >> 2;
+        
+        MotorOutput[MOTOR_BACK] = ThrottleFiltered;
+        MotorOutput[MOTOR_BACK] -= ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * 5) >> 4;
+        MotorOutput[MOTOR_BACK] -= ((GyroValue[PITCH_INDEX] - AnalogOffset[GYRO_PITCH_ACH]) * 5) >> 2;
+                
+        MotorOutput[MOTOR_RIGHT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_LEFT] -= (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_RIGHT] -= ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) * 3) >> 1;
+        MotorOutput[MOTOR_LEFT] -= ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) * 3) >> 1;
+
+        MotorOutput[MOTOR_FRONT] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_BACK] += (PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]);
+        MotorOutput[MOTOR_FRONT] += ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) * 3) >> 1;
+        MotorOutput[MOTOR_BACK] += ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) * 3) >> 1;
+
+        MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT]) >> 1;
+        MotorOutput[MOTOR_LEFT] =  (MotorOutput[MOTOR_LEFT] + MotorOutputOld[MOTOR_LEFT]) >> 1;
+        MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK]) >> 1;
+        MotorOutput[MOTOR_RIGHT] = (MotorOutput[MOTOR_RIGHT] + MotorOutputOld[MOTOR_RIGHT]) >> 1; 
+        
+        set_motor_output();
+        
+        MotorOutputOld[MOTOR_FRONT] = MotorOutput[MOTOR_FRONT];
+        MotorOutputOld[MOTOR_LEFT] = MotorOutput[MOTOR_LEFT];
+        MotorOutputOld[MOTOR_BACK] = MotorOutput[MOTOR_BACK];
+        MotorOutputOld[MOTOR_RIGHT] = MotorOutput[MOTOR_RIGHT];
+        
+    }
+    else{
+        set_all_motors(MIN_MOTOR);
+    }
+}
+
 
 // result 1 = fail
 // result 0 = success
