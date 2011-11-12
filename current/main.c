@@ -88,8 +88,10 @@ int main(void){
     MENU_RESPONSE resp = RESP_NONE;
     ProgStep = PROCESS_MAIN_MENU;
     
-    setup();
+    clock_init(); 
     
+    setup();
+            
     menu_draw(MainMenu, 1);
     
     // iluminacao progressiva do LCD
