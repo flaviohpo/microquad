@@ -3,6 +3,28 @@
 		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\QuadControllerV4_5\QuadControllerV4_5\QuadControllerV4_5.asm" />
 		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\XXcontroller_KR_v1_5\XXcontrol_KR.c" />
 	</category>
+	<category name="MSP Code Examples" expanded="no">
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_01_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_02_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_03_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_04_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_05_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_06_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_07_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_09_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_10_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_11_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_12_IAR.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_04.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_05.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_06.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_07.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_08.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_09.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_10.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_uscib0_i2c_11.c" />
+		<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\msp430x261x_uscib0_i2c_16.c" />
+	</category>
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.h" />
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\color.h" />
@@ -22,6 +44,9 @@
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\menu.h" />
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_09_IAR.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_10_IAR.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\msp430f2619 examples\MSP430F241x, MSP430F261x Code Examples\C\MSP430x261x_dma_11_IAR.c" />
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\resources.h" />
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\shorttypes.h" />
 	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\usefullibs.c" />
@@ -29,7 +54,6 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="94" placement="2:3:-1:-1:-8:-30:50:50:1050:346" />
-	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" linenum="3" placement="0:1:-1:-1:-8:-30:75:75:1079:375" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="808" placement="2:3:-1:-1:-8:-30:0:0:1000:296" />
 </workspace>
 

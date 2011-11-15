@@ -15,6 +15,8 @@
 #define DELAY_STICK_INDEX       0
 #define DELAY_SECONDS_INDEX     1
 #define DELAY_LOW_BATTERY_BUZ   2
+#define DELAY_FLIGHT_TIME       3
+#define DELAY_BATTERY_CHECK     4
 
 extern volatile unsigned int TimeDelay[TIMEDELAY_LEN];
 

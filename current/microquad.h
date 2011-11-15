@@ -4,6 +4,8 @@
 
 //#define ITG3200
 
+#define SAMPLE_TIME           20 // * 100us (2000ns)
+
 #define BUZZER                0x10
 #define BUZZER_ON()          (P2OUT |= BUZZER)
 #define BUZZER_OFF()         (P2OUT &= ~BUZZER)
@@ -16,7 +18,7 @@
 // battery colors
 #define BATTERY_YELLOW        3050
 #define BATTERY_RED           2850
-#define BATTERY_CHECK_DELAY   2000
+#define BATTERY_CHECK_TIME    2000
 
 #define YAW_PROPORTIONAL_MUL    2
 #define PITCH_PROPORTIONAL_MUL  1
@@ -24,6 +26,14 @@
 #define YAW_PROPORTIONAL_DIV    2
 #define PITCH_PROPORTIONAL_DIV  2
 #define ROLL_PROPORTIONAL_DIV   2
+
+#define YAW_INTEGRAL_MUL        1
+#define PITCH_INTEGRAL_MUL      1
+#define ROLL_INTEGRAL_MUL       1
+#define YAW_INTEGRAL_DIV        1
+#define PITCH_INTEGRAL_DIV      1
+#define ROLL_INTEGRAL_DIV       1
+
 #define YAW_REF_DIV             0
 #define PITCH_REF_DIV           2
 #define ROLL_REF_DIV            2

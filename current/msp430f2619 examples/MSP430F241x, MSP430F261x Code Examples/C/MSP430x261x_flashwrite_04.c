@@ -112,7 +112,7 @@ void copy_D2C(void)
   FCTL3 = FWKEY;                            // Clear LOCK bit
   FCTL1 = FWKEY + ERASE + EEI;              // Set Erase bit, allow interrupts
   *Flash_ptrC = 0;                          // Dummy write to erase Flash seg C
-  FCTL1 = FWKEY + WRT;                      // Set WRT bit for write operation
+ FCTL1 = FWKEY + WRT;                      // Set WRT bit for write operation
 
   for (i = 0; i < 64; i++)
   {
