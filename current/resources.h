@@ -25,14 +25,14 @@ const char* str_analogch5     = "ACH5";
 const char* str_analogch6     = "ACH6";
 const char* str_analogch7     = "ACH7";
 
-const char* str_analogof0     = "AOF0";
-const char* str_analogof1     = "AOF1";
-const char* str_analogof2     = "AOF2";
-const char* str_analogof3     = "AOF3";
-const char* str_analogof4     = "AOF4";
-const char* str_analogof5     = "AOF5";
-const char* str_analogof6     = "AOF6";
-const char* str_analogof7     = "AOF7";
+const char* str_analogof0     = "OFF0";
+const char* str_analogof1     = "OFF1";
+const char* str_analogof2     = "OFF2";
+const char* str_analogof3     = "OFF3";
+const char* str_analogof4     = "OFF4";
+const char* str_analogof5     = "OFF5";
+const char* str_analogof6     = "OFF6";
+const char* str_analogof7     = "OFF7";
 
 const char* str_radioch0      = "CH0 ";
 const char* str_radioch1      = "CH1 ";
@@ -68,17 +68,17 @@ const char* str_motor5        = "ESC5";
 const char* str_motor6        = "ESC6";
 const char* str_calibrate     = "CALI";
 
-const char* str_yawrefdiv       = "YARD";
-const char* str_pitchrefdiv     = "PIRD";
-const char* str_rollrefdiv      = "RORD";
+const char* str_yawrefdiv       = "YRDI";
+const char* str_pitchrefdiv     = "PRDI";
+const char* str_rollrefdiv      = "RRDI";
 
-const char* str_yawpm          = "YAPM";
-const char* str_pitchpm        = "PIPM";
-const char* str_rollpm         = "ROPM";
+const char* str_yawpm          = "YPMU";
+const char* str_pitchpm        = "PPMU";
+const char* str_rollpm         = "RPMU";
 
-const char* str_yawpd          = "YAPD";
-const char* str_pitchpd        = "PIPD";
-const char* str_rollpd         = "ROPD";
+const char* str_yawpd          = "YPDI";
+const char* str_pitchpd        = "PPDI";
+const char* str_rollpd         = "RPDI";
 
 const char* str_accelx        = "ACCX";
 const char* str_accely        = "ACCY";

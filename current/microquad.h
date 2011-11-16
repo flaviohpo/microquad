@@ -1,9 +1,7 @@
 #define constrain(val,min,max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
 
 //#define TEST_LOOP_PERIOD
-
 //#define ITG3200
-
 #define SAMPLE_TIME           20 // * 100us (2000ns)
 
 #define BUZZER                0x10
@@ -19,24 +17,27 @@
 #define BATTERY_YELLOW        3050
 #define BATTERY_RED           2850
 #define BATTERY_CHECK_TIME    2000
-
-#define YAW_PROPORTIONAL_MUL    2
-#define PITCH_PROPORTIONAL_MUL  1
-#define ROLL_PROPORTIONAL_MUL   1
-#define YAW_PROPORTIONAL_DIV    2
+// default proportional gain
+#define YAW_PROPORTIONAL_MUL    3
+#define PITCH_PROPORTIONAL_MUL  5
+#define ROLL_PROPORTIONAL_MUL   5
+#define YAW_PROPORTIONAL_DIV    1
 #define PITCH_PROPORTIONAL_DIV  2
 #define ROLL_PROPORTIONAL_DIV   2
-
+// default integral gain
 #define YAW_INTEGRAL_MUL        1
 #define PITCH_INTEGRAL_MUL      1
 #define ROLL_INTEGRAL_MUL       1
 #define YAW_INTEGRAL_DIV        1
 #define PITCH_INTEGRAL_DIV      1
 #define ROLL_INTEGRAL_DIV       1
-
-#define YAW_REF_DIV             0
-#define PITCH_REF_DIV           2
-#define ROLL_REF_DIV            2
+// default proportional radio influence
+#define YAW_REF_MUL             3
+#define PITCH_REF_MUL           4
+#define ROLL_REF_MUL            4
+#define YAW_REF_DIV             1
+#define PITCH_REF_DIV           3
+#define ROLL_REF_DIV            3
 
 #define BATTERY_ACH             7 
 #define GYRO_YAW_ACH            2
@@ -75,7 +76,6 @@
 #define LETSFLY_INDEX           6
 
 #define CALIBR_INDEX            1
-#define GYRO_CALIBR_INDEX       13
 #define RETURN_INDEX            0
 
 #define YAW_INDEX               0
@@ -110,6 +110,7 @@ unsigned char reset_defaults(void);
 void adjust_readings(void);
 void menu_init(void);
 void setup(void);
+void init_vars(void);
 void timer_init(void);
 void P2_init(void);
 void P1_init(void);

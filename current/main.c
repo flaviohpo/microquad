@@ -1,13 +1,18 @@
 /*
-aumentar ganho do controle remoto
-adicionar integrado
+colocar os filtros passas baixas no menu de ajuste dos ganhos
 graficos analog
+fazer um esquema pra setinha comecar a ir mais rapido se segurar o stick
+fazer o analog por DMA
+fazer um buzzer process
+fazer uma telinha de entrada (swasthya yoga man)
+fazer um doc "user manual" do miniquad
+falar com o julio pra ver se sai a nova estrutura (tirar fotos dela desmontada, porem pintada)
+adicionar integrador nos 3 eixos
+adaptar acelerometro (ligar para o juliano pra ver se ja chegou)
+fazer rotinas I2C com timeout
 gravar parametros
 carregar parametros
 fazer tudo pro itg3200
-adaptar acelerometro
-utilizar as variaveis ao inves das constantes
-
 */
 
 #include "stdio.h"
@@ -29,39 +34,35 @@ utilizar as variaveis ao inves das constantes
 
 // variaveis ajuste radio - roll pitch e yaw
 int PPMOffset[8] = {0,0,0,0,0,0,0,0};
-
 // variaveis leitura radio raw
 unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
 int PPMValue[8] = {0,0,0,0,0,0,0,0};
 
-// variaveis sensores
+//variaveis controle
+volatile unsigned char ControlSample = 0;       // sample time flag - indica a hora de fazer um sample e um controle
+int ThrottleFiltered = 0;
+// variaveis controle realimentacao
 int AccelValue[3] = {0,0,0};
 int AccelOffset[3] = {0,0,0};
 int GyroValue[3] = {0,0,0};
 int GyroOffset[3] = {0,0,0};
-int ThrottleFiltered = 0;
-// variaveis do controle
-unsigned int ControlProportionalMul[3] = {YAW_PROPORTIONAL_MUL, PITCH_PROPORTIONAL_MUL, ROLL_PROPORTIONAL_MUL};
-unsigned int ControlProportionalDiv[3] = {YAW_PROPORTIONAL_DIV, PITCH_PROPORTIONAL_DIV, ROLL_PROPORTIONAL_DIV};
-unsigned int ControlIntegralMul[3] = {YAW_INTEGRAL_MUL, PITCH_INTEGRAL_MUL, ROLL_INTEGRAL_MUL};
-unsigned int ControlIntegralDiv[3] = {YAW_INTEGRAL_DIV, PITCH_INTEGRAL_DIV, ROLL_INTEGRAL_DIV};
-unsigned int ControlReferenceDiv[3] = {YAW_REF_DIV, PITCH_REF_DIV, ROLL_REF_DIV};
-
-unsigned int ControlRadioResult[3] = {0, 0, 0};
-unsigned int ControlResult[3] = {0, 0, 0};
-unsigned int ControlIntegralResult[3] = {0, 0, 0};
-
-unsigned int MotorOutput[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
-unsigned int MotorOutputOld[6] = {MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR,MIN_MOTOR};
-
+// variaveis controle ganhos
+int ControlProportionalMul[3];
+int ControlProportionalDiv[3];
+int ControlIntegralMul[3];
+int ControlIntegralDiv[3];
+int ControlReferenceMul[3];
+int ControlReferenceDiv[3];
+// variaveis controle sinais de controle
+int ControlRadioResult[3] = {0, 0, 0};
+int ControlResult[3] = {0, 0, 0};
+int ControlIntegralResult[3] = {0, 0, 0};
+// variaveis controle atuadores
+int MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
+int MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
 // general purpose
 unsigned int FlightTime = 0; // guarda ate 9h de voo
-volatile unsigned char ControlSample = 0;
-
-// frase de entrada?
-// imagem de entrada?
-// sinais luminosos?
-
+// menus
 MENU* MainMenu;
 MENU* AnalogMenu;
 MENU* MotorMenu;
@@ -69,7 +70,7 @@ MENU* ControlMenu;
 MENU* RadioMenu;
 MENU* SensorMenu;
 MENU* OptionMenu;
-
+// variavel que guarda o estado da state-machine principal
 PROGRAM_STEP ProgStep;
 
 int main(void){
@@ -82,17 +83,20 @@ int main(void){
     MENU_RESPONSE resp = RESP_NONE;
     ProgStep = PROCESS_MAIN_MENU;
     
-    clock_init(); 
-    
+    init_vars();    
     setup();
-            
-    menu_draw(MainMenu, 1);
+          
+    //draw_welcome_screen();
     
     // iluminacao progressiva do LCD
     while(TACCR1 < LCD_MAX_BRIGHT){
         TACCR1 = TACCR1 + 1;
         delayus(1200);
     }
+    
+    //delayms(3000);
+    
+    menu_draw(MainMenu, 1);
     
     while(1){
         
@@ -599,7 +603,7 @@ void menu_init(void){
     menu_add_item(MainMenu, create_item(str_optionmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     menu_add_item(MainMenu, create_item(str_letsfly, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     // analog menu
-    AnalogMenu = menu_create(str_analogmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    AnalogMenu = menu_create(str_analogmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_small, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(AnalogMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(AnalogMenu, create_item(str_analogch0, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[0]));
     menu_add_item(AnalogMenu, create_item(str_analogch1, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[1]));
@@ -761,21 +765,17 @@ void control_loop(void){
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
         
         ThrottleFiltered = (ThrottleFiltered * 7 + PPMValue[RADIO_THROTTLE_CH]) >> 3;
-
-        // lowpass no gyro, importante
-        GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] + AnalogValue[GYRO_ROLL_ACH]) >> 1;
-        GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] + AnalogValue[GYRO_PITCH_ACH]) >> 1;
-        GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] + AnalogValue[GYRO_YAW_ACH]) >> 1;
+        
         // calcula a proporcao do gyro
-        ControlResult[ROLL_INDEX] = ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH]) * 5) >> 2;
-        ControlResult[YAW_INDEX] = ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) * 3) >> 1;
-        ControlResult[PITCH_INDEX] = ((GyroValue[PITCH_INDEX] - AnalogOffset[GYRO_PITCH_ACH]) * 5) >> 2;
+        ControlResult[ROLL_INDEX] = ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH]) * ControlProportionalMul[ROLL_INDEX]) >> ControlProportionalDiv[ROLL_INDEX];
+        ControlResult[YAW_INDEX] = ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) * ControlProportionalMul[YAW_INDEX]) >> ControlProportionalDiv[YAW_INDEX];
+        ControlResult[PITCH_INDEX] = ((GyroValue[PITCH_INDEX] - AnalogOffset[GYRO_PITCH_ACH]) * ControlProportionalMul[PITCH_INDEX]) >> ControlProportionalDiv[PITCH_INDEX];
         // calcula a influencia do comando do radio
-        ControlRadioResult[ROLL_INDEX] = ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * 4) >> 3; 
-        ControlRadioResult[PITCH_INDEX] = ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * 4) >> 3;
-        ControlRadioResult[YAW_INDEX] = ((PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) * 3) >> 1;
+        ControlRadioResult[ROLL_INDEX] = ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * ControlReferenceMul[ROLL_INDEX]) >> ControlReferenceDiv[ROLL_INDEX]; 
+        ControlRadioResult[PITCH_INDEX] = ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * ControlReferenceMul[PITCH_INDEX]) >> ControlReferenceDiv[PITCH_INDEX];
+        ControlRadioResult[YAW_INDEX] = ((PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) * ControlReferenceMul[YAW_INDEX]) >> ControlReferenceDiv[YAW_INDEX];
         // controle yaw integral
-        ControlIntegralResult[YAW_INDEX] = constrain(ControlIntegralResult[YAW_INDEX] + ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) >> 2), -16384, 16384);
+        //ControlIntegralResult[YAW_INDEX] = constrain(ControlIntegralResult[YAW_INDEX] + ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]) >> 2), -16384, 16384);
         
         MotorOutput[MOTOR_RIGHT] = ThrottleFiltered;
         MotorOutput[MOTOR_RIGHT] -= ControlRadioResult[ROLL_INDEX];
@@ -926,29 +926,49 @@ unsigned char load_params(void){
     }
   */  
     return result;
-    
 }
     
 unsigned char reset_defaults(void){
     FlightTime = 0;
-    ControlProportionalMul[YAW_INDEX] = YAW_PROPORTIONAL_MUL;
-    ControlProportionalMul[PITCH_INDEX] = PITCH_PROPORTIONAL_MUL;
-    ControlProportionalMul[ROLL_INDEX] = ROLL_PROPORTIONAL_MUL;    
-    ControlProportionalDiv[YAW_INDEX] = YAW_PROPORTIONAL_DIV;
-    ControlProportionalDiv[PITCH_INDEX] = PITCH_PROPORTIONAL_DIV;
-    ControlProportionalDiv[ROLL_INDEX] = ROLL_PROPORTIONAL_DIV;
-    ControlReferenceDiv[YAW_INDEX] = YAW_REF_DIV;
-    ControlReferenceDiv[PITCH_INDEX] = PITCH_REF_DIV;
-    ControlReferenceDiv[ROLL_INDEX] = ROLL_REF_DIV;
+    
+    init_vars();
     
     return (save_params());
     
 }
 
 void adjust_readings(void){
-    GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] * 3 + AnalogValue[GYRO_YAW_ACH]) >> 2;
-    GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] * 3 + AnalogValue[GYRO_ROLL_ACH]) >> 2;
-    GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] * 3 + AnalogValue[GYRO_PITCH_ACH]) >> 2;
+   // lowpass no gyro, importante
+    GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] + AnalogValue[GYRO_ROLL_ACH]) >> 1;
+    GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] + AnalogValue[GYRO_PITCH_ACH]) >> 1;
+    GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] + AnalogValue[GYRO_YAW_ACH]) >> 1;
+    
+    // fazer o lowpass do accel tbm
+    
+}
+
+void init_vars(void){
+    // proporcional
+    ControlProportionalMul[YAW_INDEX] = YAW_PROPORTIONAL_MUL;
+    ControlProportionalMul[PITCH_INDEX] = PITCH_PROPORTIONAL_MUL;
+    ControlProportionalMul[ROLL_INDEX] = ROLL_PROPORTIONAL_MUL;
+    ControlProportionalDiv[YAW_INDEX] = YAW_PROPORTIONAL_DIV;  
+    ControlProportionalDiv[PITCH_INDEX] = PITCH_PROPORTIONAL_DIV;
+    ControlProportionalDiv[ROLL_INDEX] = ROLL_PROPORTIONAL_DIV; 
+    // integral
+    ControlIntegralMul[YAW_INDEX] = YAW_INTEGRAL_MUL;  
+    ControlIntegralMul[PITCH_INDEX] = PITCH_INTEGRAL_MUL;
+    ControlIntegralMul[ROLL_INDEX] = ROLL_INTEGRAL_MUL;
+    ControlIntegralDiv[YAW_INDEX] = YAW_INTEGRAL_MUL;  
+    ControlIntegralDiv[PITCH_INDEX] = PITCH_INTEGRAL_MUL;
+    ControlIntegralDiv[ROLL_INDEX] = ROLL_INTEGRAL_DIV; 
+    // porportional radio
+    ControlReferenceMul[YAW_INDEX] = YAW_REF_MUL;  
+    ControlReferenceMul[PITCH_INDEX] = PITCH_REF_MUL;
+    ControlReferenceMul[ROLL_INDEX] = ROLL_REF_MUL; 
+    ControlReferenceDiv[YAW_INDEX] = YAW_REF_DIV;  
+    ControlReferenceDiv[PITCH_INDEX] = PITCH_REF_DIV;
+    ControlReferenceDiv[ROLL_INDEX] = ROLL_REF_DIV; 
 }
 
 // delay
