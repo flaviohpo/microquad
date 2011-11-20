@@ -60,6 +60,9 @@ extern unsigned char LCDForeColor;
 
 // Display Gráfico Color 
 //
+#define LCD_DEFAULT_BACKCOLOR WHITE
+#define LCD_DEFAULT_FORECOLOR BLACK
+
 #define RESX            BIT2
 #define SDA             BIT1     
 #define SCLK            BIT3     

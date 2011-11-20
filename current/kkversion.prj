@@ -54,7 +54,9 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="2" placement="2:3:-1:-1:-8:-30:0:0:1000:296" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" linenum="79" placement="0:1:-1:-1:-8:-30:100:100:1104:400" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="4" placement="2:3:-1:-1:-8:-30:0:0:1000:296" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" linenum="71" placement="0:1:-1:-1:-8:-30:100:100:1104:400" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\resources.h" linenum="103" placement="0:1:-1:-1:-8:-30:100:100:1104:400" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\shorttypes.h" linenum="12" placement="0:1:-1:-1:-8:-30:75:75:1079:375" />
 </workspace>
 

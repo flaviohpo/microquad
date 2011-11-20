@@ -1,17 +1,29 @@
 /*
-colocar os filtros passas baixas no menu de ajuste dos ganhos
-graficos analog
-fazer um esquema pra setinha comecar a ir mais rapido se segurar o stick
+POSSIVEIS TCCs
+--- CONTROLE
+incluir acelerometro no loop de controle
+controle de posicao(x,y,z) com gps e magnetometro
+controle de altitude com barometro e yaw com magnet
+controle de posicao indoor, com sonar e infrared
+colocar uma camera mirando pro chao para controle de posicao
+--- SOFT
+usar CI de wifi para que o quad seja um servidor wifi
+depois que o quad for um servidor de wifi, fazer um controle remoto no android para controlar
+fazer um fpv com osd
+
+falar com o julio pra ver se sai a nova estrutura (tirar fotos dela desmontada, porem pintada)
 fazer o analog por DMA
+colocar os filtros passas baixas no menu de ajuste dos ganhos
+fazer um esquema pra setinha comecar a ir mais rapido se segurar o stick
 fazer um buzzer process
 fazer uma telinha de entrada (swasthya yoga man)
 fazer um doc "user manual" do miniquad
-falar com o julio pra ver se sai a nova estrutura (tirar fotos dela desmontada, porem pintada)
 adicionar integrador nos 3 eixos
-adaptar acelerometro (ligar para o juliano pra ver se ja chegou)
-fazer rotinas I2C com timeout
+adaptar acelerometro (juliano: previsao para chegar dia 18 de DEZ)
+gravar e ler da flash
 gravar parametros
 carregar parametros
+fazer rotinas I2C com timeout
 fazer tudo pro itg3200
 */
 
@@ -31,15 +43,16 @@ fazer tudo pro itg3200
 #include "menu.h"
 #include "microquad.h"
 #include "resources.h"
+#include "shorttypes.h"
 
 // variaveis ajuste radio - roll pitch e yaw
 int PPMOffset[8] = {0,0,0,0,0,0,0,0};
 // variaveis leitura radio raw
-unsigned int TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
+uint16 TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
 int PPMValue[8] = {0,0,0,0,0,0,0,0};
 
 //variaveis controle
-volatile unsigned char ControlSample = 0;       // sample time flag - indica a hora de fazer um sample e um controle
+volatile uchar ControlSample = 0;       // sample time flag - indica a hora de fazer um sample e um controle
 int ThrottleFiltered = 0;
 // variaveis controle realimentacao
 int AccelValue[3] = {0,0,0};
@@ -61,8 +74,12 @@ int ControlIntegralResult[3] = {0, 0, 0};
 int MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
 int MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
 // general purpose
-unsigned int FlightTime = 0; // guarda ate 9h de voo
-// menus
+uint16 FlightTime = 0; // guarda ate 9h de voo
+// analog graph
+byte AnalogChecked;
+unsigned char AnalogColours[8] = {BLUE, LIME, RED, YELLOW, CYAN, MAGENTA, SILVER, WHITE}; 
+unsigned char AnalogGraph[8][GRAPH_LENGHT];   
+// menu
 MENU* MainMenu;
 MENU* AnalogMenu;
 MENU* MotorMenu;
@@ -75,28 +92,29 @@ PROGRAM_STEP ProgStep;
 
 int main(void){
     WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
-        
-    unsigned char MenuDraw = 0;
-    unsigned int BatteryColor = LIME;
+    
+    uchar MenuDraw = 0;
+    uint16 BatteryColor = LIME;
+    uint16 GPCounter = 0;
 
     ACTION act = ACTION_NONE;
     MENU_RESPONSE resp = RESP_NONE;
     ProgStep = PROCESS_MAIN_MENU;
     
-    init_vars();    
+    init_vars();   
     setup();
           
     //draw_welcome_screen();
     
-    // iluminacao progressiva do LCD
-    while(TACCR1 < LCD_MAX_BRIGHT){
-        TACCR1 = TACCR1 + 1;
-        delayus(1200);
-    }
-    
     //delayms(3000);
     
     menu_draw(MainMenu, 1);
+    
+    // iluminacao progressiva do LCD
+    while(TACCR1 < LCD_MAX_BRIGHT){
+        TACCR1 = TACCR1 + 1;
+        delayus(1500);
+    }
     
     while(1){
         
@@ -149,29 +167,131 @@ int main(void){
                        
             case PROCESS_ANALOG_MENU:
                 menu_draw(AnalogMenu, MenuDraw);
+
+                if(MenuDraw == 1){                  
+                    
+                    lcd_fillrect(10,GRAPH_START-3,107,GRAPH_HEIGHT+6, BLACK);
+                    lcd_fillrect(30,GRAPH_START,107-42,GRAPH_HEIGHT,GRAY);
+                    
+                    LCDBackColor = BLACK;
+                    
+                    for(GPCounter = 0; GPCounter < 4; GPCounter++){
+                        lcd_goto(2,9+GPCounter);
+                        LCDForeColor = AnalogColours[GPCounter];
+                        printf("%d", GPCounter);
+                    }
+                    for(GPCounter = 4; GPCounter < 8; GPCounter++){
+                        lcd_goto(16,5 + GPCounter);
+                        LCDForeColor = AnalogColours[GPCounter];
+                        printf("%d", GPCounter);
+                    }
+                    
+                    LCDBackColor = LCD_DEFAULT_BACKCOLOR;
+                    LCDForeColor = LCD_DEFAULT_FORECOLOR;
+                }
+                
                 MenuDraw = 0;
+                                
                 menu_refresh(AnalogMenu);
                 act = get_radio_action();
                 resp = menu_process(AnalogMenu, act);
+                process_analog_graph();
                 switch(resp){
                     case RESP_SUBMENU_OUT:
-                        if(AnalogMenu->SelectedItem == RETURN_INDEX){
-                            ProgStep = PROCESS_MAIN_MENU;
-                            MenuDraw = 1;
+                        switch(AnalogMenu->SelectedItem){
+                            case RETURN_INDEX:
+                                ProgStep = PROCESS_MAIN_MENU;
+                                MenuDraw = 1;
+                            break;
+                            
+                            case ANALOG_CH0_INDEX:
+                                AnalogChecked.BITS.bit0 = 0;
+                                analog_graph_clear(0);
+                            break;
+                            
+                            case ANALOG_CH1_INDEX:
+                                AnalogChecked.BITS.bit1 = 0;
+                                analog_graph_clear(1);
+                            break;
+                            
+                            case ANALOG_CH2_INDEX:
+                                AnalogChecked.BITS.bit2 = 0;
+                                analog_graph_clear(2);
+                            break;
+                            
+                            case ANALOG_CH3_INDEX:
+                                AnalogChecked.BITS.bit3 = 0;
+                                analog_graph_clear(3);
+                            break;
+                            
+                            case ANALOG_CH4_INDEX:
+                                AnalogChecked.BITS.bit4 = 0;
+                                analog_graph_clear(4);
+                            break;
+                            
+                            case ANALOG_CH5_INDEX:
+                                AnalogChecked.BITS.bit5 = 0;
+                                analog_graph_clear(5);
+                            break;
+                            
+                            case ANALOG_CH6_INDEX:
+                                AnalogChecked.BITS.bit6 = 0;
+                                analog_graph_clear(6);
+                            break;
+                            
+                            case ANALOG_CH7_INDEX:
+                                AnalogChecked.BITS.bit7 = 0;
+                                analog_graph_clear(7);
+                            break;
                         }
                     break;
                     
                     case RESP_SUBMENU_IN:
-                        if(AnalogMenu->SelectedItem == CALIBR_INDEX){
-                            analog_calibrate_channel(0);
-                            analog_calibrate_channel(1);
-                            analog_calibrate_channel(2);
-                            analog_calibrate_channel(3);
-                            analog_calibrate_channel(4);
-                            analog_calibrate_channel(5);
-                            analog_calibrate_channel(6);
-                            analog_calibrate_channel(7);
-                        }                    
+                        switch(AnalogMenu->SelectedItem){
+                            case CALIBR_INDEX:
+                                analog_calibrate_channel(0);
+                                analog_calibrate_channel(1);
+                                analog_calibrate_channel(2);
+                                analog_calibrate_channel(3);
+                                analog_calibrate_channel(4);
+                                analog_calibrate_channel(5);
+                                analog_calibrate_channel(6);
+                                analog_calibrate_channel(7);
+                            break;
+                            
+                            case ANALOG_CH0_INDEX:
+                                AnalogChecked.BITS.bit0 = 1;
+                            break;
+                            
+                            case ANALOG_CH1_INDEX:
+                                AnalogChecked.BITS.bit1 = 1;
+                            break;
+                            
+                            case ANALOG_CH2_INDEX:
+                                AnalogChecked.BITS.bit2 = 1;
+                            break;
+                            
+                            case ANALOG_CH3_INDEX:
+                                AnalogChecked.BITS.bit3 = 1;
+                            break;
+                            
+                            case ANALOG_CH4_INDEX:
+                                AnalogChecked.BITS.bit4 = 1;
+                            break;
+                            
+                            case ANALOG_CH5_INDEX:
+                                AnalogChecked.BITS.bit5 = 1;
+                            break;
+                            
+                            case ANALOG_CH6_INDEX:
+                                AnalogChecked.BITS.bit6 = 1;
+                            break;
+                            
+                            case ANALOG_CH7_INDEX:
+                                AnalogChecked.BITS.bit7 = 1;
+                            break;
+                        }
+                   
                     break;                    
                     
                     case RESP_EMERGENCY:
@@ -364,8 +484,8 @@ int main(void){
             
             case PROCESS_CONTROL:
                 if(TACCR1 > 0){ //apaga tela
-                    TACCR1 = TACCR1 - 1;
-                    delayus(1000);
+                    TACCR1 = TACCR1 - 10;
+                    delayus(10000);
                 }
                 else{
                     if(ControlSample == 1){
@@ -508,7 +628,7 @@ void timer_init(void){
 }
 
 
-unsigned int PPM_aux;
+uint16 PPM_aux;
 int channel_num, PPM_ch_counter;
 // muito consagred
 interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
@@ -594,6 +714,88 @@ void setup(void){
     BUZZER_OFF();
 }
 
+void process_analog_graph(void){
+    int i, k, j, y;
+    for(i = 0; i < 8; i++){
+        if((1 << i) & AnalogChecked.BYTE){
+            // apaga
+            for(k = 0; k < (GRAPH_LENGHT - 1); k++){
+                lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] ,GRAY);
+                j = AnalogGraph[i][k]; // posicao atual
+                y = AnalogGraph[i][k+1]; // proxima posicao
+                if(j != y){ // se agora ta mais alto q depois
+                    if(j < y){
+                        y--; 
+                        while(j++ < y){
+                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,GRAY);
+                        }
+                    }
+                    else{
+                        y++;
+                        while(j-- > y){
+                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,GRAY);
+                        }
+                    }
+                }
+                AnalogGraph[i][k] = AnalogGraph[i][k+1];
+            } 
+            // apaga ultimo
+            lcd_drawpoint(GRAPH_LENGHT - 1 + GRAPH_OFFSETX, AnalogGraph[i][GRAPH_LENGHT - 1] , GRAY);                       
+            // insere mais um valor
+            AnalogGraph[i][GRAPH_LENGHT - 1] = constrain(GRAPH_OFFSET - ((AnalogValue[i] >> 6) & 0xFF), GRAPH_START, GRAPH_START+GRAPH_HEIGHT);            
+            // redesenha
+            for(k = 0; k < (GRAPH_LENGHT - 1); k++){
+                lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] ,AnalogColours[i]);
+                j = AnalogGraph[i][k]; // posicao atual
+                y = AnalogGraph[i][k+1]; // proxima posicao
+                if(j != y){ // se agora ta mais alto q depois
+                    if(j < y){
+                        y--; 
+                        while(j++ < y){
+                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,AnalogColours[i]);
+                        }
+                    }
+                    else{
+                        y++;
+                        while(j-- > y){
+                            lcd_drawpoint(k+GRAPH_OFFSETX, j ,AnalogColours[i]);
+                        }
+                    }
+                }
+            } 
+            // desenha ultimo
+            lcd_drawpoint(GRAPH_LENGHT - 1 + GRAPH_OFFSETX, AnalogGraph[i][GRAPH_LENGHT - 1] ,AnalogColours[i]);            
+        }
+    }    
+}
+
+void analog_graph_clear(int i){
+    int k, j, y;
+    // apaga o grafico
+    for(k = 0; k < (GRAPH_LENGHT - 1); k++){
+        lcd_drawpoint(k+GRAPH_OFFSETX, AnalogGraph[i][k] , GRAY);
+        j = AnalogGraph[i][k]; // posicao atual
+        y = AnalogGraph[i][k+1]; // proxima posicao
+        if(j != y){ // se agora ta mais alto q depois
+            if(j < y){
+                y--; 
+                while(j++ < y){
+                    lcd_drawpoint(k+GRAPH_OFFSETX, j , GRAY);
+                }
+            }
+            else{
+                y++;
+                while(j-- > y){
+                    lcd_drawpoint(k+GRAPH_OFFSETX, j , GRAY);
+                }
+            }
+        }
+        //AnalogGraph[i][k] = AnalogGraph[i][k+1];
+    } 
+    // apaga ultimo
+    lcd_drawpoint(GRAPH_LENGHT - 1 + GRAPH_OFFSETX, AnalogGraph[i][GRAPH_LENGHT - 1] , GRAY);
+}
+
 void menu_init(void){
     MainMenu = menu_create(str_mainmenu, create_item(str_analogmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, NULL, NULL, &val_arrow_center, NULL);
     menu_add_item(MainMenu, create_item(str_radiomenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
@@ -623,20 +825,23 @@ void menu_init(void){
     menu_add_item(AnalogMenu, create_item(str_analogof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[6]));    
     menu_add_item(AnalogMenu, create_item(str_analogof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[7]));    
     // control menu
-    ControlMenu = menu_create(str_controlmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    ControlMenu = menu_create(str_controlmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(ControlMenu, create_item(str_yawpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[YAW_INDEX]));
     menu_add_item(ControlMenu, create_item(str_pitchpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[PITCH_INDEX]));
     menu_add_item(ControlMenu, create_item(str_rollpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[ROLL_INDEX]));        
     menu_add_item(ControlMenu, create_item(str_yawpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[YAW_INDEX]));
     menu_add_item(ControlMenu, create_item(str_pitchpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[PITCH_INDEX]));
     menu_add_item(ControlMenu, create_item(str_rollpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[ROLL_INDEX]));        
-    
+
+    menu_add_item(ControlMenu, create_item(str_yawrefmul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceMul[YAW_INDEX]));        
+    menu_add_item(ControlMenu, create_item(str_pitchrefmul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceMul[PITCH_INDEX]));        
+    menu_add_item(ControlMenu, create_item(str_rollrefmul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceMul[ROLL_INDEX]));            
     menu_add_item(ControlMenu, create_item(str_yawrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[YAW_INDEX]));        
     menu_add_item(ControlMenu, create_item(str_pitchrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[PITCH_INDEX]));        
     menu_add_item(ControlMenu, create_item(str_rollrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[ROLL_INDEX]));        
     
     // radio menu
-    RadioMenu = menu_create(str_radiomenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    RadioMenu = menu_create(str_radiomenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(RadioMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
         
     menu_add_item(RadioMenu, create_item(str_radioch0, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[0]));
@@ -657,7 +862,7 @@ void menu_init(void){
     menu_add_item(RadioMenu, create_item(str_radioof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[6]));    
     menu_add_item(RadioMenu, create_item(str_radioof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[7]));
     // motor menu    
-    MotorMenu = menu_create(str_motormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    MotorMenu = menu_create(str_motormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(MotorMenu, create_item(str_motor1, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[0]));
     menu_add_item(MotorMenu, create_item(str_motor2, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[1]));
     menu_add_item(MotorMenu, create_item(str_motor3, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[2]));
@@ -666,16 +871,15 @@ void menu_init(void){
     menu_add_item(MotorMenu, create_item(str_motor6, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[5]));    
     menu_add_item(MotorMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     // sensor menu
-    SensorMenu = menu_create(str_sensormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    SensorMenu = menu_create(str_sensormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(SensorMenu, create_item(str_accelx, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_X_INDEX]));
     menu_add_item(SensorMenu, create_item(str_accely, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Y_INDEX]));
     menu_add_item(SensorMenu, create_item(str_accelz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Z_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyrox, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_X_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyroy, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Y_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyroz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Z_INDEX]));    
-    menu_add_item(SensorMenu, create_item(str_graph, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     // option menu
-    OptionMenu = menu_create(str_optionmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    OptionMenu = menu_create(str_optionmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(OptionMenu, create_item(str_grava, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     menu_add_item(OptionMenu, create_item(str_rstdefault, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
 }
@@ -701,7 +905,7 @@ ACTION get_radio_action(void){
     return ACTION_NONE;
 }
 
-void set_all_motors(unsigned int val){
+void set_all_motors(uint16 val){
     MotorOutput[0] = val;
     MotorOutput[1] = val;
     MotorOutput[2] = val;
@@ -757,8 +961,8 @@ void calibrate_radio(void){
 }
 
 #ifdef TEST_LOOP_PERIOD
-unsigned int tempoloop = 0;
-unsigned int tempoloop2 = 0;
+uint16 tempoloop = 0;
+uint16 tempoloop2 = 0;
 #endif // TEST_LOOP_PERIOD
 
 void control_loop(void){
@@ -835,8 +1039,8 @@ void control_loop(void){
 
 // result 1 = fail
 // result 0 = success
-unsigned char save_params(void){
-    unsigned char result = 0;
+uchar save_params(void){
+    uchar result = 0;
 /*    twobytes VarAux;
     
     i2c_config(EEPROM_I2C_ADDR);
@@ -881,8 +1085,8 @@ unsigned char save_params(void){
     return result;
 }
 
-unsigned char load_params(void){
-    unsigned char result = 0;
+uchar load_params(void){
+    uchar result = 0;
 /*    twobytes VarAux;
     
     i2c_config(EEPROM_I2C_ADDR);
@@ -928,7 +1132,7 @@ unsigned char load_params(void){
     return result;
 }
     
-unsigned char reset_defaults(void){
+uchar reset_defaults(void){
     FlightTime = 0;
     
     init_vars();
@@ -948,6 +1152,7 @@ void adjust_readings(void){
 }
 
 void init_vars(void){
+    uint16 i, j;
     // proporcional
     ControlProportionalMul[YAW_INDEX] = YAW_PROPORTIONAL_MUL;
     ControlProportionalMul[PITCH_INDEX] = PITCH_PROPORTIONAL_MUL;
@@ -969,6 +1174,14 @@ void init_vars(void){
     ControlReferenceDiv[YAW_INDEX] = YAW_REF_DIV;  
     ControlReferenceDiv[PITCH_INDEX] = PITCH_REF_DIV;
     ControlReferenceDiv[ROLL_INDEX] = ROLL_REF_DIV; 
+    
+    // outras
+    AnalogChecked.BYTE = 0x00;
+    for(i = 0; i < 8; i++){
+        for(j = 0; j < GRAPH_LENGHT; j++){
+            AnalogGraph[i][j] = 90;
+        }
+    }
 }
 
 // delay

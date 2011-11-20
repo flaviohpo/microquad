@@ -13,8 +13,8 @@ const char* str_sensormenu    = "SENSOR VIEW";
 const char* str_optionmenu    = "OPTIONS";
 const char* str_letsfly       = "FLY!";
 
-const char* str_rstdefault      = "RESET SET.";
-const char* str_grava           = "SAVE  SET.";
+const char* str_rstdefault    = "RESET SET.";
+const char* str_grava         = "SAVE  SET.";
 
 const char* str_analogch0     = "ACH0";
 const char* str_analogch1     = "ACH1";
@@ -68,17 +68,21 @@ const char* str_motor5        = "ESC5";
 const char* str_motor6        = "ESC6";
 const char* str_calibrate     = "CALI";
 
-const char* str_yawrefdiv       = "YRDI";
-const char* str_pitchrefdiv     = "PRDI";
-const char* str_rollrefdiv      = "RRDI";
+const char* str_yawrefmul     = "YRMU";
+const char* str_pitchrefmul   = "PRMU";
+const char* str_rollrefmul    = "RRMU";
 
-const char* str_yawpm          = "YPMU";
-const char* str_pitchpm        = "PPMU";
-const char* str_rollpm         = "RPMU";
+const char* str_yawrefdiv     = "YRDI";
+const char* str_pitchrefdiv   = "PRDI";
+const char* str_rollrefdiv    = "RRDI";
 
-const char* str_yawpd          = "YPDI";
-const char* str_pitchpd        = "PPDI";
-const char* str_rollpd         = "RPDI";
+const char* str_yawpm         = "YPMU";
+const char* str_pitchpm       = "PPMU";
+const char* str_rollpm        = "RPMU";
+
+const char* str_yawpd         = "YPDI";
+const char* str_pitchpd       = "PPDI";
+const char* str_rollpd        = "RPDI";
 
 const char* str_accelx        = "ACCX";
 const char* str_accely        = "ACCY";

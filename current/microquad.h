@@ -11,11 +11,11 @@
 #define ENABLE_BUZZER()      (P2DIR |= BUZZER)
 #define DISABLE_BUZZER()     (P2DIR &=~ BUZZER)
 
-#define MIN_BATTERY           2650
-#define MAX_BATTERY           3300
+#define MIN_BATTERY           1520
+#define MAX_BATTERY           1850
 // battery colors
-#define BATTERY_YELLOW        3050
-#define BATTERY_RED           2850
+#define BATTERY_YELLOW        1720
+#define BATTERY_RED           1590
 #define BATTERY_CHECK_TIME    2000
 // default proportional gain
 #define YAW_PROPORTIONAL_MUL    3
@@ -47,7 +47,7 @@
 #define ACCELY_ACH              4
 #define ACCELZ_ACH              3
 
-#define LCD_MAX_BRIGHT          2500
+#define LCD_MAX_BRIGHT          4000
 #define PPM_P1MASK              0xFF
 
 #define MIN_MOTOR               2000
@@ -66,6 +66,12 @@
 #define RADIO_YAW_CH            4
 #define RADIO_THROTTLE_CH       3
 #define RADIO_ROLL_CH           0
+
+#define GRAPH_LENGHT            56
+#define GRAPH_OFFSETX           36
+#define GRAPH_OFFSET            115
+#define GRAPH_START             64
+#define GRAPH_HEIGHT            52
 
 #define ANALOG_MENU_INDEX       0
 #define CONTROL_MENU_INDEX      3
@@ -92,6 +98,15 @@
 #define GYRO_X_INDEX            2
 #define GYRO_Y_INDEX            1
 #define GYRO_Z_INDEX            0
+
+#define ANALOG_CH0_INDEX        2
+#define ANALOG_CH1_INDEX        3
+#define ANALOG_CH2_INDEX        4
+#define ANALOG_CH3_INDEX        5
+#define ANALOG_CH4_INDEX        6
+#define ANALOG_CH5_INDEX        7
+#define ANALOG_CH6_INDEX        8
+#define ANALOG_CH7_INDEX        9
 
 typedef enum{
     PROCESS_MAIN_MENU           = 0xFF,
@@ -120,6 +135,8 @@ void set_all_motors(unsigned int val);
 void screen_flash(int Color, int interval, int times);
 void calibrate_radio(void);
 void control_loop(void);
+void process_analog_graph(void);
+void analog_graph_clear(int i);
 int main(void);
 ACTION get_radio_action(void);
 

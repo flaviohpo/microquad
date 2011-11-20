@@ -70,11 +70,11 @@ void menu_refresh(MENU* oMenu){
             //if(1){
                 // valor
                 printf("%d",*(oItem->Value));
-                valor = 10000 - *(oItem->Value);                
-                while(valor){       // da o numero de espacos necessarios pra chegar no final
-                    valor = valor / 10;
+                valor = *(oItem->Value);                
+                do{       // da o numero de espacos necessarios pra chegar no final
                     printf(" ");
-                }
+                    valor = valor * 10;
+                }while(valor < 1000);
 
             }
             else{   // se nao for valor
@@ -216,7 +216,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                             *(oItem->Value) = UNCHECKED;
                             result = RESP_DONE;
                         }
-                        else{ // submenu
+                        else{ // submenu ou item not readable
                             oMenu->eMenuState = STATE_WAIT_SUBMENU_OUT;
                             result = RESP_BUSY;
                         }

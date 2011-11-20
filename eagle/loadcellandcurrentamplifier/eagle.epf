@@ -327,6 +327,9 @@ UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/xilinx-xc9.lbr"
 UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/xilinx-xcv.lbr"
 UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/zetex.lbr"
 UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/zilog.lbr"
+UsedLibrary="C:/Users/flaviohpo/Desktop/miniquad/luminary_x000.lbr"
+UsedLibrary="C:/Users/flaviohpo/Desktop/miniquad/luminary-arm.lbr"
+UsedLibrary="C:/Users/flaviohpo/Documents/WEBTRONICO/eagle/webtronico.lbr"
 
 [Win_1]
 Type="Control Panel"
