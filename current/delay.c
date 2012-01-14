@@ -48,12 +48,12 @@ void delayms(unsigned int tempo)
   for(i = 0; i < tempo; i++) delayus(3420);
 }
 
-void set_delay(unsigned int position, unsigned int time){
-    TimeDelay[position]=time;
+void set_delay(DELAY_INDEX index, unsigned int time){
+    TimeDelay[index]=time;
 }
 
-unsigned char get_delay(unsigned int position){
-    if(TimeDelay[position] == 0){
+unsigned char get_delay(DELAY_INDEX index){
+    if(TimeDelay[index] == 0){
         return 1;
     }
     return 0;

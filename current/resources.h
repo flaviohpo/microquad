@@ -4,14 +4,16 @@
 const char* str_graph         = "GRPH";
 const char* str_return        = "RETN";
 
-const char* str_mainmenu      = "MAIN MENU";
-const char* str_analogmenu    = "ANALOG VIEW";
-const char* str_radiomenu     = "RADIO VIEW";
-const char* str_controlmenu   = "CONTROL CONFIG.";
-const char* str_motormenu     = "MOTOR CONTROL";
-const char* str_sensormenu    = "SENSOR VIEW";
-const char* str_optionmenu    = "OPTIONS";
-const char* str_letsfly       = "FLY!";
+const char* str_main_menu                = "MAIN MENU";
+const char* str_analog_menu              = "ANALOG VIEW";
+const char* str_radio_menu               = "RADIO VIEW";
+const char* str_control_menu             = "CONTROL CONFIG.";
+const char* str_motor_menu               = "MOTOR CONTROL";
+const char* str_sensor_menu              = "SENSOR VIEW";
+const char* str_option_menu              = "OPTIONS";
+const char* str_vibration_analyzer_menu  = "VIBRATION TEST";
+const char* str_voltage_drop_menu        = "BATTERY TEST";
+const char* str_letsfly                  = "FLY!";
 
 const char* str_rstdefault    = "RESET SET.";
 const char* str_grava         = "SAVE  SET.";
@@ -92,6 +94,49 @@ const char* str_gyrox         = "GYRX";
 const char* str_gyroy         = "GYRY";
 const char* str_gyroz         = "GYRZ";
 
+const char* str_throttle      = "THRO";
+
+// accel max values during vibration test
+const char* str_throttle_max  = "ThrH";
+const char* str_throttle_min  = "ThrL";
+const char* str_accelx_max    = "HacX";
+const char* str_accely_max    = "HacY";
+const char* str_accelz_max    = "HacZ";
+// gyro max values during vibration test
+const char* str_gyrox_max     = "HgyX";
+const char* str_gyroy_max     = "HgyY";
+const char* str_gyroz_max     = "HgyZ";
+// motor output max values during vibration test
+const char* str_motor1_max    = "HMo1";
+const char* str_motor2_max    = "HMo2";
+const char* str_motor3_max    = "HMo3";
+const char* str_motor4_max    = "HMo4";
+// control output
+const char* str_roll_max      = "HCRo";
+const char* str_pitch_max     = "HCPi";
+const char* str_yaw_max       = "HCYa";
+// accel max values during vibration test
+const char* str_accelx_min    = "LacX";
+const char* str_accely_min    = "LacY";
+const char* str_accelz_min    = "LacZ";
+// gyro max values during vibration test
+const char* str_gyrox_min     = "LgyX";
+const char* str_gyroy_min     = "LgyY";
+const char* str_gyroz_min     = "LgyZ";
+// motor output max values during vibration test
+const char* str_motor1_min    = "LMo1";
+const char* str_motor2_min    = "LMo2";
+const char* str_motor3_min    = "LMo3";
+const char* str_motor4_min    = "LMo4";
+// vdrop menu
+const char* str_battery_max   = "BatH";
+const char* str_battery       = "Bat ";
+const char* str_battery_min   = "BatL";
+// control output
+const char* str_roll_min      = "LCRo";
+const char* str_pitch_min     = "LCPi";
+const char* str_yaw_min       = "LCYa";
+/*******************************/
 // CONST VALUES
 const int val_zero            = 0;
 const int val_one             = 1;
@@ -118,4 +163,5 @@ const uchar val_bar_position_right    = 70;
 const uchar val_value_position_right  = 15;
 const uchar val_value_position_center = 7;
 const int val_max_int                 = 35767;
+const int val_min_int                 = -35767;
 const uint val_max_uint               = 65534;

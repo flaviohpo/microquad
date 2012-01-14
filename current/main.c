@@ -1,4 +1,16 @@
 /*
+** 
+- fazer um misc.h nesse prog
+- fazer grafico para o Vdrop
+
+POSSIVEIS CAUSA DO PROBLEMA FULL-THROTTLE
+- corrente bateria nao ta dando conta
+- placa de distribuicao nao deixa passar corrente (acho improvavel)
+- tensao da bateria ta caindo muito
+- corrente no motor ta subindo muito
+- temperatura do ESC? (improvavel)
+- overflow de alguma variavel
+
 POSSIVEIS TCCs
 --- CONTROLE
 incluir acelerometro no loop de controle
@@ -36,7 +48,7 @@ fazer tudo pro itg3200
 #include "delay.h"
 #include "analog.h"
 #include "lcd6100.h"
-#include "itg3200.h"
+//#include "itg3200.h"
 #include "eeprom.h"
 #include "i2c.h"
 #include "usefullibs.h"
@@ -77,8 +89,10 @@ int MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, 
 uint16 FlightTime = 0; // guarda ate 9h de voo
 // analog graph
 byte AnalogChecked;
+
 unsigned char AnalogColours[8] = {BLUE, LIME, RED, YELLOW, CYAN, MAGENTA, SILVER, WHITE}; 
 unsigned char AnalogGraph[8][GRAPH_LENGHT];   
+
 // menu
 MENU* MainMenu;
 MENU* AnalogMenu;
@@ -87,6 +101,28 @@ MENU* ControlMenu;
 MENU* RadioMenu;
 MENU* SensorMenu;
 MENU* OptionMenu;
+MENU* VibrationAnalyzerMenu;
+MENU* VoltageDropMenu;
+
+// variaveis do menu vibration analyzer
+int ThrottleFilteredMin = 0;
+int ThrottleFilteredMax = 0;
+int ControlResultMax[3] = {0, 0, 0};
+int ControlResultMin[3] = {0, 0, 0};
+int GyroValueMax[3] = {0,0,0};
+int AccelValueMax[3] = {0,0,0};
+int GyroValueMin[3] = {0,0,0};
+int AccelValueMin[3] = {0,0,0};
+int MotorOutputMax[6] = {0,0,0,0,0,0};
+int MotorOutputMin[6] = {0,0,0,0,0,0};
+
+// variaveis do menu voltage drop
+// 1790 = 8.36V entao a razao eh /21
+unsigned int VdropMinBat = 0;
+unsigned int VdropMaxBat = 0;
+unsigned int Vbat = 0;
+// misc
+
 // variavel que guarda o estado da state-machine principal
 PROGRAM_STEP ProgStep;
 
@@ -104,10 +140,6 @@ int main(void){
     init_vars();   
     setup();
           
-    //draw_welcome_screen();
-    
-    //delayms(3000);
-    
     menu_draw(MainMenu, 1);
     
     // iluminacao progressiva do LCD
@@ -120,11 +152,22 @@ int main(void){
         
         analog_refresh_all();
         adjust_readings();
-              
+
+        if(get_delay(DELAY_SIDELEDS)){
+            LED_LEFT_TOGGLE();
+            LED_RIGHT_TOGGLE();
+            set_delay(DELAY_SIDELEDS, 500);
+        }
+        
+        if(get_delay(DELAY_BACKLED)){
+            LED_BACK_TOGGLE();
+            set_delay(DELAY_SIDELEDS, 1200);
+        }
+                      
         switch(ProgStep){
             case PROCESS_MAIN_MENU:
                 menu_draw(MainMenu, MenuDraw);
-                if(get_delay(1)){
+                if(get_delay(DELAY_SECONDS_INDEX)){
                     if(AnalogValue[BATTERY_ACH] < BATTERY_RED){
                         BatteryColor = RED;
                     }      
@@ -189,13 +232,12 @@ int main(void){
                     LCDBackColor = LCD_DEFAULT_BACKCOLOR;
                     LCDForeColor = LCD_DEFAULT_FORECOLOR;
                 }
-                
+                process_analog_graph();
                 MenuDraw = 0;
                                 
                 menu_refresh(AnalogMenu);
                 act = get_radio_action();
                 resp = menu_process(AnalogMenu, act);
-                process_analog_graph();
                 switch(resp){
                     case RESP_SUBMENU_OUT:
                         switch(AnalogMenu->SelectedItem){
@@ -443,7 +485,124 @@ int main(void){
                     break;
                 }
             break;
-            
+
+            case PROCESS_VIBRATION_ANALYZER_MENU:
+                menu_draw(VibrationAnalyzerMenu, MenuDraw);
+                
+                // roda o loop de controle excepcionalmente nesse step
+                // so para poder avaliar os sinais de controle
+                if(ControlSample == 1){
+                    
+                    ControlSample = 0;
+                    control_loop();
+                    
+                    if(MenuDraw == 1){
+                        // condicao inicial
+                        // coloca valor atual em todas variaveis
+                        ThrottleFilteredMin = ThrottleFiltered;
+                        ThrottleFilteredMax = ThrottleFiltered;
+                        
+                        memcpy(ControlResultMax, ControlResult, sizeof(int) * 3);
+                        memcpy(ControlResultMin, ControlResult, sizeof(int) * 3);
+                        memcpy(GyroValueMax, GyroValue, sizeof(int) * 3);
+                        memcpy(AccelValueMax, AccelValue, sizeof(int) * 3);
+                        memcpy(GyroValueMin, GyroValue, sizeof(int) * 3);
+                        memcpy(AccelValueMin, AccelValue, sizeof(int) * 3);
+                        memcpy(MotorOutputMax, MotorOutput, sizeof(int) * 6);
+                        memcpy(MotorOutputMin, MotorOutput, sizeof(int) * 6);
+                    }
+                }
+                
+                MenuDraw = 0;
+                menu_refresh(VibrationAnalyzerMenu);
+
+                act = get_radio_action();
+                resp = menu_process(VibrationAnalyzerMenu, act);
+                
+                process_vibration_analyzer_menu();
+                
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(VibrationAnalyzerMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
+                        }
+                    break;
+                    
+                    case RESP_EMERGENCY:
+                        set_all_motors(MIN_MOTOR);
+                        screen_flash(RED, 200, 2);
+                        ProgStep = PROCESS_MAIN_MENU;
+                        MenuDraw = 1;
+                    break;
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
+                }
+            break;
+                  
+            case PROCESS_VOLTAGE_DROP_MENU:
+                menu_draw(VoltageDropMenu, MenuDraw);
+                if(MenuDraw == 1){
+                    // condicao inicial
+                    VdropMinBat = AnalogValue[BATTERY_ACH] / 21;
+                    VdropMaxBat = AnalogValue[BATTERY_ACH] / 21;
+                }
+                MenuDraw = 0;
+                menu_refresh(VoltageDropMenu);
+                
+                act = get_radio_action();
+                resp = menu_process(VoltageDropMenu, act);
+                
+                set_all_motors(PPMValue[RADIO_THROTTLE_CH]);
+                Vbat = AnalogValue[BATTERY_ACH] / 21;
+                // em regime
+                // ajusta minimo valor
+                if(Vbat < VdropMinBat){
+                    VdropMinBat = Vbat;
+                }
+                else{
+                    // ajusta maximo valor
+                    if(Vbat > VdropMaxBat){
+                        VdropMaxBat = Vbat;
+                    }
+                }
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(VoltageDropMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
+                        }
+                    break;
+                    
+                    case RESP_EMERGENCY:
+                        set_all_motors(MIN_MOTOR);
+                        screen_flash(RED, 200, 2);
+                        ProgStep = PROCESS_MAIN_MENU;
+                        MenuDraw = 1;
+                    break;
+                    case RESP_SUBMENU_IN:
+                    case RESP_NONE:          
+                    case RESP_BUSY:
+                    case RESP_SEL_MIN_LIMIT:
+                    case RESP_SEL_MAX_LIMIT:
+                    case RESP_MAX_VALUE:
+                    case RESP_MIN_VALUE:
+                    case RESP_CHECKED:
+                    case RESP_UNCHECKED:
+                    case RESP_DONE:
+                    break;
+                }
+            break;
+                  
             case PROCESS_OPTION_MENU:
                 menu_draw(OptionMenu, MenuDraw);
                 MenuDraw = 0;
@@ -458,12 +617,13 @@ int main(void){
                         switch(OptionMenu->SelectedItem){
                             case SAVE_INDEX:
                                 if(save_params()){
-                                    // error processing 
+                                    printf("FAILLED");
+                                    delayms(2000);
                                 }
                             break;
                             
                             case RESET_INDEX:
-                                reset_defaults();
+                                //reset_defaults();
                             break;
                         }
                         
@@ -514,6 +674,69 @@ int main(void){
     }
 }
 
+inline void process_vibration_analyzer_menu(void){
+    unsigned int indexer;
+    // min max variaveis
+    
+    // throttle
+    if(ThrottleFiltered < ThrottleFilteredMin){
+        ThrottleFilteredMin = ThrottleFiltered;
+    }
+    else{
+        if(ThrottleFiltered > ThrottleFilteredMax){
+            ThrottleFilteredMax = ThrottleFiltered;         
+        }
+    }
+    
+    // ControlResultMax[3]
+    for(indexer = 0; indexer < 3; indexer++){
+        if(ControlResult[indexer] < ControlResultMin[indexer]){
+            ControlResultMin[indexer] = ControlResult[indexer];
+        }
+        else{
+            if(ControlResult[indexer] > ControlResultMax[indexer]){
+                ControlResultMax[indexer] = ControlResult[indexer];
+            }
+        }
+    }
+    
+    // gyro max min
+    for(indexer = 0; indexer < 3; indexer++){
+        if(GyroValue[indexer] < GyroValueMin[indexer]){
+            GyroValueMin[indexer] = GyroValue[indexer];
+        }
+        else{
+            if(GyroValue[indexer] > GyroValueMax[indexer]){
+                GyroValueMax[indexer] = GyroValue[indexer];
+            }
+        }
+    }
+    
+    // motores max min
+    for(indexer = 0; indexer < 6; indexer++){
+        if(MotorOutput[indexer] < MotorOutputMin[indexer]){
+            MotorOutputMin[indexer] = MotorOutput[indexer];
+        }
+        else{
+            if(MotorOutput[indexer] > MotorOutputMax[indexer]){
+                MotorOutputMax[indexer] = MotorOutput[indexer];
+            }
+        }
+    }
+
+    // accel max min
+    for(indexer = 0; indexer < 6; indexer++){
+        if(AccelValue[indexer] < AccelValueMin[indexer]){
+            AccelValueMin[indexer] = AccelValue[indexer];
+        }
+        else{
+            if(AccelValue[indexer] > AccelValueMax[indexer]){
+                AccelValueMax[indexer] = AccelValue[indexer];
+            }
+        }
+    }
+}
+
 // tudo para 16MHz
 void clock_init(void){
     BCSCTL2 = SELM_0 + DIVM_0 + DIVS_0;
@@ -551,12 +774,12 @@ void P2_init(void){ // p2 eh interruption do gyro
 #endif
 }
 
-void set_motor_output(void){
+inline void set_motor_output(void){
     TBCCR1 = constrain(MotorOutput[0], 0, MAX_MOTOR);
     TBCCR2 = constrain(MotorOutput[1], 0, MAX_MOTOR);
-    TBCCR3 = constrain(MotorOutput[2], 0, MAX_MOTOR);
+    TBCCR5 = constrain(MotorOutput[2], 0, MAX_MOTOR);
     TBCCR4 = constrain(MotorOutput[3], 0, MAX_MOTOR);
-    TBCCR5 = constrain(MotorOutput[4], 0, MAX_MOTOR);
+    TBCCR3 = constrain(MotorOutput[4], 0, MAX_MOTOR);
     TBCCR6 = constrain(MotorOutput[5], 0, MAX_MOTOR);
 }
 
@@ -674,6 +897,15 @@ void setup(void){
     P1_init(); // ppm receiver interrupt
     P2_init(); // itg3200 sample interrupt
     
+#ifdef LIGHTS_ON_I2C
+    P3SEL &= (0x02 | 0x04);
+    P3DIR |= (0x02 | 0x04);
+#endif
+#ifdef LIGHTS_ON_UART
+    P3SEL &= (0x20);
+    P3DIR |= (0x20);
+#endif
+    
     eint(); // habilita interrupt
     
     delayms(400);
@@ -700,10 +932,6 @@ void setup(void){
     analog_calibrate_channel(7);
         
     calibrate_radio();
-        
-    if(load_params()){
-        
-    }
         
     menu_init();
     ENABLE_BUZZER();
@@ -797,15 +1025,17 @@ void analog_graph_clear(int i){
 }
 
 void menu_init(void){
-    MainMenu = menu_create(str_mainmenu, create_item(str_analogmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, NULL, NULL, &val_arrow_center, NULL);
-    menu_add_item(MainMenu, create_item(str_radiomenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
-    menu_add_item(MainMenu, create_item(str_motormenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
-    menu_add_item(MainMenu, create_item(str_controlmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
-    menu_add_item(MainMenu, create_item(str_sensormenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
-    menu_add_item(MainMenu, create_item(str_optionmenu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
+    MainMenu = menu_create(str_main_menu, create_item(str_analog_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, NULL, NULL, &val_arrow_center, NULL);
+    menu_add_item(MainMenu, create_item(str_radio_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_motor_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_control_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_sensor_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_option_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
+    menu_add_item(MainMenu, create_item(str_vibration_analyzer_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
+    menu_add_item(MainMenu, create_item(str_voltage_drop_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     menu_add_item(MainMenu, create_item(str_letsfly, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     // analog menu
-    AnalogMenu = menu_create(str_analogmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_small, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    AnalogMenu = menu_create(str_analog_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_small, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(AnalogMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(AnalogMenu, create_item(str_analogch0, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[0]));
     menu_add_item(AnalogMenu, create_item(str_analogch1, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogValue[1]));
@@ -825,7 +1055,7 @@ void menu_init(void){
     menu_add_item(AnalogMenu, create_item(str_analogof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[6]));    
     menu_add_item(AnalogMenu, create_item(str_analogof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[7]));    
     // control menu
-    ControlMenu = menu_create(str_controlmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    ControlMenu = menu_create(str_control_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(ControlMenu, create_item(str_yawpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[YAW_INDEX]));
     menu_add_item(ControlMenu, create_item(str_pitchpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[PITCH_INDEX]));
     menu_add_item(ControlMenu, create_item(str_rollpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[ROLL_INDEX]));        
@@ -841,7 +1071,7 @@ void menu_init(void){
     menu_add_item(ControlMenu, create_item(str_rollrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[ROLL_INDEX]));        
     
     // radio menu
-    RadioMenu = menu_create(str_radiomenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    RadioMenu = menu_create(str_radio_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(RadioMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
         
     menu_add_item(RadioMenu, create_item(str_radioch0, ITEMTYPE_VALUE_BAR_R, &val_min_radio, &val_max_radio, NULL, (int*)&PPMValue[0]));
@@ -862,7 +1092,7 @@ void menu_init(void){
     menu_add_item(RadioMenu, create_item(str_radioof6, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[6]));    
     menu_add_item(RadioMenu, create_item(str_radioof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_radio, NULL, (int*)&PPMOffset[7]));
     // motor menu    
-    MotorMenu = menu_create(str_motormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    MotorMenu = menu_create(str_motor_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(MotorMenu, create_item(str_motor1, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[0]));
     menu_add_item(MotorMenu, create_item(str_motor2, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[1]));
     menu_add_item(MotorMenu, create_item(str_motor3, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[2]));
@@ -871,15 +1101,47 @@ void menu_init(void){
     menu_add_item(MotorMenu, create_item(str_motor6, ITEMTYPE_VALUE_BAR_RW, &val_min_motor, &val_max_motor, &val_int_motor, (int*)&MotorOutput[5]));    
     menu_add_item(MotorMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     // sensor menu
-    SensorMenu = menu_create(str_sensormenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    SensorMenu = menu_create(str_sensor_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(SensorMenu, create_item(str_accelx, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_X_INDEX]));
     menu_add_item(SensorMenu, create_item(str_accely, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Y_INDEX]));
     menu_add_item(SensorMenu, create_item(str_accelz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&AccelValue[ACCEL_Z_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyrox, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_X_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyroy, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Y_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyroz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Z_INDEX]));    
+    // vibration analyzer menu
+    VibrationAnalyzerMenu = menu_create(str_vibration_analyzer_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_throttle_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ThrottleFilteredMax));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_throttle_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ThrottleFilteredMin));    
+    
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_pitch_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ControlResultMax[PITCH_INDEX]));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_pitch_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ControlResultMin[PITCH_INDEX]));
+
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_roll_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ControlResultMax[ROLL_INDEX]));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_roll_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ControlResultMin[ROLL_INDEX]));    
+
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_yaw_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ControlResultMax[YAW_INDEX]));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_yaw_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ControlResultMin[YAW_INDEX]));
+            
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor1_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMax[0]));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor1_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMin[0]));
+    
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor2_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMax[1]));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor2_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMin[1]));
+    
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor3_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMax[2]));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor3_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMin[2]));
+    
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor4_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMax[3]));
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_motor4_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&MotorOutputMin[3]));
+    
+    // vdrop menu
+    VoltageDropMenu = menu_create(str_voltage_drop_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(VoltageDropMenu, create_item(str_battery_max, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&VdropMaxBat));
+    menu_add_item(VoltageDropMenu, create_item(str_battery, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&Vbat));    
+    menu_add_item(VoltageDropMenu, create_item(str_battery_min, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&VdropMinBat));
     // option menu
-    OptionMenu = menu_create(str_optionmenu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    OptionMenu = menu_create(str_option_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(OptionMenu, create_item(str_grava, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
     menu_add_item(OptionMenu, create_item(str_rstdefault, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));    
 }
@@ -965,7 +1227,7 @@ uint16 tempoloop = 0;
 uint16 tempoloop2 = 0;
 #endif // TEST_LOOP_PERIOD
 
-void control_loop(void){
+inline void control_loop(void){
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
         
         ThrottleFiltered = (ThrottleFiltered * 7 + PPMValue[RADIO_THROTTLE_CH]) >> 3;
@@ -1012,9 +1274,9 @@ void control_loop(void){
         MotorOutput[MOTOR_BACK] += ControlResult[YAW_INDEX];
 
         // low pass na saida
-        MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT]) >> 1;
+        MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT] * 7) >> 3;
         MotorOutput[MOTOR_LEFT] =  (MotorOutput[MOTOR_LEFT] + MotorOutputOld[MOTOR_LEFT]) >> 1;
-        MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK]) >> 1;
+        MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK] * 7) >> 3;
         MotorOutput[MOTOR_RIGHT] = (MotorOutput[MOTOR_RIGHT] + MotorOutputOld[MOTOR_RIGHT]) >> 1; 
         
         set_motor_output();
@@ -1041,85 +1303,84 @@ void control_loop(void){
 // result 0 = success
 uchar save_params(void){
     uchar result = 0;
-/*    twobytes VarAux;
+    twobytes VarAux;
     
     i2c_config(EEPROM_I2C_ADDR);
-    result = i2c_find_device(EEPROM_I2C_ADDR);
+    result = i2c_find_device();
     if(!result){
         
         VarAux.i = 0xAA;
-        result |= i2c_write_one_buffer(ADDR_VALIDATION, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_VALIDATION, VarAux.c, 2);
         delayms(100);
         
         VarAux.ui = FlightTime;
-        result |= i2c_write_one_buffer(ADDR_FLIGHT_TIME, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_FLIGHT_TIME, VarAux.c, 2);
         delayms(100);
         
         VarAux.i = ControlProportionalMul[PITCH_INDEX];
-        result |= i2c_write_one_buffer(ADDR_P_PITCH_MUL, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_P_PITCH_MUL, VarAux.c, 2);
         delayms(100);
         
         VarAux.i = ControlProportionalMul[ROLL_INDEX];
-        result |= i2c_write_one_buffer(ADDR_P_ROLL_MUL, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_P_ROLL_MUL, VarAux.c, 2);
         delayms(100);
         
         VarAux.i = ControlProportionalMul[YAW_INDEX];
-        result |= i2c_write_one_buffer(ADDR_P_YAW_MUL, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_P_YAW_MUL, VarAux.c, 2);
         delayms(100);
 
         VarAux.i = ControlProportionalDiv[PITCH_INDEX];
-        result |= i2c_write_one_buffer(ADDR_P_PITCH_DIV, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_P_PITCH_DIV, VarAux.c, 2);
         delayms(100);
 
         VarAux.i = ControlProportionalDiv[ROLL_INDEX];
-        result |= i2c_write_one_buffer(ADDR_P_ROLL_DIV, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_P_ROLL_DIV, VarAux.c, 2);
         delayms(100);
 
         VarAux.i = ControlProportionalDiv[YAW_INDEX];
-        result |= i2c_write_one_buffer(ADDR_P_YAW_DIV, VarAux.uc, 2);
+        result |= i2c_write_multiples(ADDR_P_YAW_DIV, VarAux.c, 2);
         delayms(100);
         
         screen_flash(256, 200, 2);
     }
-  */  
     return result;
 }
 
 uchar load_params(void){
     uchar result = 0;
-/*    twobytes VarAux;
+    twobytes VarAux;
     
     i2c_config(EEPROM_I2C_ADDR);
-    result = i2c_find_device(EEPROM_I2C_ADDR);
+    result = i2c_find_device();
     if(!result){
-        i2c_wread_one_buffer(ADDR_VALIDATION, VarAux.uc, 2);
+        i2c_read_multiples(ADDR_VALIDATION, VarAux.c, 2);
         if(VarAux.i == 0xAA){
             delayms(50);
-            result |= i2c_wread_one_buffer(ADDR_FLIGHT_TIME, VarAux.uc, 2);
+            result |= i2c_read_multiples(ADDR_FLIGHT_TIME, VarAux.c, 2);
             FlightTime = VarAux.i;
             
             delayms(50);
-            result |= i2c_wread_one_buffer(ADDR_P_PITCH_MUL, VarAux.uc, 2);
+            result |= i2c_read_multiples(ADDR_P_PITCH_MUL, VarAux.c, 2);
             ControlProportionalMul[PITCH_INDEX] = VarAux.i;
             
             delayms(50);
-            result |= i2c_wread_one_buffer(ADDR_P_ROLL_MUL, VarAux.uc, 2);
+            result |= i2c_read_multiples(ADDR_P_ROLL_MUL, VarAux.c, 2);
             ControlProportionalMul[ROLL_INDEX] = VarAux.i;
                         
             delayms(50);
-            result |= i2c_wread_one_buffer(ADDR_P_YAW_MUL, VarAux.uc, 2);
+            result |= i2c_read_multiples(ADDR_P_YAW_MUL, VarAux.c, 2);
             ControlProportionalMul[YAW_INDEX] = VarAux.i;
             
             delayms(50);
-            result |= i2c_wread_one_buffer(ADDR_P_PITCH_DIV, VarAux.uc, 2);
+            result |= i2c_read_multiples(ADDR_P_PITCH_DIV, VarAux.c, 2);
             ControlProportionalDiv[PITCH_INDEX] = VarAux.i;
             
             delayms(50);
-            result |= i2c_wread_one_buffer(ADDR_P_ROLL_DIV, VarAux.uc, 2);
+            result |= i2c_read_multiples(ADDR_P_ROLL_DIV, VarAux.c, 2);
             ControlProportionalDiv[ROLL_INDEX] = VarAux.i;
             
             delayms(50);
-            result |= i2c_wread_one_buffer(ADDR_P_YAW_DIV, VarAux.uc, 2);
+            result |= i2c_read_multiples(ADDR_P_YAW_DIV, VarAux.c, 2);
             ControlProportionalDiv[YAW_INDEX] = VarAux.i;
             
             screen_flash(256, 200, 5);
@@ -1128,7 +1389,6 @@ uchar load_params(void){
             result |= reset_defaults();
         }    
     }
-  */  
     return result;
 }
     
@@ -1141,14 +1401,17 @@ uchar reset_defaults(void){
     
 }
 
-void adjust_readings(void){
+inline void adjust_readings(void){
    // lowpass no gyro, importante
     GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] + AnalogValue[GYRO_ROLL_ACH]) >> 1;
     GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] + AnalogValue[GYRO_PITCH_ACH]) >> 1;
     GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] + AnalogValue[GYRO_YAW_ACH]) >> 1;
     
     // fazer o lowpass do accel tbm
-    
+    AccelValue[ROLL_INDEX] = (AccelValue[ROLL_INDEX] + AnalogValue[ACCELX_ACH]) >> 1;
+    AccelValue[PITCH_INDEX] = (AccelValue[PITCH_INDEX] + AnalogValue[ACCELY_ACH]) >> 1;
+    AccelValue[YAW_INDEX] = (AccelValue[YAW_INDEX] + AnalogValue[ACCELY_ACH]) >> 1;
+     
 }
 
 void init_vars(void){

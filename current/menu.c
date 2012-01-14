@@ -47,6 +47,7 @@ void menu_refresh(MENU* oMenu){
     
     // varre todos os items visiveis
     while((i < (oMenu->FirstShowed + *(oMenu->JanelaSize))) && (i < oMenu->oListItems->Size)){
+        
         oItem = list_items_get_item(oMenu->oListItems,i);
         // se possuir barra
         if((oItem->ItemType & MASK_READ) && (oItem->ItemType & MASK_BAR)){
@@ -71,11 +72,8 @@ void menu_refresh(MENU* oMenu){
                 // valor
                 printf("%d",*(oItem->Value));
                 valor = *(oItem->Value);                
-                do{       // da o numero de espacos necessarios pra chegar no final
-                    printf(" ");
-                    valor = valor * 10;
-                }while(valor < 1000);
-
+                
+                printf("   ");
             }
             else{   // se nao for valor
                 if((oItem->ItemType & MASK_BOOL) == MASK_BOOL){ // se for um boolean

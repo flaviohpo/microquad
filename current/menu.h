@@ -1,6 +1,8 @@
 /**********************************************************/
 // menu.h
 // 
+// usar sprintf para ajustar o tamanho do Valor dos items
+// 
 // Gerencia menus 
 // - os menus sao ponteiros criados pela funcao menu_create
 // - as funcoes recebem sempre um Handler que eh um ponteiro

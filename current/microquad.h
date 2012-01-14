@@ -1,5 +1,15 @@
-#define constrain(val,min,max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
+#define constrain(val, min, max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
 
+#define LIGHTS_ON_I2C
+#ifdef LIGHTS_ON_I2C
+#define LED_RIGHT_TOGGLE() (P3OUT^=0x02)
+#define LED_BACK_TOGGLE() (P3OUT^=0x04)
+#endif
+
+#define LIGHTS_ON_UART
+#ifdef LIGHTS_ON_UART
+#define LED_LEFT_TOGGLE()   (P3OUT^=0x20)
+#endif
 //#define TEST_LOOP_PERIOD
 //#define ITG3200
 #define SAMPLE_TIME           20 // * 100us (2000ns)
@@ -18,9 +28,9 @@
 #define BATTERY_RED           1590
 #define BATTERY_CHECK_TIME    2000
 // default proportional gain
-#define YAW_PROPORTIONAL_MUL    3
-#define PITCH_PROPORTIONAL_MUL  5
-#define ROLL_PROPORTIONAL_MUL   5
+#define YAW_PROPORTIONAL_MUL    4
+#define PITCH_PROPORTIONAL_MUL  7
+#define ROLL_PROPORTIONAL_MUL   7
 #define YAW_PROPORTIONAL_DIV    1
 #define PITCH_PROPORTIONAL_DIV  2
 #define ROLL_PROPORTIONAL_DIV   2
@@ -33,8 +43,8 @@
 #define ROLL_INTEGRAL_DIV       1
 // default proportional radio influence
 #define YAW_REF_MUL             3
-#define PITCH_REF_MUL           4
-#define ROLL_REF_MUL            4
+#define PITCH_REF_MUL           3
+#define ROLL_REF_MUL            3
 #define YAW_REF_DIV             1
 #define PITCH_REF_DIV           3
 #define ROLL_REF_DIV            3
@@ -47,7 +57,7 @@
 #define ACCELY_ACH              4
 #define ACCELZ_ACH              3
 
-#define LCD_MAX_BRIGHT          4000
+#define LCD_MAX_BRIGHT          2800
 #define PPM_P1MASK              0xFF
 
 #define MIN_MOTOR               2000
@@ -73,13 +83,15 @@
 #define GRAPH_START             64
 #define GRAPH_HEIGHT            52
 
-#define ANALOG_MENU_INDEX       0
-#define CONTROL_MENU_INDEX      3
-#define RADIO_MENU_INDEX        1
-#define MOTOR_MENU_INDEX        2
-#define SENSOR_MENU_INDEX       4
-#define OPTION_MENU_INDEX       5
-#define LETSFLY_INDEX           6
+#define ANALOG_MENU_INDEX           0
+#define CONTROL_MENU_INDEX          3
+#define RADIO_MENU_INDEX            1
+#define MOTOR_MENU_INDEX            2
+#define SENSOR_MENU_INDEX           4
+#define OPTION_MENU_INDEX           5
+#define VIBRATION_ANALYZER_INDEX    6
+#define VOLTAGE_DROP_INDEX         7
+#define LETSFLY_INDEX               8
 
 #define CALIBR_INDEX            1
 #define RETURN_INDEX            0
@@ -108,20 +120,36 @@
 #define ANALOG_CH6_INDEX        8
 #define ANALOG_CH7_INDEX        9
 
+typedef struct{
+    int AccelHigher[3];
+    int GyroHigher[3];
+    int AccelLower[3];
+    int GyroLower[3];
+    int ControlResultHigher[3];
+    int ControlResultLower[3];
+    int MotorOutputHigher[6];
+    int MotorOutputLower[6];
+}BlackBox;
+
 typedef enum{
-    PROCESS_MAIN_MENU           = 0xFF,
-    PROCESS_ANALOG_MENU         = ANALOG_MENU_INDEX,
-    PROCESS_MOTOR_MENU          = MOTOR_MENU_INDEX,
-    PROCESS_SENSOR_MENU         = SENSOR_MENU_INDEX,
-    PROCESS_RADIO_MENU          = RADIO_MENU_INDEX,
-    PROCESS_OPTION_MENU         = OPTION_MENU_INDEX,
-    PROCESS_CONTROL_MENU        = CONTROL_MENU_INDEX,
-    PROCESS_CONTROL             = LETSFLY_INDEX
+    PROCESS_MAIN_MENU                   = 0xFF,
+    PROCESS_ANALOG_MENU                 = ANALOG_MENU_INDEX,
+    PROCESS_MOTOR_MENU                  = MOTOR_MENU_INDEX,
+    PROCESS_SENSOR_MENU                 = SENSOR_MENU_INDEX,
+    PROCESS_RADIO_MENU                  = RADIO_MENU_INDEX,
+    PROCESS_OPTION_MENU                 = OPTION_MENU_INDEX,
+    PROCESS_CONTROL_MENU                = CONTROL_MENU_INDEX,
+    PROCESS_VIBRATION_ANALYZER_MENU     = VIBRATION_ANALYZER_INDEX,
+    PROCESS_VOLTAGE_DROP_MENU           = VOLTAGE_DROP_INDEX,
+    PROCESS_CONTROL                     = LETSFLY_INDEX
 }PROGRAM_STEP;
+
+int main(void);
 
 unsigned char save_params(void);
 unsigned char load_params(void);
 unsigned char reset_defaults(void);
+
 void adjust_readings(void);
 void menu_init(void);
 void setup(void);
@@ -137,6 +165,7 @@ void calibrate_radio(void);
 void control_loop(void);
 void process_analog_graph(void);
 void analog_graph_clear(int i);
-int main(void);
+void process_vibration_analyzer_menu(void);
+
 ACTION get_radio_action(void);
 

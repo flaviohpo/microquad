@@ -1,0 +1,145 @@
+#define LIGHTS_ON_I2C
+#ifdef LIGHTS_ON_I2C
+#define LED_RIGHT_TOGGLE() (P3OUT^=0x02)
+#define LED_BACK_TOGGLE() (P3OUT^=0x04)
+#endif
+
+#define LIGHTS_ON_UART
+#ifdef LIGHTS_ON_UART
+#define LED_LEFT_TOGGLE()   (P3OUT^=0x20)
+#endif
+//#define TEST_LOOP_PERIOD
+//#define ITG3200
+#define SAMPLE_TIME           20 // * 100us (2000ns)
+
+#define BUZZER                0x10
+#define BUZZER_ON()          (P2OUT |= BUZZER)
+#define BUZZER_OFF()         (P2OUT &= ~BUZZER)
+#define BUZZER_TOOGLE()      (P2OUT ^= BUZZER)
+#define ENABLE_BUZZER()      (P2DIR |= BUZZER)
+#define DISABLE_BUZZER()     (P2DIR &=~ BUZZER)
+
+#define MIN_BATTERY           1520
+#define MAX_BATTERY           1850
+// battery colors
+#define BATTERY_YELLOW        1720
+#define BATTERY_RED           1590
+#define BATTERY_CHECK_TIME    2000
+// default proportional gain
+#define YAW_PROPORTIONAL_MUL    4
+#define PITCH_PROPORTIONAL_MUL  7
+#define ROLL_PROPORTIONAL_MUL   7
+#define YAW_PROPORTIONAL_DIV    1
+#define PITCH_PROPORTIONAL_DIV  2
+#define ROLL_PROPORTIONAL_DIV   2
+// default integral gain
+#define YAW_INTEGRAL_MUL        1
+#define PITCH_INTEGRAL_MUL      1
+#define ROLL_INTEGRAL_MUL       1
+#define YAW_INTEGRAL_DIV        1
+#define PITCH_INTEGRAL_DIV      1
+#define ROLL_INTEGRAL_DIV       1
+// default proportional radio influence
+#define YAW_REF_MUL             3
+#define PITCH_REF_MUL           3
+#define ROLL_REF_MUL            3
+#define YAW_REF_DIV             1
+#define PITCH_REF_DIV           3
+#define ROLL_REF_DIV            3
+
+#define BATTERY_ACH             7 
+#define GYRO_YAW_ACH            2
+#define GYRO_PITCH_ACH          1
+#define GYRO_ROLL_ACH           0
+#define ACCELX_ACH              5
+#define ACCELY_ACH              4
+#define ACCELZ_ACH              3
+
+#define LCD_MAX_BRIGHT          2800
+#define PPM_P1MASK              0xFF
+
+#define MIN_MOTOR               2000
+#define MAX_MOTOR               4000
+#define MIN_MOTOR_WORK          2450
+
+#define MOTOR_FRONT             2
+#define MOTOR_BACK              1
+#define MOTOR_RIGHT             3
+#define MOTOR_LEFT              0
+
+#define STICK_UPPER_THRESHOLD   3200
+#define STICK_LOWER_THRESHOLD   2300
+
+#define RADIO_PITCH_CH          2
+#define RADIO_YAW_CH            4
+#define RADIO_THROTTLE_CH       3
+#define RADIO_ROLL_CH           0
+
+#define GRAPH_LENGHT            56
+#define GRAPH_OFFSETX           36
+#define GRAPH_OFFSET            115
+#define GRAPH_START             64
+#define GRAPH_HEIGHT            52
+
+#define ANALOG_MENU_INDEX       0
+#define CONTROL_MENU_INDEX      3
+#define RADIO_MENU_INDEX        1
+#define MOTOR_MENU_INDEX        2
+#define SENSOR_MENU_INDEX       4
+#define OPTION_MENU_INDEX       5
+#define LETSFLY_INDEX           6
+
+#define CALIBR_INDEX            1
+#define RETURN_INDEX            0
+
+#define YAW_INDEX               0
+#define PITCH_INDEX             1
+#define ROLL_INDEX              2
+
+#define SAVE_INDEX              1
+#define RESET_INDEX             2
+
+#define ACCEL_X_INDEX           0
+#define ACCEL_Y_INDEX           1
+#define ACCEL_Z_INDEX           2
+
+#define GYRO_X_INDEX            2
+#define GYRO_Y_INDEX            1
+#define GYRO_Z_INDEX            0
+
+#define ANALOG_CH0_INDEX        2
+#define ANALOG_CH1_INDEX        3
+#define ANALOG_CH2_INDEX        4
+#define ANALOG_CH3_INDEX        5
+#define ANALOG_CH4_INDEX        6
+#define ANALOG_CH5_INDEX        7
+#define ANALOG_CH6_INDEX        8
+#define ANALOG_CH7_INDEX        9
+
+typedef enum{
+    PROCESS_MAIN_MENU           = 0xFF,
+    PROCESS_ANALOG_MENU         = ANALOG_MENU_INDEX,
+    PROCESS_MOTOR_MENU          = MOTOR_MENU_INDEX,
+    PROCESS_SENSOR_MENU         = SENSOR_MENU_INDEX,
+    PROCESS_RADIO_MENU          = RADIO_MENU_INDEX,
+    PROCESS_OPTION_MENU         = OPTION_MENU_INDEX,
+    PROCESS_CONTROL_MENU        = CONTROL_MENU_INDEX,
+    PROCESS_CONTROL             = LETSFLY_INDEX
+}PROGRAM_STEP;
+
+unsigned char save_params(void);
+unsigned char load_params(void);
+unsigned char reset_defaults(void);
+void interrupt_400Hz(void);
+void adjust_readings(void);
+void menu_init(void);
+void setup(void);
+void vars_init(void);
+void screen_flash(int Color, int interval, int times);
+void calibrate_radio(void);
+void control_loop(void);
+void process_analog_graph(void);
+void analog_graph_clear(int i);
+int main(void);
+ACTION get_radio_action(void);
+
