@@ -136,6 +136,9 @@ const char* str_battery_min   = "BatL";
 const char* str_roll_min      = "LCRo";
 const char* str_pitch_min     = "LCPi";
 const char* str_yaw_min       = "LCYa";
+
+const char* _str_calibrando_esc = "CALIBRANDO ESC...";
+const char* _str_programando_esc = "PROGRAMANDO ESC...";
 /*******************************/
 // CONST VALUES
 const int val_zero            = 0;

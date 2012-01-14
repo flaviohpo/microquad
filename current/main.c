@@ -141,13 +141,7 @@ int main(void){
     setup();
           
     menu_draw(MainMenu, 1);
-    
-    // iluminacao progressiva do LCD
-    while(TACCR1 < LCD_MAX_BRIGHT){
-        TACCR1 = TACCR1 + 1;
-        delayus(1500);
-    }
-    
+        
     while(1){
         
         analog_refresh_all();
@@ -492,25 +486,8 @@ int main(void){
                 // roda o loop de controle excepcionalmente nesse step
                 // so para poder avaliar os sinais de controle
                 if(ControlSample == 1){
-                    
                     ControlSample = 0;
                     control_loop();
-                    
-                    if(MenuDraw == 1){
-                        // condicao inicial
-                        // coloca valor atual em todas variaveis
-                        ThrottleFilteredMin = ThrottleFiltered;
-                        ThrottleFilteredMax = ThrottleFiltered;
-                        
-                        memcpy(ControlResultMax, ControlResult, sizeof(int) * 3);
-                        memcpy(ControlResultMin, ControlResult, sizeof(int) * 3);
-                        memcpy(GyroValueMax, GyroValue, sizeof(int) * 3);
-                        memcpy(AccelValueMax, AccelValue, sizeof(int) * 3);
-                        memcpy(GyroValueMin, GyroValue, sizeof(int) * 3);
-                        memcpy(AccelValueMin, AccelValue, sizeof(int) * 3);
-                        memcpy(MotorOutputMax, MotorOutput, sizeof(int) * 6);
-                        memcpy(MotorOutputMin, MotorOutput, sizeof(int) * 6);
-                    }
                 }
                 
                 MenuDraw = 0;
@@ -536,6 +513,24 @@ int main(void){
                         MenuDraw = 1;
                     break;
                     case RESP_SUBMENU_IN:
+                        switch(VibrationAnalyzerMenu->SelectedItem){
+                            case CALIBR_INDEX:
+                                // condicao inicial
+                                // coloca valor atual em todas variaveis
+                                ThrottleFilteredMin = ThrottleFiltered;
+                                ThrottleFilteredMax = ThrottleFiltered;
+                                
+                                memcpy(ControlResultMax, ControlResult, sizeof(int) * 3);
+                                memcpy(ControlResultMin, ControlResult, sizeof(int) * 3);
+                                memcpy(GyroValueMax, GyroValue, sizeof(int) * 3);
+                                memcpy(AccelValueMax, AccelValue, sizeof(int) * 3);
+                                memcpy(GyroValueMin, GyroValue, sizeof(int) * 3);
+                                memcpy(AccelValueMin, AccelValue, sizeof(int) * 3);
+                                memcpy(MotorOutputMax, MotorOutput, sizeof(int) * 6);
+                                memcpy(MotorOutputMin, MotorOutput, sizeof(int) * 6);
+                            break;
+                        }
+                    break;
                     case RESP_NONE:          
                     case RESP_BUSY:
                     case RESP_SEL_MIN_LIMIT:
@@ -907,19 +902,46 @@ void setup(void){
 #endif
     
     eint(); // habilita interrupt
+
+    lcd_init(LCDBackColor);    
     
-    delayms(400);
+    delayms(350);
         
-    // calibra esc
+    // calibra ou programa esc
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
-        while(i--){
-            set_all_motors(PPMValue[RADIO_THROTTLE_CH]);
-            delayms(80);
-        }       
+        
+        // iluminacao progressiva do LCD
+        while(TACCR1 < LCD_MAX_BRIGHT){
+            TACCR1 = TACCR1 + 1;
+            delayus(1500);
+        }
+        
+        if(PPMValue[5] > STICK_UPPER_THRESHOLD){
+            printf(_str_programando_esc);           
+            while(PPMValue[5] > STICK_UPPER_THRESHOLD){
+                set_all_motors(PPMValue[RADIO_THROTTLE_CH]);    
+            }
+        }
+        else{
+            printf(_str_calibrando_esc);
+            while(i--){
+                set_all_motors(PPMValue[RADIO_THROTTLE_CH]);
+                delayms(80);
+            }       
+        }
     }
     else{
         set_all_motors(MIN_MOTOR);
     }
+    
+    
+    // iluminacao progressiva do LCD
+    while(TACCR1 < LCD_MAX_BRIGHT){
+        TACCR1 = TACCR1 + 1;
+        delayus(1500);
+    }
+    
+    lcd_clear(LCDBackColor);
     
     analog_init(); // config registradores        
     analog_calibrate_channel(0);
@@ -936,8 +958,6 @@ void setup(void){
     menu_init();
     ENABLE_BUZZER();
     BUZZER_ON();
-    
-    lcd_init(LCDBackColor);
     
     BUZZER_OFF();
 }
@@ -1109,8 +1129,9 @@ void menu_init(void){
     menu_add_item(SensorMenu, create_item(str_gyroy, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Y_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyroz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Z_INDEX]));    
     // vibration analyzer menu
-    VibrationAnalyzerMenu = menu_create(str_vibration_analyzer_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
-    
+    VibrationAnalyzerMenu = menu_create(str_vibration_analyzer_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(VibrationAnalyzerMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
+        
     menu_add_item(VibrationAnalyzerMenu, create_item(str_throttle_max, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ThrottleFilteredMax));
     menu_add_item(VibrationAnalyzerMenu, create_item(str_throttle_min, ITEMTYPE_VALUE_R, &val_min_int, &val_max_int, NULL, (int*)&ThrottleFilteredMin));    
     
