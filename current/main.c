@@ -4,6 +4,8 @@
 - fazer grafico para o Vdrop
 
 POSSIVEIS CAUSA DO PROBLEMA FULL-THROTTLE
+- helice
+- ganho alto
 - corrente bateria nao ta dando conta
 - placa de distribuicao nao deixa passar corrente (acho improvavel)
 - tensao da bateria ta caindo muito
@@ -61,30 +63,30 @@ fazer tudo pro itg3200
 int PPMOffset[8] = {0,0,0,0,0,0,0,0};
 // variaveis leitura radio raw
 uint16 TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
-int PPMValue[8] = {0,0,0,0,0,0,0,0};
+long PPMValue[8] = {0,0,0,0,0,0,0,0};
 
 //variaveis controle
 volatile uchar ControlSample = 0;       // sample time flag - indica a hora de fazer um sample e um controle
-int ThrottleFiltered = 0;
+long ThrottleFiltered = 0;
 // variaveis controle realimentacao
-int AccelValue[3] = {0,0,0};
-int AccelOffset[3] = {0,0,0};
-int GyroValue[3] = {0,0,0};
-int GyroOffset[3] = {0,0,0};
+long AccelValue[3] = {0,0,0};
+long AccelOffset[3] = {0,0,0};
+long GyroValue[3] = {0,0,0};
+long GyroOffset[3] = {0,0,0};
 // variaveis controle ganhos
-int ControlProportionalMul[3];
-int ControlProportionalDiv[3];
-int ControlIntegralMul[3];
-int ControlIntegralDiv[3];
-int ControlReferenceMul[3];
-int ControlReferenceDiv[3];
+long ControlProportionalMul[3];
+long ControlProportionalDiv[3];
+long ControlIntegralMul[3];
+long ControlIntegralDiv[3];
+long ControlReferenceMul[3];
+long ControlReferenceDiv[3];
 // variaveis controle sinais de controle
-int ControlRadioResult[3] = {0, 0, 0};
-int ControlResult[3] = {0, 0, 0};
-int ControlIntegralResult[3] = {0, 0, 0};
+long ControlRadioResult[3] = {0, 0, 0};
+long ControlResult[3] = {0, 0, 0};
+long ControlIntegralResult[3] = {0, 0, 0};
 // variaveis controle atuadores
-int MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
-int MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
+long MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
+long MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
 // general purpose
 uint16 FlightTime = 0; // guarda ate 9h de voo
 // analog graph
@@ -1251,7 +1253,7 @@ uint16 tempoloop2 = 0;
 inline void control_loop(void){
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
         
-        ThrottleFiltered = (ThrottleFiltered * 7 + PPMValue[RADIO_THROTTLE_CH]) >> 3;
+        ThrottleFiltered = (ThrottleFiltered * 9 + PPMValue[RADIO_THROTTLE_CH]) / 10;
         
         // calcula a proporcao do gyro
         ControlResult[ROLL_INDEX] = ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH]) * ControlProportionalMul[ROLL_INDEX]) >> ControlProportionalDiv[ROLL_INDEX];
@@ -1295,10 +1297,10 @@ inline void control_loop(void){
         MotorOutput[MOTOR_BACK] += ControlResult[YAW_INDEX];
 
         // low pass na saida
-        MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT] * 7) >> 3;
-        MotorOutput[MOTOR_LEFT] =  (MotorOutput[MOTOR_LEFT] + MotorOutputOld[MOTOR_LEFT]) >> 1;
-        MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK] * 7) >> 3;
-        MotorOutput[MOTOR_RIGHT] = (MotorOutput[MOTOR_RIGHT] + MotorOutputOld[MOTOR_RIGHT]) >> 1; 
+        MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT] * 3) >> 2;
+        MotorOutput[MOTOR_LEFT] =  (MotorOutput[MOTOR_LEFT] + MotorOutputOld[MOTOR_LEFT] * 3) >> 2;
+        MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK] * 3) >> 2;
+        MotorOutput[MOTOR_RIGHT] = (MotorOutput[MOTOR_RIGHT] + MotorOutputOld[MOTOR_RIGHT] * 3) >> 2; 
         
         set_motor_output();
         
@@ -1424,14 +1426,14 @@ uchar reset_defaults(void){
 
 inline void adjust_readings(void){
    // lowpass no gyro, importante
-    GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] + AnalogValue[GYRO_ROLL_ACH]) >> 1;
-    GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] + AnalogValue[GYRO_PITCH_ACH]) >> 1;
-    GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] + AnalogValue[GYRO_YAW_ACH]) >> 1;
+    GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] * 3 + AnalogValue[GYRO_ROLL_ACH]) >> 2;
+    GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] * 3 + AnalogValue[GYRO_PITCH_ACH]) >> 2;
+    GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] * 3 + AnalogValue[GYRO_YAW_ACH]) >> 2;
     
     // fazer o lowpass do accel tbm
-    AccelValue[ROLL_INDEX] = (AccelValue[ROLL_INDEX] + AnalogValue[ACCELX_ACH]) >> 1;
-    AccelValue[PITCH_INDEX] = (AccelValue[PITCH_INDEX] + AnalogValue[ACCELY_ACH]) >> 1;
-    AccelValue[YAW_INDEX] = (AccelValue[YAW_INDEX] + AnalogValue[ACCELY_ACH]) >> 1;
+    AccelValue[ROLL_INDEX] = (AccelValue[ROLL_INDEX] * 7 + AnalogValue[ACCELX_ACH]) >> 3;
+    AccelValue[PITCH_INDEX] = (AccelValue[PITCH_INDEX] * 7 + AnalogValue[ACCELY_ACH]) >> 3;
+    AccelValue[YAW_INDEX] = (AccelValue[YAW_INDEX] * 7 + AnalogValue[ACCELY_ACH]) >> 3;
      
 }
 
