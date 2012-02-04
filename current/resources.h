@@ -9,6 +9,7 @@ const char* str_main_menu                = "MAIN MENU";
 const char* str_analog_menu              = "ANALOG VIEW";
 const char* str_radio_menu               = "RADIO VIEW";
 const char* str_control_menu             = "CONTROL CONFIG.";
+const char* str_filter_menu              = "FILTER MENU";
 const char* str_motor_menu               = "MOTOR CONTROL";
 const char* str_sensor_menu              = "SENSOR VIEW";
 const char* str_option_menu              = "OPTIONS";
@@ -37,6 +38,15 @@ const char* str_analogof4     = "OFF4";
 const char* str_analogof5     = "OFF5";
 const char* str_analogof6     = "OFF6";
 const char* str_analogof7     = "OFF7";
+
+const char* str_throttle_lp_mul     = "TRHM";
+const char* str_throttle_lp_div     = "TRHD";
+const char* str_motor_lp_mul        = "MTRM";
+const char* str_motor_lp_div        = "MTRD";
+const char* str_gyro_lp_mul         = "GYRM";
+const char* str_gyro_lp_div         = "GYRD";
+const char* str_accel_lp_mul        = "ACCM";
+const char* str_accel_lp_div        = "ACCD";
 
 const char* str_radioch0      = "CH0 ";
 const char* str_radioch1      = "CH1 ";
@@ -139,10 +149,12 @@ const char* str_roll_min      = "LCRo";
 const char* str_pitch_min     = "LCPi";
 const char* str_yaw_min       = "LCYa";
 
-const char* _str_calibrando_esc = "CALIBRANDO ESC...";
-const char* _str_programando_esc = "PROGRAMANDO ESC...";
-const char* _str_inicializando = "INCIALIZANDO...\nNAO MEXA A IMU!\nO RADIO DEVE ESTAR\nLIGADO.\n";
-const char* _str_pontinho = ".";
+const char* str_vibration_desc  = "MOVE RIGHT STICK\nWITHOUT PROPS!";
+const char* str_failled         = "FAILLED";
+const char* str_calibrando_esc  = "CALIBRANDO ESC...";
+const char* str_programando_esc = "PROGRAMANDO ESC...";
+const char* str_inicializando   = "INCIALIZANDO...\nNAO MEXA A IMU!\nO RADIO DEVE ESTAR\nLIGADO.\n";
+const char* str_pontinho        = ".";
 
 /*******************************/
 // CONST VALUES

@@ -1,5 +1,6 @@
 /*
 CALIBRACAO DE THROTTLE ESTA DESABILITADA PQ DA PRA CALIBRAR THROTTLE NO CALIBRATE ESC
+soh entra nos menus se throttle for < STICK_LOWER_THRESHOLD
 
 - fazer um misc.h nesse prog
 - fazer grafico para o Vdrop
@@ -75,6 +76,15 @@ long ControlIntegralMul[3];
 long ControlIntegralDiv[3];
 long ControlReferenceMul[3];
 long ControlReferenceDiv[3];
+// variaveis dos filtros
+long ThrottleLPMul;    
+long ThrottleLPDiv;    
+long MotorOutputLPMul; 
+long MotorOutputLPDiv; 
+long GyroLPMul;     
+long GyroLPDiv;     
+long AccelLPMul;        
+long AccelLPDiv;        
 // variaveis controle sinais de controle
 long ControlRadioResult[3] = {0, 0, 0};
 long ControlResult[3] = {0, 0, 0};
@@ -95,6 +105,7 @@ MENU* MainMenu;
 MENU* AnalogMenu;
 MENU* MotorMenu;
 MENU* ControlMenu;
+MENU* FilterMenu;
 MENU* RadioMenu;
 MENU* SensorMenu;
 MENU* OptionMenu;
@@ -447,6 +458,26 @@ int main(void){
                 }
             break;
 
+            case PROCESS_FILTER_MENU:
+                menu_draw(FilterMenu, MenuDraw);
+                MenuDraw = 0;
+                menu_refresh(FilterMenu);
+                act = get_radio_action();
+                resp = menu_process(FilterMenu, act);
+                switch(resp){
+                    case RESP_SUBMENU_OUT:
+                        if(FilterMenu->SelectedItem == RETURN_INDEX){
+                            ProgStep = PROCESS_MAIN_MENU;
+                            MenuDraw = 1;
+                        }
+                    break;
+                    
+                    default:
+                    break;
+                }
+            break;
+
+            
             case PROCESS_VIBRATION_ANALYZER_MENU:
 
                 menu_draw(VibrationAnalyzerMenu, MenuDraw);              
@@ -535,7 +566,7 @@ int main(void){
                         switch(OptionMenu->SelectedItem){
                             case SAVE_INDEX:
                                 if(save_params()){
-                                    printf("FAILLED");
+                                    printf(str_failled);
                                     delayms(2000);
                                 }
                             break;
@@ -796,13 +827,13 @@ void setup(void){
         }
         
         if(PPMValue[5] > STICK_UPPER_THRESHOLD){
-            printf(_str_programando_esc);           
+            printf(str_programando_esc);           
             while(PPMValue[5] > STICK_UPPER_THRESHOLD){
                 set_all_motors(PPMValue[RADIO_THROTTLE_CH]);    
             }
         }
         else{
-            printf(_str_calibrando_esc);
+            printf(str_calibrando_esc);
             while(i--){
                 set_all_motors(PPMValue[RADIO_THROTTLE_CH]);
                 delayms(80);
@@ -811,7 +842,7 @@ void setup(void){
     }
     else{
         set_all_motors(MIN_MOTOR);
-        printf(_str_inicializando);           
+        printf(str_inicializando);           
     }
     
     
@@ -823,30 +854,30 @@ void setup(void){
      
     analog_init(); // config registradores        
     analog_calibrate_channel(0);
-    printf(_str_pontinho);
+    printf(str_pontinho);
     analog_calibrate_channel(1);
-    printf(_str_pontinho);
+    printf(str_pontinho);
     analog_calibrate_channel(2);
-    printf(_str_pontinho);
+    printf(str_pontinho);
     analog_calibrate_channel(3);
-    printf(_str_pontinho);
+    printf(str_pontinho);
     analog_calibrate_channel(4);
-    printf(_str_pontinho);
+    printf(str_pontinho);
     analog_calibrate_channel(5);
-    printf(_str_pontinho);
+    printf(str_pontinho);
     analog_calibrate_channel(6);
-    printf(_str_pontinho);
+    printf(str_pontinho);
     analog_calibrate_channel(7);
-    printf(_str_pontinho);
+    printf(str_pontinho);
         
     AccelOffset[PITCH_INDEX] = AnalogOffset[ACCELX_ACH];
     AccelOffset[ROLL_INDEX] = AnalogOffset[ACCELY_ACH];
     AccelOffset[YAW_INDEX] = AnalogOffset[ACCELZ_ACH];
     
     calibrate_radio();
-    printf(_str_pontinho);
-    printf(_str_pontinho);
-    printf(_str_pontinho);
+    printf(str_pontinho);
+    printf(str_pontinho);
+    printf(str_pontinho);
     
     lcd_clear(LCDBackColor);        
     menu_init();
@@ -954,6 +985,7 @@ void menu_init(void){
     MainMenu = menu_create(str_main_menu, create_item(str_letsfly, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, NULL, NULL, &val_arrow_center, NULL);
     menu_add_item(MainMenu, create_item(str_analog_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_control_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
+    menu_add_item(MainMenu, create_item(str_filter_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_radio_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_motor_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
     menu_add_item(MainMenu, create_item(str_sensor_menu, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));
@@ -996,7 +1028,18 @@ void menu_init(void){
     menu_add_item(ControlMenu, create_item(str_yawrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[YAW_INDEX]));        
     menu_add_item(ControlMenu, create_item(str_pitchrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[PITCH_INDEX]));        
     menu_add_item(ControlMenu, create_item(str_rollrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[ROLL_INDEX]));        
-    
+
+    // filters menu
+    FilterMenu = menu_create(str_filter_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    menu_add_item(FilterMenu, create_item(str_throttle_lp_mul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ThrottleLPMul));        
+    menu_add_item(FilterMenu, create_item(str_throttle_lp_div, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ThrottleLPDiv));        
+    menu_add_item(FilterMenu, create_item(str_motor_lp_mul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&MotorOutputLPMul));        
+    menu_add_item(FilterMenu, create_item(str_motor_lp_div, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&MotorOutputLPDiv));        
+    menu_add_item(FilterMenu, create_item(str_gyro_lp_mul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&GyroLPMul));        
+    menu_add_item(FilterMenu, create_item(str_gyro_lp_div, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&GyroLPDiv));        
+    menu_add_item(FilterMenu, create_item(str_accel_lp_mul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&AccelLPMul));        
+    menu_add_item(FilterMenu, create_item(str_accel_lp_div, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&AccelLPDiv));        
+       
     // radio menu
     RadioMenu = menu_create(str_radio_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_medium, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(RadioMenu, create_item(str_calibrate, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL));            
@@ -1036,7 +1079,7 @@ void menu_init(void){
     menu_add_item(SensorMenu, create_item(str_gyroy, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Y_INDEX]));
     menu_add_item(SensorMenu, create_item(str_gyroz, ITEMTYPE_VALUE_BAR_R, &val_zero, &val_max_analog, NULL, (int*)&GyroValue[GYRO_Z_INDEX]));    
     // vibration analyzer menu
-    VibrationAnalyzerMenu = menu_create(str_vibration_analyzer_menu, create_item("MOVE RIGHT STICK\nWITHOUT PROPS!", ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    VibrationAnalyzerMenu = menu_create(str_vibration_analyzer_menu, create_item(str_vibration_desc, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     // vdrop menu
     VoltageDropMenu = menu_create(str_voltage_drop_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
     menu_add_item(VoltageDropMenu, create_item(str_battery_max, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&VdropMaxBat));
@@ -1138,12 +1181,10 @@ uint16 tempoloop2 = 0;
 inline void control_loop(void){
     // implementar integrador aqui nesta funcao
     // ajusta throttle de acordo com o throttleMax e thottleMin    
-    //long ThrottleAdjusted = PPMValue[RADIO_THROTTLE_CH];
-    //ThrottleAdjusted = (ThrottleAdjusted * ThrottleSlopeMul) / ThrottleSlopeDiv - ThrottleOffset;
-    
+
     // verifica se o throttle nao ta em 0
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){    
-        ThrottleFiltered = (ThrottleFiltered * 9 + PPMValue[RADIO_THROTTLE_CH]) / 10;
+        ThrottleFiltered = (ThrottleFiltered * ThrottleLPMul + PPMValue[RADIO_THROTTLE_CH]) >> ThrottleLPDiv;
         
         // calcula a proporcao do gyro
         ControlResult[ROLL_INDEX] = ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH]) * ControlProportionalMul[ROLL_INDEX]) >> ControlProportionalDiv[ROLL_INDEX];
@@ -1174,23 +1215,19 @@ inline void control_loop(void){
                 
         MotorOutput[MOTOR_RIGHT] -= ControlRadioResult[YAW_INDEX];
         MotorOutput[MOTOR_LEFT] -= ControlRadioResult[YAW_INDEX];
-//        MotorOutput[MOTOR_RIGHT] -= ControlResult[YAW_INDEX] - (ControlIntegralResult[YAW_INDEX] >> 5);
-//        MotorOutput[MOTOR_LEFT] -= ControlResult[YAW_INDEX] - (ControlIntegralResult[YAW_INDEX] >> 5);
         MotorOutput[MOTOR_RIGHT] -= ControlResult[YAW_INDEX];
         MotorOutput[MOTOR_LEFT] -= ControlResult[YAW_INDEX];
 
         MotorOutput[MOTOR_FRONT] += ControlRadioResult[YAW_INDEX];
         MotorOutput[MOTOR_BACK] += ControlRadioResult[YAW_INDEX];
-//        MotorOutput[MOTOR_FRONT] += ControlResult[YAW_INDEX] + (ControlIntegralResult[YAW_INDEX] >> 5);
-//        MotorOutput[MOTOR_BACK] += ControlResult[YAW_INDEX] + (ControlIntegralResult[YAW_INDEX] >> 5);
         MotorOutput[MOTOR_FRONT] += ControlResult[YAW_INDEX];
         MotorOutput[MOTOR_BACK] += ControlResult[YAW_INDEX];
 
         // low pass na saida
-        MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT] * 3) >> 2;
-        MotorOutput[MOTOR_LEFT] =  (MotorOutput[MOTOR_LEFT] + MotorOutputOld[MOTOR_LEFT] * 3) >> 2;
-        MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK] * 3) >> 2;
-        MotorOutput[MOTOR_RIGHT] = (MotorOutput[MOTOR_RIGHT] + MotorOutputOld[MOTOR_RIGHT] * 3) >> 2; 
+        MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT] * MotorOutputLPMul) >> MotorOutputLPDiv;
+        MotorOutput[MOTOR_LEFT] =  (MotorOutput[MOTOR_LEFT] + MotorOutputOld[MOTOR_LEFT] * MotorOutputLPMul) >> MotorOutputLPDiv;
+        MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK] * MotorOutputLPMul) >> MotorOutputLPDiv;
+        MotorOutput[MOTOR_RIGHT] = (MotorOutput[MOTOR_RIGHT] + MotorOutputOld[MOTOR_RIGHT] * MotorOutputLPMul) >> MotorOutputLPDiv; 
         
         set_motor_output();
         
@@ -1317,14 +1354,14 @@ uchar reset_defaults(void){
 // tem q fazer isso configuravel
 inline void adjust_readings(void){
    // lowpass no gyro, importante
-    GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] * 3 + AnalogValue[GYRO_ROLL_ACH]) >> 2;
-    GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] * 3 + AnalogValue[GYRO_PITCH_ACH]) >> 2;
-    GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] * 3 + AnalogValue[GYRO_YAW_ACH]) >> 2;
+    GyroValue[ROLL_INDEX] = (GyroValue[ROLL_INDEX] * GyroLPMul + AnalogValue[GYRO_ROLL_ACH]) >> GyroLPDiv;
+    GyroValue[PITCH_INDEX] = (GyroValue[PITCH_INDEX] * GyroLPMul + AnalogValue[GYRO_PITCH_ACH]) >> GyroLPDiv;
+    GyroValue[YAW_INDEX] = (GyroValue[YAW_INDEX] * GyroLPMul + AnalogValue[GYRO_YAW_ACH]) >> GyroLPDiv;
     
     // fazer o lowpass do accel tbm
-    AccelValue[ROLL_INDEX] = (AccelValue[ROLL_INDEX] * 7 + AnalogValue[ACCELX_ACH]) >> 3;
-    AccelValue[PITCH_INDEX] = (AccelValue[PITCH_INDEX] * 7 + AnalogValue[ACCELY_ACH]) >> 3;
-    AccelValue[YAW_INDEX] = (AccelValue[YAW_INDEX] * 7 + AnalogValue[ACCELZ_ACH]) >> 3;
+    AccelValue[ROLL_INDEX] = (AccelValue[ROLL_INDEX] * AccelLPMul + AnalogValue[ACCELX_ACH]) >> AccelLPDiv;
+    AccelValue[PITCH_INDEX] = (AccelValue[PITCH_INDEX] * AccelLPMul + AnalogValue[ACCELY_ACH]) >> AccelLPDiv;
+    AccelValue[YAW_INDEX] = (AccelValue[YAW_INDEX] * AccelLPMul + AnalogValue[ACCELZ_ACH]) >> AccelLPDiv;
      
 }
 
@@ -1351,6 +1388,16 @@ void init_vars(void){
     ControlReferenceDiv[YAW_INDEX] = YAW_REF_DIV;  
     ControlReferenceDiv[PITCH_INDEX] = PITCH_REF_DIV;
     ControlReferenceDiv[ROLL_INDEX] = ROLL_REF_DIV; 
+    
+    // filters
+    ThrottleLPMul   = THROTTLE_LP_MUL      ;
+    ThrottleLPDiv   = THROTTLE_LP_DIV      ;
+    MotorOutputLPMul= MOTOR_OUTPUT_LP_MUL  ;
+    MotorOutputLPDiv= MOTOR_OUTPUT_LP_DIV  ;
+    GyroLPMul       = GYRO_LP_MUL          ;
+    GyroLPDiv       = GYRO_LP_DIV          ;
+    AccelLPMul      = ACCEL_LP_MUL         ;
+    AccelLPDiv      = ACCEL_LP_DIV         ;
     
     // outras
     AnalogChecked.BYTE = 0x00;

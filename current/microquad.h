@@ -52,6 +52,16 @@
 #define PITCH_REF_DIV           3
 #define ROLL_REF_DIV            3
 
+// default filters
+#define THROTTLE_LP_MUL         7
+#define THROTTLE_LP_DIV         3
+#define MOTOR_OUTPUT_LP_MUL     1
+#define MOTOR_OUTPUT_LP_DIV     1
+#define GYRO_LP_MUL             1
+#define GYRO_LP_DIV             1
+#define ACCEL_LP_MUL            7
+#define ACCEL_LP_DIV            3         
+
 #define BATTERY_ACH             7 
 #define GYRO_YAW_ACH            2
 #define GYRO_PITCH_ACH          1
@@ -90,6 +100,7 @@ enum{
     LETSFLY_INDEX               ,
     ANALOG_MENU_INDEX           ,
     CONTROL_MENU_INDEX          ,
+    FILTER_MENU_INDEX           ,
     RADIO_MENU_INDEX            ,
     MOTOR_MENU_INDEX            ,
     SENSOR_MENU_INDEX           ,
@@ -150,6 +161,7 @@ typedef enum{
     PROCESS_RADIO_MENU                  = RADIO_MENU_INDEX,
     PROCESS_OPTION_MENU                 = OPTION_MENU_INDEX,
     PROCESS_CONTROL_MENU                = CONTROL_MENU_INDEX,
+    PROCESS_FILTER_MENU                 = FILTER_MENU_INDEX,
     PROCESS_VIBRATION_ANALYZER_MENU     = VIBRATION_ANALYZER_INDEX,
     PROCESS_VOLTAGE_DROP_MENU           = VOLTAGE_DROP_INDEX,
     PROCESS_CONTROL                     = LETSFLY_INDEX
