@@ -3,6 +3,7 @@
 // STRINGS
 const char* str_graph         = "GRPH";
 const char* str_return        = "RETN";
+const char* str_calibrate_throttle = "CATH";
 
 const char* str_main_menu                = "MAIN MENU";
 const char* str_analog_menu              = "ANALOG VIEW";
@@ -13,6 +14,7 @@ const char* str_sensor_menu              = "SENSOR VIEW";
 const char* str_option_menu              = "OPTIONS";
 const char* str_vibration_analyzer_menu  = "VIBRATION TEST";
 const char* str_voltage_drop_menu        = "BATTERY TEST";
+const char* str_throttle_calibration_menu= "THROTTLE CALIBRATION";
 const char* str_letsfly                  = "FLY!";
 
 const char* str_rstdefault    = "RESET SET.";
@@ -139,6 +141,9 @@ const char* str_yaw_min       = "LCYa";
 
 const char* _str_calibrando_esc = "CALIBRANDO ESC...";
 const char* _str_programando_esc = "PROGRAMANDO ESC...";
+const char* _str_inicializando = "INCIALIZANDO...\nNAO MEXA A IMU!\nO RADIO DEVE ESTAR\nLIGADO.\n";
+const char* _str_pontinho = ".";
+
 /*******************************/
 // CONST VALUES
 const int val_zero            = 0;

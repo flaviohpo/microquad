@@ -2,8 +2,8 @@
 #include "analog.h"
 #include "delay.h"
 
-int AnalogOffset[8] = {0,0,0,0,0,0,0,0};
-int AnalogValue[8] = {0,0,0,0,0,0,0,0}; 
+long AnalogOffset[8] = {0,0,0,0,0,0,0,0};
+long AnalogValue[8] = {0,0,0,0,0,0,0,0}; 
 
 void analog_init(void){
     P6SEL = ANALOG_ENABLE;
@@ -19,16 +19,16 @@ void analog_calibrate_channel(int i){
     
     if((0x01 << i) & P6SEL){
         AnalogOffset[i] = 0;
-        for(k = 0; k < 8; k++ ){
+        for(k = 0; k < 100; k++ ){
             ADC12CTL0 &= ~ENC;
             ADC12MCTL0 = i;
             ADC12CTL0 |= ENC;
             ADC12CTL0 |= ADC12SC;
             while(ADC12CTL1 & ADC12BUSY);
-            delayms(30);
+            delayms(1);
             AnalogOffset[i] += ADC12MEM0;
         }
-        AnalogOffset[i] = AnalogOffset[i] >> 3;
+        AnalogOffset[i] = AnalogOffset[i] / 100;
     }
 }
 

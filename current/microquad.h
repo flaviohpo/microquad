@@ -21,6 +21,9 @@
 #define ENABLE_BUZZER()      (P2DIR |= BUZZER)
 #define DISABLE_BUZZER()     (P2DIR &=~ BUZZER)
 
+#define LCD_CENTER_VIBRATION_X 64
+#define LCD_CENTER_VIBRATION_Y 70
+
 #define MIN_BATTERY           1520
 #define MAX_BATTERY           1850
 // battery colors
@@ -28,9 +31,9 @@
 #define BATTERY_RED           1590
 #define BATTERY_CHECK_TIME    2000
 // default proportional gain
-#define YAW_PROPORTIONAL_MUL    3
-#define PITCH_PROPORTIONAL_MUL  5
-#define ROLL_PROPORTIONAL_MUL   5
+#define YAW_PROPORTIONAL_MUL    4
+#define PITCH_PROPORTIONAL_MUL  6
+#define ROLL_PROPORTIONAL_MUL   6
 #define YAW_PROPORTIONAL_DIV    1
 #define PITCH_PROPORTIONAL_DIV  2
 #define ROLL_PROPORTIONAL_DIV   2
@@ -43,8 +46,8 @@
 #define ROLL_INTEGRAL_DIV       1
 // default proportional radio influence
 #define YAW_REF_MUL             3
-#define PITCH_REF_MUL           3
-#define ROLL_REF_MUL            3
+#define PITCH_REF_MUL           4
+#define ROLL_REF_MUL            4
 #define YAW_REF_DIV             1
 #define PITCH_REF_DIV           3
 #define ROLL_REF_DIV            3
@@ -53,9 +56,9 @@
 #define GYRO_YAW_ACH            2
 #define GYRO_PITCH_ACH          1
 #define GYRO_ROLL_ACH           0
-#define ACCELX_ACH              5
-#define ACCELY_ACH              4
-#define ACCELZ_ACH              3
+#define ACCELX_ACH              4
+#define ACCELY_ACH              3
+#define ACCELZ_ACH              5
 
 #define LCD_MAX_BRIGHT          2800
 #define PPM_P1MASK              0xFF
@@ -83,18 +86,21 @@
 #define GRAPH_START             64
 #define GRAPH_HEIGHT            52
 
-#define ANALOG_MENU_INDEX           0
-#define CONTROL_MENU_INDEX          3
-#define RADIO_MENU_INDEX            1
-#define MOTOR_MENU_INDEX            2
-#define SENSOR_MENU_INDEX           4
-#define OPTION_MENU_INDEX           5
-#define VIBRATION_ANALYZER_INDEX    6
-#define VOLTAGE_DROP_INDEX         7
-#define LETSFLY_INDEX               8
+enum{
+    LETSFLY_INDEX               ,
+    ANALOG_MENU_INDEX           ,
+    CONTROL_MENU_INDEX          ,
+    RADIO_MENU_INDEX            ,
+    MOTOR_MENU_INDEX            ,
+    SENSOR_MENU_INDEX           ,
+    VOLTAGE_DROP_INDEX          ,
+    VIBRATION_ANALYZER_INDEX    ,
+    OPTION_MENU_INDEX           
+}MENU_INDEX;
 
-#define CALIBR_INDEX            1
 #define RETURN_INDEX            0
+#define CALIBR_INDEX            1
+#define THROTTLE_CALIBR_INDEX   2
 
 #define YAW_INDEX               0
 #define PITCH_INDEX             1
@@ -130,6 +136,11 @@ typedef struct{
     int MotorOutputHigher[6];
     int MotorOutputLower[6];
 }BlackBox;
+
+typedef enum{
+    RADIO_MENU_VISUALIZANDO             ,
+    RADIO_MENU_CALIBRANDO_THROTTLE
+}RADIO_MENU_STEP;
 
 typedef enum{
     PROCESS_MAIN_MENU                   = 0xFF,

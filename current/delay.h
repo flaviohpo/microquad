@@ -11,14 +11,13 @@
 //
 
 typedef enum{
-    DELAY_STICK_INDEX        = 0,
-    DELAY_SECONDS_INDEX     ,
-    DELAY_LOW_BATTERY_BUZ   ,
-    DELAY_FLIGHT_TIME       ,
-    DELAY_BATTERY_CHECK     ,
-    DELAY_BACKLED           ,
-    DELAY_SIDELEDS          ,
-    TIMEDELAY_LEN         
+    DELAY_SIDELEDS,
+    DELAY_BATTERY_CHECK,
+    DELAY_FLIGHT_TIME,
+    DELAY_SECONDS_INDEX,
+    DELAY_BACKLED,
+    DELAY_AMOSTRA_VIBRATION,
+    TIMEDELAY_LEN ,        
 }DELAY_INDEX;
 
 extern volatile unsigned int TimeDelay[TIMEDELAY_LEN];
