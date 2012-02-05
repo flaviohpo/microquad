@@ -1,9 +1,9 @@
 #include "shorttypes.h"
 
 // STRINGS
-const char* str_graph         = "GRPH";
-const char* str_return        = "RETN";
-const char* str_calibrate_throttle = "CATH";
+const char* str_graph                   = "GRPH";
+const char* str_return                  = "RETN";
+const char* str_calibrate_throttle      = "CATH";
 
 const char* str_main_menu                = "MAIN MENU";
 const char* str_analog_menu              = "ANALOG VIEW";
@@ -160,7 +160,7 @@ const char* str_pontinho        = ".";
 // CONST VALUES
 const int val_zero            = 0;
 const int val_one             = 1;
-const int val_max_control     = 255;
+const int val_max_control     = 7;
 const int val_max_motor       = 4000;
 const int val_min_motor       = 2000;
 const int val_int_motor       = 25;
@@ -182,6 +182,6 @@ const uchar val_bar_position_center   = 50;
 const uchar val_bar_position_right    = 70;
 const uchar val_value_position_right  = 15;
 const uchar val_value_position_center = 7;
-const int val_max_int                 = 35767;
-const int val_min_int                 = -35767;
+const int val_max_int                 = 32767;
+const int val_min_int                 = -32767;
 const uint val_max_uint               = 65534;

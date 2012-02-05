@@ -5,6 +5,7 @@
 typedef unsigned char uchar;
 typedef unsigned char uint8;
 typedef unsigned int uint16;
+typedef int int16;
 
 typedef union{
     unsigned char BYTE;

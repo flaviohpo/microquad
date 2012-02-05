@@ -55,12 +55,12 @@
 // default filters
 #define THROTTLE_LP_MUL         7
 #define THROTTLE_LP_DIV         3
-#define MOTOR_OUTPUT_LP_MUL     1
-#define MOTOR_OUTPUT_LP_DIV     1
-#define GYRO_LP_MUL             1
-#define GYRO_LP_DIV             1
-#define ACCEL_LP_MUL            7
-#define ACCEL_LP_DIV            3         
+#define MOTOR_OUTPUT_LP_MUL     3
+#define MOTOR_OUTPUT_LP_DIV     2
+#define GYRO_LP_MUL             3
+#define GYRO_LP_DIV             2
+#define ACCEL_LP_MUL            3
+#define ACCEL_LP_DIV            2         
 
 #define BATTERY_ACH             7 
 #define GYRO_YAW_ACH            2
@@ -70,7 +70,7 @@
 #define ACCELY_ACH              3
 #define ACCELZ_ACH              5
 
-#define LCD_MAX_BRIGHT          2800
+#define LCD_MAX_BRIGHT          1800
 #define PPM_P1MASK              0xFF
 
 #define MIN_MOTOR               2000
@@ -149,11 +149,6 @@ typedef struct{
 }BlackBox;
 
 typedef enum{
-    RADIO_MENU_VISUALIZANDO             ,
-    RADIO_MENU_CALIBRANDO_THROTTLE
-}RADIO_MENU_STEP;
-
-typedef enum{
     PROCESS_MAIN_MENU                   = 0xFF,
     PROCESS_ANALOG_MENU                 = ANALOG_MENU_INDEX,
     PROCESS_MOTOR_MENU                  = MOTOR_MENU_INDEX,
@@ -178,7 +173,6 @@ void menu_init(void);
 void setup(void);
 void init_vars(void);
 void timer_init(void);
-void P2_init(void);
 void P1_init(void);
 void clock_init(void);
 void set_motor_output(void);

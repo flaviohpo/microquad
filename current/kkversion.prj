@@ -54,11 +54,11 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="1033" placement="2:3:-1:-1:-8:-30:100:100:1177:352" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\lcd6100.h" linenum="99" placement="0:1:-1:-1:-8:-30:50:50:1131:300" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.c" linenum="10" placement="0:1:-1:-1:-8:-30:100:100:1181:350" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\delay.h" linenum="19" placement="0:1:-1:-1:-8:-30:0:0:1081:250" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" linenum="66" placement="0:1:-1:-1:-8:-30:50:50:1131:300" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\resources.h" linenum="7" placement="0:1:-1:-1:-8:-30:100:100:1069:350" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\main.c" linenum="151" placement="2:3:-1:-1:-8:-30:50:50:1015:296" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\shorttypes.h" linenum="8" placement="0:1:-1:-1:-8:-30:0:0:969:250" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.c" linenum="3" placement="0:1:-1:-1:-8:-30:50:50:1019:300" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\analog.h" linenum="4" placement="0:1:-1:-1:-8:-30:75:75:1044:325" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\microquad.h" linenum="151" placement="0:1:-1:-1:-8:-30:100:100:1069:350" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\current\lcd6100.c" linenum="1" placement="0:1:-1:-1:-8:-30:25:25:994:275" />
 </workspace>
 
