@@ -1,0 +1,4 @@
+Added Component: Designator=*(QFN80P500X300X80-14N)
+Added Component: Designator=U3(LGA16)
+Added Member To Class: ClassName=FCStellarisSCH Member=Component * ADXL345
+Added Member To Class: ClassName=FCStellarisSCH Member=Component U3 L3G4200D

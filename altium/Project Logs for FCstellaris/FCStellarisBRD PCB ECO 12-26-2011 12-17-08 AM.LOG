@@ -1,0 +1,5 @@
+Removed Member From Class: ClassName=FCStellarisSCH Member=W?
+Added Pin To Net: NetName=VCC Pin=C1-1
+Added Pin To Net: NetName=VCC Pin=U*-3
+Added Net: Name=VCC
+Added Room: Name=FCStellarisSCH

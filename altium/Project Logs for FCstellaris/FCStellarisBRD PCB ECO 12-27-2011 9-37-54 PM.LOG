@@ -1,0 +1,4 @@
+Change Component Designator: OldDesignator=U* NewDesignator=U2
+Added Component: Designator=?(QFP50P1200X1200X160-64N)
+Added Member To Class: ClassName=FCStellarisSCH Member=Component ? LM3S2776-IQR
+Added Room: Name=FCStellarisSCH

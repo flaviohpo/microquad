@@ -1,0 +1,18 @@
+Field=Comment~String~Comment~100|Field=Description~String~Description~100|Field=Designator~String~Designator~100|Field=Footprint~String~Footprint~100|Field=LibRef~String~LibRef~100|Field=Quantity~Integer~Quantity~100|ReportField=Currency~<none>|ReportField=ProductionQuantity~1|ReportField=ProjectFileName~FCstellaris.PrjPCB|ReportField=ProjectFullPath~C:\Users\flaviohpo\Desktop\miniquad\altium\FCstellaris.PrjPCB|ReportField=Title~Bill of Materials For Project [FCstellaris.PrjPCB] (No PCB Document Selected)|ReportField=TotalQuantity~38|ReportField=ReportTime~6:32:27 PM|ReportField=ReportDate~2/5/2012|ReportField=ReportDateTime~2/5/2012 6:32:27 PM|ReportField=OutputName~Bill of Materials|ReportField=OutputType~BOM_PartType|ReportField=GeneratorName~BOM|ReportField=GeneratorDescription~Bill of Materials|ReportField=VariantName~None|ReportField=Address1~|ReportField=Address2~|ReportField=Address3~|ReportField=Address4~|ReportField=ApprovedBy~|ReportField=Author~|ReportField=CheckedBy~|ReportField=CompanyName~|ReportField=CurrentDate~2/5/2012|ReportField=CurrentTime~6:32:22 PM|ReportField=Date~|ReportField=DocumentFullPathAndName~C:\Users\flaviohpo\Desktop\miniquad\altium\FCStellarisSCH.SchDoc|ReportField=DocumentName~FCStellarisSCH.SchDoc|ReportField=DocumentNumber~|ReportField=DrawnBy~|ReportField=Engineer~|ReportField=ImagePath~|ReportField=ModifiedDate~2/5/2012|ReportField=Organization~|ReportField=ProjectName~FCstellaris.PrjPCB|ReportField=Revision~|ReportField=Rule~|ReportField=SheetNumber~|ReportField=SheetTotal~|ReportField=Time~|ReportField=Title~|ReportField=DataSourceFileName~FCstellaris.PrjPCB|ReportField=DataSourceFullPath~C:\Users\flaviohpo\Desktop\miniquad\altium\FCstellaris.PrjPCB
+Cap|Capacitor|C1, C2, C4|Capacitor 0805|Cap|3
+Cap Pol3|Polarized Capacitor (Surface Mount)|C3|C0805|Cap Pol3|1
+Cap|Capacitor|C5, C6, C7, C?|RAD-0.3|Cap|17
+D Schottky|Schottky Diode|D?|SMB|D Schottky|1
+Conector 2x1||M1|Con256M2x1|conector254-2x1|1
+conector127-6x1||M2||conector127-6x1|1
+conector127-4x1||M3||conector127-4x1|1
+conector127-8x1||M4, M5||conector127-8x1|2
+COLINKEX||M6||JTAG_COLINKEX|1
+Res1|Resistor|R2, R?|AXIAL-0.3|Res1|3
+Res1|Resistor|R?|Capacitor 0805|Res1|1
+LM3S2776-IQR|Stellaris ARM Cortex-M3 Microcontroller|U1|QFP50P1200X1200X160-64N|LM3S2776-IQR|1
+AMS1111|3.3V Linear Regulator|U2|AMS1111|AMS1111|1
+L3G4200D|Digital Gyroscope 3-axis|U3|LGA16|L3G4200D|1
+ADXL345||U4|QFN80P500X300X80-14N|ADXL345|1
+MINISD||U?||MINI_SD|1
+XTAL|Crystal Oscillator|Y?|R38|XTAL|1
