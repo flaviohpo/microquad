@@ -17,7 +17,9 @@ typedef enum{
     DELAY_SECONDS_INDEX,
     DELAY_BACKLED,
     DELAY_AMOSTRA_VIBRATION,
-    TIMEDELAY_LEN ,        
+    DELAY_STICK_INDEX,
+    TIMEDELAY_LEN ,       
+     
 }DELAY_INDEX;
 
 extern volatile unsigned int TimeDelay[TIMEDELAY_LEN];

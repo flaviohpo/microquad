@@ -249,7 +249,7 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
         break;
         
         case STATE_WAIT_BACK:
-            if((act == ACTION_NONE) || (get_delay(DELAY_STICK_INDEX))){
+            if(get_delay(DELAY_STICK_INDEX)){
                 oMenu->eMenuState = STATE_IDLE;
                 result = RESP_NONE;
             }

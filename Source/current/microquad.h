@@ -30,6 +30,9 @@
 #define BATTERY_YELLOW        1720
 #define BATTERY_RED           1590
 #define BATTERY_CHECK_TIME    2000
+// control saturation
+#define PITCH_ROLL_P_SATURATION 750 // bahhhhhh fico tri
+#define YAW_P_SATURATION        500 // not used
 // default proportional gain
 #define YAW_PROPORTIONAL_MUL    4
 #define PITCH_PROPORTIONAL_MUL  6
@@ -57,8 +60,8 @@
 #define THROTTLE_LP_DIV         3
 #define MOTOR_OUTPUT_LP_MUL     3
 #define MOTOR_OUTPUT_LP_DIV     2
-#define GYRO_LP_MUL             3
-#define GYRO_LP_DIV             2
+#define GYRO_LP_MUL             1       // com 3 de mul e 2 de div fica bom tbm
+#define GYRO_LP_DIV             1
 #define ACCEL_LP_MUL            3
 #define ACCEL_LP_DIV            2         
 

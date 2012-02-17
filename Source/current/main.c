@@ -65,25 +65,25 @@ int16 AccelOffset[3] = {0,0,0};
 int16 GyroValue[3] = {0,0,0};
 int16 GyroOffset[3] = {0,0,0};
 // variaveis controle ganhos
-uint8 ControlProportionalMul[3];
-uint8 ControlProportionalDiv[3];
-uint8 ControlIntegralMul[3];
-uint8 ControlIntegralDiv[3];
-uint8 ControlReferenceMul[3];
-uint8 ControlReferenceDiv[3];
+int16 ControlProportionalMul[3];
+int16 ControlProportionalDiv[3];
+int16 ControlIntegralMul[3];
+int16 ControlIntegralDiv[3];
+int16 ControlReferenceMul[3];
+int16 ControlReferenceDiv[3];
 // variaveis dos filtros
-uint8 ThrottleLPMul;    
-uint8 ThrottleLPDiv;    
-uint8 MotorOutputLPMul; 
-uint8 MotorOutputLPDiv; 
-uint8 GyroLPMul;     
-uint8 GyroLPDiv;     
-uint8 AccelLPMul;        
-uint8 AccelLPDiv;        
+int16 ThrottleLPMul;    
+int16 ThrottleLPDiv;    
+int16 MotorOutputLPMul; 
+int16 MotorOutputLPDiv; 
+int16 GyroLPMul;     
+int16 GyroLPDiv;     
+int16 AccelLPMul;        
+int16 AccelLPDiv;        
 // variaveis controle sinais de controle
-uint16 ControlRadioResult[3] = {0, 0, 0};
-uint16 ControlIntegralResult[3] = {0, 0, 0};
-uint16 ControlProportionalResult[3] = {0, 0, 0};
+int16 ControlRadioResult[3] = {0, 0, 0};
+int16 ControlIntegralResult[3] = {0, 0, 0};
+int16 ControlProportionalResult[3] = {0, 0, 0};
 // variaveis controle atuadores
 uint16 MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
 uint16 MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
@@ -135,13 +135,13 @@ int main(void){
     menu_draw(MainMenu, 1);
         
     while(1){
-        
+
+        // deadzone para RC input        
         for(GPCounter = 0; GPCounter < 8; GPCounter++){
-            if(((PPMRaw[GPCounter] - PPMOffset[GPCounter]) < 20) && ((PPMRaw[GPCounter] - PPMOffset[GPCounter]) > -20)){
+            if(((PPMRaw[GPCounter] - PPMOffset[GPCounter]) < 30) && ((PPMRaw[GPCounter] - PPMOffset[GPCounter]) > -30)){
                 PPMRaw[GPCounter] = PPMOffset[GPCounter];
             }
-            PPMValue[GPCounter] = (PPMValue[GPCounter] * 3 + PPMRaw[GPCounter]) >> 2;
-            PPMValue[GPCounter] = constrain(PPMValue[GPCounter], 2000, 4000);
+            PPMValue[GPCounter] = PPMRaw[GPCounter];
         }
     
         if(get_delay(DELAY_SIDELEDS)){
@@ -1131,13 +1131,14 @@ inline void control_loop(void){
         ControlProportionalResult[ROLL_INDEX] =  ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH])   * (int16)ControlProportionalMul[ROLL_INDEX]) >> (int16)ControlProportionalDiv[ROLL_INDEX];          // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
         ControlProportionalResult[PITCH_INDEX] = ((GyroValue[PITCH_INDEX] - AnalogOffset[GYRO_PITCH_ACH]) * (int16)ControlProportionalMul[PITCH_INDEX]) >> (int16)ControlProportionalDiv[PITCH_INDEX];        // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
         ControlProportionalResult[YAW_INDEX] =   ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH])     * (int16)ControlProportionalMul[YAW_INDEX]) >> (int16)ControlProportionalDiv[YAW_INDEX];            // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
+        // satura os ganhos proporcionais
+        ControlProportionalResult[ROLL_INDEX] = constrain(ControlProportionalResult[ROLL_INDEX], -PITCH_ROLL_P_SATURATION, PITCH_ROLL_P_SATURATION);
+        ControlProportionalResult[PITCH_INDEX] = constrain(ControlProportionalResult[PITCH_INDEX], -PITCH_ROLL_P_SATURATION, PITCH_ROLL_P_SATURATION);
         // calcula a influencia do comando do radio
         ControlRadioResult[ROLL_INDEX] = ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * (int16)ControlReferenceMul[ROLL_INDEX]) >> (int16)ControlReferenceDiv[ROLL_INDEX];               // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
         ControlRadioResult[PITCH_INDEX] = ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * (int16)ControlReferenceMul[PITCH_INDEX]) >> (int16)ControlReferenceDiv[PITCH_INDEX];          // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
         ControlRadioResult[YAW_INDEX] = ((PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) * (int16)ControlReferenceMul[YAW_INDEX]) >> (int16)ControlReferenceDiv[YAW_INDEX];                    // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
-        // integrador
-        // fazer
-        
+
         MotorOutput[MOTOR_RIGHT] = ThrottleFiltered;
         MotorOutput[MOTOR_RIGHT] -= ControlRadioResult[ROLL_INDEX];
         MotorOutput[MOTOR_RIGHT] += ControlProportionalResult[ROLL_INDEX];
@@ -1352,23 +1353,6 @@ void init_vars(void){
 // delay
 interrupt (TIMERA1_VECTOR) TIMERA1_ISR_HOOK(void){ // 2ms
     int i = 0;
-    /*
-    for(;i<8;i++){
-        PPMValue[i] = constrain(2000, 4000, (PPMValue[i] + PPMRaw[i]) >> 1);
-        
-        if(SetupDone == 1){
-            if(((PPMValue[i] - PPMOffset[i]) < 20) && ((PPMValue[i] - PPMOffset[i]) > -20)){            // deadband
-                PPMValue[i] = constrain(2000, 4000, PPMOffset[i]);
-            }
-            else{
-                PPMValue[i] = constrain(2000, 4000, (PPMValue[i] + PPMRaw[i]) >> 1);
-            }
-        }
-        else{
-            PPMValue[i] = constrain(2000, 4000, (PPMValue[i] + PPMRaw[i]) >> 1);
-        }
-    }    */      
-    
     i = TIMEDELAY_LEN;
            
     do{
