@@ -2,7 +2,6 @@
 CALIBRACAO DE THROTTLE ESTA DESABILITADA PQ DA PRA CALIBRAR THROTTLE NO CALIBRATE ESC
 soh entra nos menus se throttle for < STICK_LOWER_THRESHOLD
 
-- fazer um misc.h nesse prog
 - fazer grafico para o Vdrop
 
 POSSIVEIS TCCs
@@ -18,16 +17,24 @@ depois que o quad for um servidor de wifi, fazer um controle remoto no android p
 fazer um fpv com osd
 
 fazer o analog por DMA
-colocar os filtros passas baixas no menu de ajuste dos ganhos
-fazer um esquema pra setinha comecar a ir mais rapido se segurar o stick
-fazer um buzzer process
-fazer um doc "user manual" do miniquad
 adicionar integrador nos 3 eixos
 gravar e ler da flash
 gravar parametros
 carregar parametros
 fazer rotinas I2C com timeout
 fazer tudo pro itg3200
+
+SOBRE POSICIONAMENTO DOS SENSORES
+
+GYRO
+pitch aumenta qd quad vai pra frente
+pitch diminui qd quad vai pra traz
+
+roll diminui qd o quad vai para a esquerda
+roll aumenta qd o quad vai para a direita
+
+yaw diminui horario
+yaw aumenta anti-horario
 */
 
 #include "stdio.h"
@@ -58,7 +65,7 @@ int16 PPMRaw[8] = {0,0,0,0,0,0,0,0};
 //variaveis controle
 volatile uchar ControlSample = 0;       // sample time flag - indica a hora de fazer um sample e um controle
 uint16 ThrottleFiltered = 0;
-
+int16 PitchRollPSaturation = 0;
 // variaveis controle realimentacao
 int16 AccelValue[3] = {0,0,0};
 int16 AccelOffset[3] = {0,0,0};
@@ -71,6 +78,7 @@ int16 ControlIntegralMul[3];
 int16 ControlIntegralDiv[3];
 int16 ControlReferenceMul[3];
 int16 ControlReferenceDiv[3];
+
 // variaveis dos filtros
 int16 ThrottleLPMul;    
 int16 ThrottleLPDiv;    
@@ -80,15 +88,13 @@ int16 GyroLPMul;
 int16 GyroLPDiv;     
 int16 AccelLPMul;        
 int16 AccelLPDiv;        
-// variaveis controle sinais de controle
-int16 ControlRadioResult[3] = {0, 0, 0};
-int16 ControlIntegralResult[3] = {0, 0, 0};
-int16 ControlProportionalResult[3] = {0, 0, 0};
+
 // variaveis controle atuadores
 uint16 MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
-uint16 MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
+
 // general purpose
-long FlightTime = 0; // guarda ate 9h de voo
+long FlightTime = 0;
+
 // analog graph
 byte AnalogChecked;
 
@@ -116,8 +122,10 @@ unsigned int Vbat = 0;
 // misc
 char SetupDone = 0;
 
+
 int main(void){
     // variavel que guarda o estado da state-machine principal
+//    static PROGRAM_STEP ProgStep = PROCESS_VIBRATION_ANALYZER_MENU;
     static PROGRAM_STEP ProgStep = PROCESS_MAIN_MENU;
                     
     WDTCTL = WDTPW + WDTHOLD;   // desabilita watchdog
@@ -129,7 +137,6 @@ int main(void){
     ACTION act = ACTION_NONE;
     MENU_RESPONSE resp = RESP_NONE;
 
-    init_vars();   
     setup();
           
     menu_draw(MainMenu, 1);
@@ -188,7 +195,12 @@ int main(void){
                 
                 switch(resp){                    
                     case RESP_SUBMENU_IN:
-                        ProgStep = (PROGRAM_STEP)(MainMenu->SelectedItem);
+                        if(PPMValue[RADIO_THROTTLE_CH] < STICK_LOWER_THRESHOLD){    
+                            ProgStep = (PROGRAM_STEP)(MainMenu->SelectedItem);
+                        }
+                        else{
+                            screen_flash(LIME, 200, 2);
+                        }
                         MenuDraw = 1;
                     break;
                     
@@ -542,7 +554,7 @@ int main(void){
                             break;
                             
                             case RESET_INDEX:
-                                //reset_defaults();
+
                             break;
                         }
                         
@@ -566,7 +578,16 @@ int main(void){
                         //lcd_goto(0,6);
                     }
                 }
-                    
+/*                    
+                if(ControlSample == 1){
+                    ControlSample = 0;
+
+                    control_loop();
+                    lcd_goto(0,0);
+                    printf("%d   \n%d    \n%d   ", ControlRadioResult[ROLL_INDEX], ControlRadioResult[PITCH_INDEX], ControlRadioResult[YAW_INDEX]);
+                    printf("\n%d   \n%d    \n%d   ", ControlProportionalResult[ROLL_INDEX], ControlProportionalResult[PITCH_INDEX], ControlProportionalResult[YAW_INDEX]);
+                }
+  */              
                 act = get_radio_action();
                 switch(act){
                     case ACTION_EMERGENCY:
@@ -761,23 +782,35 @@ void setup(void){
     lcd_init(LCDBackColor);    
     
     delayms(350);
+ 
+    // iluminacao progressiva do LCD
+    while(TACCR1 < LCD_MAX_BRIGHT){
+        TACCR1 = TACCR1 + 1;
+        delayus(1500);
+    }
         
-    // calibra ou programa esc
-    if(PPMRaw[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
-        
-        // iluminacao progressiva do LCD
-        while(TACCR1 < LCD_MAX_BRIGHT){
-            TACCR1 = TACCR1 + 1;
-            delayus(1500);
-        }
-        
-        if(PPMRaw[5] > STICK_UPPER_THRESHOLD){
+    // se canal 5 ta on
+    if(PPMRaw[5] > STICK_UPPER_THRESHOLD){
+        // e o throttle ta alto
+        if(PPMRaw[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
+            // significa que o cara quer programar o esc
             printf(str_programando_esc);           
             while(PPMRaw[5] > STICK_UPPER_THRESHOLD){
                 set_all_motors(PPMRaw[RADIO_THROTTLE_CH]);    
             }
         }
         else{
+            // significa que o cara quer usar motor grande
+            init_vars();
+        }
+    }
+    else{
+    // se o canal 5 ta off
+        // inicializa motor pequeno
+        init_vars();   
+        // se o throttle ta alto
+        if(PPMRaw[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){
+            // significa que o cara quer calibrar o esc
             printf(str_calibrando_esc);
             while(i--){
                 set_all_motors(PPMRaw[RADIO_THROTTLE_CH]);
@@ -785,17 +818,9 @@ void setup(void){
             }       
         }
     }
-    else{
-        set_all_motors(MIN_MOTOR);
-        printf(str_inicializando);           
-    }
     
-    
-    // iluminacao progressiva do LCD
-    while(TACCR1 < LCD_MAX_BRIGHT){
-        TACCR1 = TACCR1 + 1;
-        delayus(1500);
-    }
+    set_all_motors(MIN_MOTOR);
+    printf(str_inicializando);           
      
     analog_init(); // config registradores        
     analog_calibrate_channel(0);
@@ -961,6 +986,8 @@ void menu_init(void){
     menu_add_item(AnalogMenu, create_item(str_analogof7, ITEMTYPE_VALUE_R, &val_zero, &val_max_analog, NULL, (int*)&AnalogOffset[7]));    
     // control menu
     ControlMenu = menu_create(str_control_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
+    
+    menu_add_item(ControlMenu, create_item(str_pitch_roll_sat, ITEMTYPE_VALUE_RW, &val_saturation_limit_low, &val_saturation_limit_high, &val_ten, (int*)&PitchRollPSaturation));
     menu_add_item(ControlMenu, create_item(str_yawpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[YAW_INDEX]));
     menu_add_item(ControlMenu, create_item(str_pitchpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[PITCH_INDEX]));
     menu_add_item(ControlMenu, create_item(str_rollpm, ITEMTYPE_VALUE_RW, &val_one, &val_max_control, &val_one, (int*)&ControlProportionalMul[ROLL_INDEX]));        
@@ -1120,57 +1147,90 @@ void calibrate_radio(void){
 }
 
 inline void control_loop(void){
-    // implementar integrador aqui nesta funcao
-    // ajusta throttle de acordo com o throttleMax e thottleMin    
+    // variaveis controle sinais de controle
+//    static int16 ControlRadioResult[3] = {0, 0, 0};
+    static int16 ControlProportionalResult[3] = {0, 0, 0};
+    static int16 ControlRadioResult[3] = {0, 0, 0};
 
-    // verifica se o throttle nao ta em 0
+    static int16 Error[3] = {0, 0, 0};
+    static int16 MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
+    
+    /*    
+    GYRO
+    pitch aumenta qd quad vai pra frente
+    pitch diminui qd quad vai pra traz
+    
+    roll diminui qd o quad vai para a esquerda
+    roll aumenta qd o quad vai para a direita
+    
+    yaw diminui horario
+    yaw aumenta anti-horario
+    
+    MOTORES
+    
+    cima e baixo anti-horario
+    esquerda e direita horario
+    
+    no yaw como funciona:
+    - vai girar horario se aumentar a rotacao dos motores que giram anti-horario:
+    MOTOR FRONT e BACK ++++ = girar horario
+    MOTOR RIGHT e LEFT ++++ = anti-horario
+    
+    RADIO
+    
+    pitch pra frente diminui
+    roll pra esquerda diminui
+    yaw horario aumenta
+    
+    RADIO E GYRO TEM Q COINCIDIR!
+    entao na hora do erro eu tenho q ver se eu somo ou subtraio
+    
+    o pitch ta invertido
+    o roll ta ok
+    o yaw ta invertido
+    
+    */
+    
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){    
         ThrottleFiltered = ((ThrottleFiltered * (int16)ThrottleLPMul + PPMValue[RADIO_THROTTLE_CH]) >> (int16)ThrottleLPDiv);
-        
-        // calcula a proporcao do gyro
-        ControlProportionalResult[ROLL_INDEX] =  ((GyroValue[ROLL_INDEX] - AnalogOffset[GYRO_ROLL_ACH])   * (int16)ControlProportionalMul[ROLL_INDEX]) >> (int16)ControlProportionalDiv[ROLL_INDEX];          // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
-        ControlProportionalResult[PITCH_INDEX] = ((GyroValue[PITCH_INDEX] - AnalogOffset[GYRO_PITCH_ACH]) * (int16)ControlProportionalMul[PITCH_INDEX]) >> (int16)ControlProportionalDiv[PITCH_INDEX];        // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
-        ControlProportionalResult[YAW_INDEX] =   ((GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH])     * (int16)ControlProportionalMul[YAW_INDEX]) >> (int16)ControlProportionalDiv[YAW_INDEX];            // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
-        // satura os ganhos proporcionais
-        ControlProportionalResult[ROLL_INDEX] = constrain(ControlProportionalResult[ROLL_INDEX], -PITCH_ROLL_P_SATURATION, PITCH_ROLL_P_SATURATION);
-        ControlProportionalResult[PITCH_INDEX] = constrain(ControlProportionalResult[PITCH_INDEX], -PITCH_ROLL_P_SATURATION, PITCH_ROLL_P_SATURATION);
-        // calcula a influencia do comando do radio
-        ControlRadioResult[ROLL_INDEX] = ((PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH]) * (int16)ControlReferenceMul[ROLL_INDEX]) >> (int16)ControlReferenceDiv[ROLL_INDEX];               // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
-        ControlRadioResult[PITCH_INDEX] = ((PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH]) * (int16)ControlReferenceMul[PITCH_INDEX]) >> (int16)ControlReferenceDiv[PITCH_INDEX];          // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
-        ControlRadioResult[YAW_INDEX] = ((PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH]) * (int16)ControlReferenceMul[YAW_INDEX]) >> (int16)ControlReferenceDiv[YAW_INDEX];                    // aqui nao tem como dar overflow, o maximo eh 4000 * 7 = 28000
 
-        MotorOutput[MOTOR_RIGHT] = ThrottleFiltered;
-        MotorOutput[MOTOR_RIGHT] -= ControlRadioResult[ROLL_INDEX];
-        MotorOutput[MOTOR_RIGHT] += ControlProportionalResult[ROLL_INDEX];
-        
-        MotorOutput[MOTOR_LEFT] = ThrottleFiltered;
-        MotorOutput[MOTOR_LEFT] += ControlRadioResult[ROLL_INDEX];
-        MotorOutput[MOTOR_LEFT] -= ControlProportionalResult[ROLL_INDEX];
-            
-        MotorOutput[MOTOR_FRONT] = ThrottleFiltered;
-        MotorOutput[MOTOR_FRONT] += ControlRadioResult[PITCH_INDEX];
-        MotorOutput[MOTOR_FRONT] += ControlProportionalResult[PITCH_INDEX];
-        
-        MotorOutput[MOTOR_BACK] = ThrottleFiltered;
-        MotorOutput[MOTOR_BACK] -= ControlRadioResult[PITCH_INDEX];
-        MotorOutput[MOTOR_BACK] -= ControlProportionalResult[PITCH_INDEX];
-                
-        MotorOutput[MOTOR_RIGHT] -= ControlRadioResult[YAW_INDEX];
-        MotorOutput[MOTOR_LEFT] -= ControlRadioResult[YAW_INDEX];
-        MotorOutput[MOTOR_RIGHT] -= ControlProportionalResult[YAW_INDEX];
-        MotorOutput[MOTOR_LEFT] -= ControlProportionalResult[YAW_INDEX];
+        // ajusta radio para funcionar de +313 a -312
+        // 313 = 100º/s e -312 = -100º/s
+        ControlRadioResult[ROLL_INDEX] = PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH];
+        ControlRadioResult[YAW_INDEX] = PPMValue[RADIO_YAW_CH] - PPMOffset[RADIO_YAW_CH];
+        ControlRadioResult[PITCH_INDEX] = PPMValue[RADIO_PITCH_CH] - PPMOffset[RADIO_PITCH_CH];
 
-        MotorOutput[MOTOR_FRONT] += ControlRadioResult[YAW_INDEX];
-        MotorOutput[MOTOR_BACK] += ControlRadioResult[YAW_INDEX];
-        MotorOutput[MOTOR_FRONT] += ControlProportionalResult[YAW_INDEX];
-        MotorOutput[MOTOR_BACK] += ControlProportionalResult[YAW_INDEX];
+        ControlRadioResult[ROLL_INDEX] = (ControlRadioResult[ROLL_INDEX] * 5) >> 4; 
+        ControlRadioResult[YAW_INDEX] = (ControlRadioResult[YAW_INDEX] * 5) >> 4; 
+        ControlRadioResult[PITCH_INDEX] = (ControlRadioResult[PITCH_INDEX] * 5) >> 4; 
+        
+        // agora o radio ta entre -312 e +313
+        // tem q ajustar o erro agora q tbm vai ficar nessa faixa
+        Error[ROLL_INDEX] = ControlRadioResult[ROLL_INDEX] - GyroValue[ROLL_INDEX] + AnalogOffset[GYRO_ROLL_ACH];
+        Error[YAW_INDEX] = ControlRadioResult[YAW_INDEX] + (GyroValue[YAW_INDEX] - AnalogOffset[GYRO_YAW_ACH]);
+        Error[PITCH_INDEX] = ControlRadioResult[PITCH_INDEX] + (GyroValue[PITCH_INDEX] - AnalogOffset[GYRO_PITCH_ACH]);
+        
+        // agora multiplica pelo proportional        
+        ControlProportionalResult[ROLL_INDEX] = constrain((Error[ROLL_INDEX] * ControlProportionalMul[ROLL_INDEX]) >> ControlProportionalDiv[ROLL_INDEX], -PitchRollPSaturation, PitchRollPSaturation);
+        ControlProportionalResult[PITCH_INDEX] = constrain((Error[PITCH_INDEX] * ControlProportionalMul[PITCH_INDEX]) >> ControlProportionalDiv[PITCH_INDEX], -PitchRollPSaturation, PitchRollPSaturation);
+        ControlProportionalResult[YAW_INDEX] = (Error[YAW_INDEX] * ControlProportionalMul[YAW_INDEX]) >> ControlProportionalDiv[YAW_INDEX];
+
+        // integrador
+        
+        // derivativo
+        
+        // output mixing        
+        MotorOutput[MOTOR_RIGHT] = ThrottleFiltered - ControlProportionalResult[ROLL_INDEX] - ControlProportionalResult[YAW_INDEX];
+        MotorOutput[MOTOR_LEFT] = ThrottleFiltered + ControlProportionalResult[ROLL_INDEX] - ControlProportionalResult[YAW_INDEX];
+        MotorOutput[MOTOR_FRONT] = ThrottleFiltered  + ControlProportionalResult[PITCH_INDEX] + ControlProportionalResult[YAW_INDEX];
+        MotorOutput[MOTOR_BACK] = ThrottleFiltered - ControlProportionalResult[PITCH_INDEX] + ControlProportionalResult[YAW_INDEX];
 
         // low pass na saida
         MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT] * (int16)MotorOutputLPMul) >> (int16)MotorOutputLPDiv;
         MotorOutput[MOTOR_LEFT] =  (MotorOutput[MOTOR_LEFT] + MotorOutputOld[MOTOR_LEFT] * (int16)MotorOutputLPMul) >> (int16)MotorOutputLPDiv;
         MotorOutput[MOTOR_BACK] = (MotorOutput[MOTOR_BACK] + MotorOutputOld[MOTOR_BACK] * (int16)MotorOutputLPMul) >> (int16)MotorOutputLPDiv;
         MotorOutput[MOTOR_RIGHT] = (MotorOutput[MOTOR_RIGHT] + MotorOutputOld[MOTOR_RIGHT] * (int16)MotorOutputLPMul) >> (int16)MotorOutputLPDiv; 
-        
+    
         set_motor_output();
         
         // coleta sinal atual pra depois fazer o lowpass
@@ -1194,105 +1254,15 @@ inline void control_loop(void){
 // result 1 = fail
 // result 0 = success
 uchar save_params(void){
-    uchar result = 0;
-    twobytes VarAux;
     
-    i2c_config(EEPROM_I2C_ADDR);
-    result = i2c_find_device();
-    if(!result){
-        
-        VarAux.i = 0xAA;
-        result |= i2c_write_multiples(ADDR_VALIDATION, VarAux.c, 2);
-        delayms(100);
-        
-        VarAux.ui = FlightTime;
-        result |= i2c_write_multiples(ADDR_FLIGHT_TIME, VarAux.c, 2);
-        delayms(100);
-        
-        VarAux.i = ControlProportionalMul[PITCH_INDEX];
-        result |= i2c_write_multiples(ADDR_P_PITCH_MUL, VarAux.c, 2);
-        delayms(100);
-        
-        VarAux.i = ControlProportionalMul[ROLL_INDEX];
-        result |= i2c_write_multiples(ADDR_P_ROLL_MUL, VarAux.c, 2);
-        delayms(100);
-        
-        VarAux.i = ControlProportionalMul[YAW_INDEX];
-        result |= i2c_write_multiples(ADDR_P_YAW_MUL, VarAux.c, 2);
-        delayms(100);
-
-        VarAux.i = ControlProportionalDiv[PITCH_INDEX];
-        result |= i2c_write_multiples(ADDR_P_PITCH_DIV, VarAux.c, 2);
-        delayms(100);
-
-        VarAux.i = ControlProportionalDiv[ROLL_INDEX];
-        result |= i2c_write_multiples(ADDR_P_ROLL_DIV, VarAux.c, 2);
-        delayms(100);
-
-        VarAux.i = ControlProportionalDiv[YAW_INDEX];
-        result |= i2c_write_multiples(ADDR_P_YAW_DIV, VarAux.c, 2);
-        delayms(100);
-        
-        screen_flash(256, 200, 2);
-    }
-    return result;
+    return 0;
 }
 
 uchar load_params(void){
-    uchar result = 0;
-    twobytes VarAux;
-    
-    i2c_config(EEPROM_I2C_ADDR);
-    result = i2c_find_device();
-    if(!result){
-        i2c_read_multiples(ADDR_VALIDATION, VarAux.c, 2);
-        if(VarAux.i == 0xAA){
-            delayms(50);
-            result |= i2c_read_multiples(ADDR_FLIGHT_TIME, VarAux.c, 2);
-            FlightTime = VarAux.i;
-            
-            delayms(50);
-            result |= i2c_read_multiples(ADDR_P_PITCH_MUL, VarAux.c, 2);
-            ControlProportionalMul[PITCH_INDEX] = VarAux.i;
-            
-            delayms(50);
-            result |= i2c_read_multiples(ADDR_P_ROLL_MUL, VarAux.c, 2);
-            ControlProportionalMul[ROLL_INDEX] = VarAux.i;
-                        
-            delayms(50);
-            result |= i2c_read_multiples(ADDR_P_YAW_MUL, VarAux.c, 2);
-            ControlProportionalMul[YAW_INDEX] = VarAux.i;
-            
-            delayms(50);
-            result |= i2c_read_multiples(ADDR_P_PITCH_DIV, VarAux.c, 2);
-            ControlProportionalDiv[PITCH_INDEX] = VarAux.i;
-            
-            delayms(50);
-            result |= i2c_read_multiples(ADDR_P_ROLL_DIV, VarAux.c, 2);
-            ControlProportionalDiv[ROLL_INDEX] = VarAux.i;
-            
-            delayms(50);
-            result |= i2c_read_multiples(ADDR_P_YAW_DIV, VarAux.c, 2);
-            ControlProportionalDiv[YAW_INDEX] = VarAux.i;
-            
-            screen_flash(256, 200, 5);
-        }    
-        else{
-            result |= reset_defaults();
-        }    
-    }
-    return result;
-}
-    
-uchar reset_defaults(void){
-    FlightTime = 0;
-    
-    init_vars();
-    
-    return (save_params());
-    
-}
 
+    return 0;
+}
+    
 // tem q fazer isso configuravel
 inline void adjust_readings(void){
    // lowpass no gyro, importante
@@ -1307,8 +1277,11 @@ inline void adjust_readings(void){
      
 }
 
-void init_vars(void){
+void init_vars(){
     uint16 i, j;
+
+    // saturation
+    PitchRollPSaturation = PITCH_ROLL_P_SATURATION;
     // proporcional
     ControlProportionalMul[YAW_INDEX] = YAW_PROPORTIONAL_MUL;
     ControlProportionalMul[PITCH_INDEX] = PITCH_PROPORTIONAL_MUL;
@@ -1323,14 +1296,7 @@ void init_vars(void){
     ControlIntegralDiv[YAW_INDEX] = YAW_INTEGRAL_MUL;  
     ControlIntegralDiv[PITCH_INDEX] = PITCH_INTEGRAL_MUL;
     ControlIntegralDiv[ROLL_INDEX] = ROLL_INTEGRAL_DIV; 
-    // porportional radio
-    ControlReferenceMul[YAW_INDEX] = YAW_REF_MUL;  
-    ControlReferenceMul[PITCH_INDEX] = PITCH_REF_MUL;
-    ControlReferenceMul[ROLL_INDEX] = ROLL_REF_MUL; 
-    ControlReferenceDiv[YAW_INDEX] = YAW_REF_DIV;  
-    ControlReferenceDiv[PITCH_INDEX] = PITCH_REF_DIV;
-    ControlReferenceDiv[ROLL_INDEX] = ROLL_REF_DIV; 
-    
+            
     // filters
     ThrottleLPMul   = THROTTLE_LP_MUL      ;
     ThrottleLPDiv   = THROTTLE_LP_DIV      ;

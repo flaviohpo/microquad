@@ -47,6 +47,7 @@ const char* str_gyro_lp_mul         = "GYRM";
 const char* str_gyro_lp_div         = "GYRD";
 const char* str_accel_lp_mul        = "ACCM";
 const char* str_accel_lp_div        = "ACCD";
+const char* str_pitch_roll_sat      = "PRSA";
 
 const char* str_radioch0      = "CH0 ";
 const char* str_radioch1      = "CH1 ";
@@ -160,6 +161,7 @@ const char* str_pontinho        = ".";
 // CONST VALUES
 const int val_zero            = 0;
 const int val_one             = 1;
+const int val_ten             = 10;
 const int val_max_control     = 7;
 const int val_max_motor       = 4000;
 const int val_min_motor       = 2000;
@@ -185,3 +187,5 @@ const uchar val_value_position_center = 7;
 const int val_max_int                 = 32767;
 const int val_min_int                 = -32767;
 const uint val_max_uint               = 65534;
+const int val_saturation_limit_high   = 950;
+const int val_saturation_limit_low    = 200;

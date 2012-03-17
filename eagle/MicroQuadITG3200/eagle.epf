@@ -323,14 +323,15 @@ UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/xilinx-xc9.lbr"
 UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/xilinx-xcv.lbr"
 UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/zetex.lbr"
 UsedLibrary="C:/Program Files/EAGLE-5.10.0/lbr/zilog.lbr"
+UsedLibrary="C:/Users/flaviohpo/Documents/WEBTRONICO/eagle/webtronico.lbr"
 
 [Win_1]
 Type="Schematic Editor"
-Loc="1684 174 2283 573"
-State=1
+Loc="150 150 749 549"
+State=0
 Number=2
-File="C:/Users/flaviohpo/Documents/webtronico/eagle/SIM900/novoSIM900.sch"
-View="-182029 -1245117 1724749 -411823"
+File="C:/Users/flaviohpo/Documents/webtronico/eagle/despertador/despertador.sch"
+View="-91530 -220236 3190410 1820492"
 WireWidths=" 0 3048 6096 8128 10160 12700 14224 16764 17780 19304 21844 25400 38100 64516 4064 1524"
 PadDiameters=" 2540 3048 4064 6096 8128 10160 12700 14224 16764 17780 19304 21844 25400 38100 64516 0"
 PadDrills=" 5000 6000 7000 9000 10000 11000 12000 13000 14000 15000 16000 20000 22000 28000 32000 8000"
@@ -362,7 +363,7 @@ ArcDirection=0
 AddLevel=2
 PadsSameType=0
 Layer=91
-Views=" 1: -182029 -1245117 1724749 -411823"
+Views=" 1: -91530 -220236 3190410 1820492"
 Sheet=1
 
 [Win_2]
@@ -372,6 +373,6 @@ State=2
 Number=0
 
 [Desktop]
-Screen="2646 1024"
+Screen="1366 768"
 Window="Win_1"
 Window="Win_2"

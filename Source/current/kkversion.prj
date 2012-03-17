@@ -28,7 +28,7 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Documents\workspace\driverlib\sysctl.c" linenum="1270" placement="0:1:-1:-1:-8:-30:0:0:1077:252" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\Source\current\main.c" linenum="5" placement="2:3:-1:-1:-8:-30:125:125:992:408" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\Source\current\microquad.h" linenum="64" placement="0:1:-1:-1:-8:-30:50:50:1057:362" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\Source\current\main.c" linenum="1" placement="2:3:-1:-1:-8:-30:75:75:1086:391" />
 </workspace>
 

@@ -1,3 +1,4 @@
+//pag 29
 #define constrain(val, min, max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
 
 #define LIGHTS_ON_I2C
@@ -30,16 +31,35 @@
 #define BATTERY_YELLOW        1720
 #define BATTERY_RED           1590
 #define BATTERY_CHECK_TIME    2000
-// control saturation
-#define PITCH_ROLL_P_SATURATION 750 // bahhhhhh fico tri
-#define YAW_P_SATURATION        500 // not used
-// default proportional gain
-#define YAW_PROPORTIONAL_MUL    4
-#define PITCH_PROPORTIONAL_MUL  6
-#define ROLL_PROPORTIONAL_MUL   6
+
+
+/* se usar motor fraco de high rpm considerar como se fosse low rpm */
+#ifdef HIGH_RPM_MOTOR
+#define YAW_PROPORTIONAL_MUL    3
+#define PITCH_PROPORTIONAL_MUL  3
+#define ROLL_PROPORTIONAL_MUL   3
 #define YAW_PROPORTIONAL_DIV    1
 #define PITCH_PROPORTIONAL_DIV  2
 #define ROLL_PROPORTIONAL_DIV   2
+
+// control saturation
+#define PITCH_ROLL_P_SATURATION 250
+#define YAW_P_SATURATION        100 // not used
+
+#else // LOW_RPM_MOTOR
+#define YAW_PROPORTIONAL_MUL    4
+#define PITCH_PROPORTIONAL_MUL  3
+#define ROLL_PROPORTIONAL_MUL   3
+#define YAW_PROPORTIONAL_DIV    0
+#define PITCH_PROPORTIONAL_DIV  0
+#define ROLL_PROPORTIONAL_DIV   0
+
+// control saturation
+#define PITCH_ROLL_P_SATURATION 750
+#define YAW_P_SATURATION        500 // not used
+
+#endif // HIGH_RP_MOTOR
+
 // default integral gain
 #define YAW_INTEGRAL_MUL        1
 #define PITCH_INTEGRAL_MUL      1
@@ -47,13 +67,34 @@
 #define YAW_INTEGRAL_DIV        1
 #define PITCH_INTEGRAL_DIV      1
 #define ROLL_INTEGRAL_DIV       1
-// default proportional radio influence
-#define YAW_REF_MUL             3
-#define PITCH_REF_MUL           4
-#define ROLL_REF_MUL            4
-#define YAW_REF_DIV             1
-#define PITCH_REF_DIV           3
-#define ROLL_REF_DIV            3
+
+#define RETURN_INDEX            0
+#define CALIBR_INDEX            1
+#define THROTTLE_CALIBR_INDEX   2
+
+#define YAW_INDEX               0
+#define PITCH_INDEX             1
+#define ROLL_INDEX              2
+
+#define SAVE_INDEX              1
+#define RESET_INDEX             2
+
+#define ACCEL_X_INDEX           0
+#define ACCEL_Y_INDEX           1
+#define ACCEL_Z_INDEX           2
+
+#define GYRO_X_INDEX            2
+#define GYRO_Y_INDEX            1
+#define GYRO_Z_INDEX            0
+
+#define ANALOG_CH0_INDEX        2
+#define ANALOG_CH1_INDEX        3
+#define ANALOG_CH2_INDEX        4
+#define ANALOG_CH3_INDEX        5
+#define ANALOG_CH4_INDEX        6
+#define ANALOG_CH5_INDEX        7
+#define ANALOG_CH6_INDEX        8
+#define ANALOG_CH7_INDEX        9
 
 // default filters
 #define THROTTLE_LP_MUL         7
@@ -85,7 +126,7 @@
 #define MOTOR_RIGHT             3
 #define MOTOR_LEFT              0
 
-#define STICK_UPPER_THRESHOLD   3200
+#define STICK_UPPER_THRESHOLD   3000
 #define STICK_LOWER_THRESHOLD   2300
 
 #define RADIO_PITCH_CH          2
@@ -111,34 +152,6 @@ enum{
     VIBRATION_ANALYZER_INDEX    ,
     OPTION_MENU_INDEX           
 }MENU_INDEX;
-
-#define RETURN_INDEX            0
-#define CALIBR_INDEX            1
-#define THROTTLE_CALIBR_INDEX   2
-
-#define YAW_INDEX               0
-#define PITCH_INDEX             1
-#define ROLL_INDEX              2
-
-#define SAVE_INDEX              1
-#define RESET_INDEX             2
-
-#define ACCEL_X_INDEX           0
-#define ACCEL_Y_INDEX           1
-#define ACCEL_Z_INDEX           2
-
-#define GYRO_X_INDEX            2
-#define GYRO_Y_INDEX            1
-#define GYRO_Z_INDEX            0
-
-#define ANALOG_CH0_INDEX        2
-#define ANALOG_CH1_INDEX        3
-#define ANALOG_CH2_INDEX        4
-#define ANALOG_CH3_INDEX        5
-#define ANALOG_CH4_INDEX        6
-#define ANALOG_CH5_INDEX        7
-#define ANALOG_CH6_INDEX        8
-#define ANALOG_CH7_INDEX        9
 
 typedef struct{
     int AccelHigher[3];
