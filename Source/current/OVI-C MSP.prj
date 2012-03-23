@@ -1,0 +1,32 @@
+<project version="Crimson Editor 3.60">
+    <localfile path="Z:\analog.c" />
+    <localfile path="Z:\analog.h" />
+    <localfile path="Z:\color.h" />
+    <localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
+    <localfile path="Z:\current.cob" />
+    <localfile path="Z:\delay.c" />
+    <localfile path="Z:\delay.h" />
+    <localfile path="Z:\eeprom.c" />
+    <localfile path="Z:\eeprom.h" />
+    <localfile path="Z:\i2c.c" />
+    <localfile path="Z:\i2c.h" />
+    <localfile path="Z:\itg3200.c" />
+    <localfile path="Z:\itg3200.h" />
+    <localfile path="Z:\lcd6100.c" />
+    <localfile path="Z:\lcd6100.h" />
+    <localfile path="Z:\main.c" />
+    <localfile path="Z:\main2.c" />
+    <localfile path="Z:\menu.c" />
+    <localfile path="Z:\menu.h" />
+    <localfile path="Z:\microquad.h" />
+    <localfile path="Z:\resources.h" />
+    <localfile path="Z:\shorttypes.h" />
+    <localfile path="Z:\uart.c" />
+    <localfile path="Z:\uart.h" />
+    <localfile path="Z:\usefullibs.c" />
+    <localfile path="Z:\usefullibs.h" />
+</project>
+
+<workspace version="Crimson Editor 3.60">
+</workspace>
+

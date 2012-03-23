@@ -99,6 +99,14 @@ const char* str_yawpd         = "YPDI";
 const char* str_pitchpd       = "PPDI";
 const char* str_rollpd        = "RPDI";
 
+const char* str_yawid         = "YIDI";
+const char* str_pitchid       = "PIDI";
+const char* str_rollid        = "RIDI";
+
+const char* str_yawilim       = "YILI";
+const char* str_pitchilim     = "PILI";
+const char* str_rollilim      = "RILI";
+
 const char* str_accelx        = "ACCX";
 const char* str_accely        = "ACCY";
 const char* str_accelz        = "ACCZ";
@@ -162,6 +170,7 @@ const char* str_pontinho        = ".";
 const int val_zero            = 0;
 const int val_one             = 1;
 const int val_ten             = 10;
+const int val_hundred         = 100;
 const int val_max_control     = 7;
 const int val_max_motor       = 4000;
 const int val_min_motor       = 2000;

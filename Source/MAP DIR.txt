@@ -1,0 +1,1 @@
+Para abrir o projeto "OVI-C MSP.prj" tem que mapear a plasta current no drive Z:\

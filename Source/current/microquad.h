@@ -35,38 +35,39 @@
 
 /* se usar motor fraco de high rpm considerar como se fosse low rpm */
 #ifdef HIGH_RPM_MOTOR
-#define YAW_PROPORTIONAL_MUL    3
-#define PITCH_PROPORTIONAL_MUL  3
-#define ROLL_PROPORTIONAL_MUL   3
+#define YAW_PROPORTIONAL_MUL    2
+#define PITCH_PROPORTIONAL_MUL  1
+#define ROLL_PROPORTIONAL_MUL   1
 #define YAW_PROPORTIONAL_DIV    1
-#define PITCH_PROPORTIONAL_DIV  2
-#define ROLL_PROPORTIONAL_DIV   2
+#define PITCH_PROPORTIONAL_DIV  1
+#define ROLL_PROPORTIONAL_DIV   1
 
 // control saturation
 #define PITCH_ROLL_P_SATURATION 250
 #define YAW_P_SATURATION        100 // not used
 
 #else // LOW_RPM_MOTOR
-#define YAW_PROPORTIONAL_MUL    4
-#define PITCH_PROPORTIONAL_MUL  3
-#define ROLL_PROPORTIONAL_MUL   3
+#define YAW_PROPORTIONAL_MUL    2
+#define PITCH_PROPORTIONAL_MUL  1
+#define ROLL_PROPORTIONAL_MUL   1
 #define YAW_PROPORTIONAL_DIV    0
 #define PITCH_PROPORTIONAL_DIV  0
 #define ROLL_PROPORTIONAL_DIV   0
 
 // control saturation
-#define PITCH_ROLL_P_SATURATION 750
+#define PITCH_ROLL_P_SATURATION 650
 #define YAW_P_SATURATION        500 // not used
 
 #endif // HIGH_RP_MOTOR
 
-// default integral gain
-#define YAW_INTEGRAL_MUL        1
-#define PITCH_INTEGRAL_MUL      1
-#define ROLL_INTEGRAL_MUL       1
-#define YAW_INTEGRAL_DIV        1
-#define PITCH_INTEGRAL_DIV      1
-#define ROLL_INTEGRAL_DIV       1
+// default integral gain, soh tem DIV pro integral, pode ser 1, 2, 4, 8, 32, 64, 128, 256....
+#define YAW_INTEGRAL_DIV        7   // = 2^DIV
+#define PITCH_INTEGRAL_DIV      7   // 8 vai limitar o integral em 128, 7 vai limitar em 256
+#define ROLL_INTEGRAL_DIV       7
+
+#define YAW_INTEGRAL_LIMIT      32000
+#define PITCH_INTEGRAL_LIMIT    32000
+#define ROLL_INTEGRAL_LIMIT     32000
 
 #define RETURN_INDEX            0
 #define CALIBR_INDEX            1
@@ -97,13 +98,14 @@
 #define ANALOG_CH7_INDEX        9
 
 // default filters
-#define THROTTLE_LP_MUL         7
+// esses filtros devem ser tais que (mul + 1) = 2^div
+#define THROTTLE_LP_MUL         7       // 7+1 = 2^3
 #define THROTTLE_LP_DIV         3
-#define MOTOR_OUTPUT_LP_MUL     3
-#define MOTOR_OUTPUT_LP_DIV     2
+#define MOTOR_OUTPUT_LP_MUL     1       // 3+1 = 2^2
+#define MOTOR_OUTPUT_LP_DIV     1
 #define GYRO_LP_MUL             1       // com 3 de mul e 2 de div fica bom tbm
 #define GYRO_LP_DIV             1
-#define ACCEL_LP_MUL            3
+#define ACCEL_LP_MUL            3       // 3+1 = 2^2
 #define ACCEL_LP_DIV            2         
 
 #define BATTERY_ACH             7 

@@ -74,10 +74,8 @@ int16 GyroOffset[3] = {0,0,0};
 // variaveis controle ganhos
 int16 ControlProportionalMul[3];
 int16 ControlProportionalDiv[3];
-int16 ControlIntegralMul[3];
+int16 ControlIntegralLimit[3];
 int16 ControlIntegralDiv[3];
-int16 ControlReferenceMul[3];
-int16 ControlReferenceDiv[3];
 
 // variaveis dos filtros
 int16 ThrottleLPMul;    
@@ -121,6 +119,7 @@ unsigned int VdropMaxBat = 0;
 unsigned int Vbat = 0;
 // misc
 char SetupDone = 0;
+
 
 
 int main(void){
@@ -577,17 +576,17 @@ int main(void){
                         control_loop();
                         //lcd_goto(0,6);
                     }
-                }
-/*                    
+                }/*
+                    
                 if(ControlSample == 1){
                     ControlSample = 0;
 
                     control_loop();
                     lcd_goto(0,0);
-                    printf("%d   \n%d    \n%d   ", ControlRadioResult[ROLL_INDEX], ControlRadioResult[PITCH_INDEX], ControlRadioResult[YAW_INDEX]);
-                    printf("\n%d   \n%d    \n%d   ", ControlProportionalResult[ROLL_INDEX], ControlProportionalResult[PITCH_INDEX], ControlProportionalResult[YAW_INDEX]);
-                }
-  */              
+                    printf("\n\n%d   \n%d    \n%d   ", ControlIntegralResult[ROLL_INDEX], ControlIntegralResult[PITCH_INDEX], ControlIntegralResult[YAW_INDEX]);
+                    
+                }*/
+                
                 act = get_radio_action();
                 switch(act){
                     case ACTION_EMERGENCY:
@@ -994,13 +993,12 @@ void menu_init(void){
     menu_add_item(ControlMenu, create_item(str_yawpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[YAW_INDEX]));
     menu_add_item(ControlMenu, create_item(str_pitchpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[PITCH_INDEX]));
     menu_add_item(ControlMenu, create_item(str_rollpd, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlProportionalDiv[ROLL_INDEX]));        
-
-    menu_add_item(ControlMenu, create_item(str_yawrefmul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceMul[YAW_INDEX]));        
-    menu_add_item(ControlMenu, create_item(str_pitchrefmul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceMul[PITCH_INDEX]));        
-    menu_add_item(ControlMenu, create_item(str_rollrefmul, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceMul[ROLL_INDEX]));            
-    menu_add_item(ControlMenu, create_item(str_yawrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[YAW_INDEX]));        
-    menu_add_item(ControlMenu, create_item(str_pitchrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[PITCH_INDEX]));        
-    menu_add_item(ControlMenu, create_item(str_rollrefdiv, ITEMTYPE_VALUE_RW, &val_zero, &val_max_control, &val_one, (int*)&ControlReferenceDiv[ROLL_INDEX]));        
+    menu_add_item(ControlMenu, create_item(str_yawid, ITEMTYPE_VALUE_RW, &val_zero, &val_ten, &val_one, (int*)&ControlIntegralDiv[YAW_INDEX]));       
+    menu_add_item(ControlMenu, create_item(str_pitchid, ITEMTYPE_VALUE_RW, &val_zero, &val_ten, &val_one, (int*)&ControlIntegralDiv[PITCH_INDEX]));       
+    menu_add_item(ControlMenu, create_item(str_rollid, ITEMTYPE_VALUE_RW, &val_zero, &val_ten, &val_one, (int*)&ControlIntegralDiv[ROLL_INDEX]));       
+    menu_add_item(ControlMenu, create_item(str_yawilim, ITEMTYPE_VALUE_RW, &val_zero, &val_max_int, &val_hundred, (int*)&ControlIntegralLimit[YAW_INDEX]));       
+    menu_add_item(ControlMenu, create_item(str_pitchilim, ITEMTYPE_VALUE_RW, &val_zero, &val_max_int, &val_hundred, (int*)&ControlIntegralLimit[PITCH_INDEX]));       
+    menu_add_item(ControlMenu, create_item(str_rollilim, ITEMTYPE_VALUE_RW, &val_zero, &val_max_int, &val_hundred, (int*)&ControlIntegralLimit[ROLL_INDEX]));       
 
     // filters menu
     FilterMenu = menu_create(str_filter_menu, create_item(str_return, ITEMTYPE_SUBMENU, NULL, NULL, NULL, NULL), &val_janela_size_large, &val_bar_position_center, &val_value_position_right, &val_arrow_center, &val_bar_lenght_medium);
@@ -1148,10 +1146,12 @@ void calibrate_radio(void){
 
 inline void control_loop(void){
     // variaveis controle sinais de controle
-//    static int16 ControlRadioResult[3] = {0, 0, 0};
+
     static int16 ControlProportionalResult[3] = {0, 0, 0};
     static int16 ControlRadioResult[3] = {0, 0, 0};
+    static int16 ControlIntegralResult[3] = {0, 0, 0};
 
+    
     static int16 Error[3] = {0, 0, 0};
     static int16 MotorOutputOld[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
     
@@ -1216,14 +1216,21 @@ inline void control_loop(void){
         ControlProportionalResult[YAW_INDEX] = (Error[YAW_INDEX] * ControlProportionalMul[YAW_INDEX]) >> ControlProportionalDiv[YAW_INDEX];
 
         // integrador
+        ControlIntegralResult[ROLL_INDEX] += Error[ROLL_INDEX];
+        ControlIntegralResult[PITCH_INDEX] += Error[PITCH_INDEX];
+        ControlIntegralResult[YAW_INDEX] += Error[YAW_INDEX];
         
+        ControlIntegralResult[ROLL_INDEX] = constrain(ControlIntegralResult[ROLL_INDEX], -ControlIntegralLimit[ROLL_INDEX], ControlIntegralLimit[ROLL_INDEX]);
+        ControlIntegralResult[PITCH_INDEX] = constrain(ControlIntegralResult[PITCH_INDEX], -ControlIntegralLimit[PITCH_INDEX], ControlIntegralLimit[PITCH_INDEX]);
+        ControlIntegralResult[YAW_INDEX] = constrain(ControlIntegralResult[YAW_INDEX], -ControlIntegralLimit[YAW_INDEX], ControlIntegralLimit[YAW_INDEX]);
+                
         // derivativo
         
         // output mixing        
-        MotorOutput[MOTOR_RIGHT] = ThrottleFiltered - ControlProportionalResult[ROLL_INDEX] - ControlProportionalResult[YAW_INDEX];
-        MotorOutput[MOTOR_LEFT] = ThrottleFiltered + ControlProportionalResult[ROLL_INDEX] - ControlProportionalResult[YAW_INDEX];
-        MotorOutput[MOTOR_FRONT] = ThrottleFiltered  + ControlProportionalResult[PITCH_INDEX] + ControlProportionalResult[YAW_INDEX];
-        MotorOutput[MOTOR_BACK] = ThrottleFiltered - ControlProportionalResult[PITCH_INDEX] + ControlProportionalResult[YAW_INDEX];
+        MotorOutput[MOTOR_RIGHT] = ThrottleFiltered - ControlProportionalResult[ROLL_INDEX] - (ControlIntegralResult[ROLL_INDEX] >> ControlIntegralDiv[ROLL_INDEX]) - ControlProportionalResult[YAW_INDEX] - (ControlIntegralResult[YAW_INDEX] >> ControlIntegralDiv[YAW_INDEX]);
+        MotorOutput[MOTOR_LEFT] = ThrottleFiltered + ControlProportionalResult[ROLL_INDEX] + (ControlIntegralResult[ROLL_INDEX] >> ControlIntegralDiv[ROLL_INDEX]) - ControlProportionalResult[YAW_INDEX] - (ControlIntegralResult[YAW_INDEX] >> ControlIntegralDiv[YAW_INDEX]);
+        MotorOutput[MOTOR_FRONT] = ThrottleFiltered  + ControlProportionalResult[PITCH_INDEX] + (ControlIntegralResult[PITCH_INDEX] >> ControlIntegralDiv[PITCH_INDEX]) + ControlProportionalResult[YAW_INDEX] + (ControlIntegralResult[YAW_INDEX] >> ControlIntegralDiv[YAW_INDEX]);
+        MotorOutput[MOTOR_BACK] = ThrottleFiltered - ControlProportionalResult[PITCH_INDEX] - (ControlIntegralResult[PITCH_INDEX] >> ControlIntegralDiv[PITCH_INDEX]) + ControlProportionalResult[YAW_INDEX] + (ControlIntegralResult[YAW_INDEX] >> ControlIntegralDiv[YAW_INDEX]);
 
         // low pass na saida
         MotorOutput[MOTOR_FRONT] = (MotorOutput[MOTOR_FRONT] + MotorOutputOld[MOTOR_FRONT] * (int16)MotorOutputLPMul) >> (int16)MotorOutputLPDiv;
@@ -1245,7 +1252,10 @@ inline void control_loop(void){
         }
     }
     else{
-
+        ControlIntegralResult[ROLL_INDEX] = 0;
+        ControlIntegralResult[YAW_INDEX] = 0;
+        ControlIntegralResult[PITCH_INDEX] = 0;
+        
         set_all_motors(MIN_MOTOR);
     }
 }
@@ -1290,13 +1300,15 @@ void init_vars(){
     ControlProportionalDiv[PITCH_INDEX] = PITCH_PROPORTIONAL_DIV;
     ControlProportionalDiv[ROLL_INDEX] = ROLL_PROPORTIONAL_DIV; 
     // integral
-    ControlIntegralMul[YAW_INDEX] = YAW_INTEGRAL_MUL;  
-    ControlIntegralMul[PITCH_INDEX] = PITCH_INTEGRAL_MUL;
-    ControlIntegralMul[ROLL_INDEX] = ROLL_INTEGRAL_MUL;
-    ControlIntegralDiv[YAW_INDEX] = YAW_INTEGRAL_MUL;  
-    ControlIntegralDiv[PITCH_INDEX] = PITCH_INTEGRAL_MUL;
+    ControlIntegralDiv[YAW_INDEX] = YAW_INTEGRAL_DIV;  
+    ControlIntegralDiv[PITCH_INDEX] = PITCH_INTEGRAL_DIV;
     ControlIntegralDiv[ROLL_INDEX] = ROLL_INTEGRAL_DIV; 
+    
+    ControlIntegralLimit[YAW_INDEX] = YAW_INTEGRAL_LIMIT;  
+    ControlIntegralLimit[PITCH_INDEX] = PITCH_INTEGRAL_LIMIT;
+    ControlIntegralLimit[ROLL_INDEX] = ROLL_INTEGRAL_LIMIT; 
             
+    
     // filters
     ThrottleLPMul   = THROTTLE_LP_MUL      ;
     ThrottleLPDiv   = THROTTLE_LP_DIV      ;
