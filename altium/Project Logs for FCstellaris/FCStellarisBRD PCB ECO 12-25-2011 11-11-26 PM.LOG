@@ -1,5 +1,0 @@
-Removed Pin From Net: NetName=NetC*_1 Pin=C*-1
-Removed Member From Class: ClassName=FCStellarisSCH Member=C*
-Added Pin To Net: NetName=NetC*_1 Pin=U1-6
-Added Pin To Net: NetName=NetC*_1 Pin=U1-8
-Change Net Name : Old Net Name=NetC*_1 New Net Name=NetU1_6

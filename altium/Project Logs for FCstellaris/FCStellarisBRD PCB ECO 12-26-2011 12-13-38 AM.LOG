@@ -1,5 +1,0 @@
-Removed Member From Class: ClassName=FCStellarisSCH Member=U2
-Added Component: Designator=U*(AMS1111)
-Added Pin To Net: NetName=GND Pin=C1-2
-Added Pin To Net: NetName=GND Pin=U*-1
-Added Member To Class: ClassName=FCStellarisSCH Member=Component U* AMS1111

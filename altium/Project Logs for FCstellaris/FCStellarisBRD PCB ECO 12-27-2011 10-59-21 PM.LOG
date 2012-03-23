@@ -1,6 +1,0 @@
-Change Component DesignItemId : Designator=C1 Old DesignItemId=L3G4200D New DesignItemId=Cap Pol3
-Change Component Description : Designator=C1 Old Description=Digital Gyroscope 3-axis New Description=Polarized Capacitor (Surface Mount)
-Change Component Library : Designator=C1 Old Library=altiumflaviolibSH.SchLib New Library=Miscellaneous Devices.IntLib
-Added Component: Designator=U3(LGA16)
-Added Member To Class: ClassName=FCStellarisSCH Member=Component U3 L3G4200D
-Added Room: Name=FCStellarisSCH

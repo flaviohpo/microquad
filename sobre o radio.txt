@@ -1,0 +1,26 @@
+RADIO
+
+2000 = 0   %
+4000 = 100 %
+
+offset = 2000
+
+pra ficar compativel com o gyro tem q dar umas shiftadas
+
+o gyro funciona de -310 a +310 quando ja tirou o offset, entao o radio tem q funcionar mais ou menos na mesma faixa para yaw, pitch e roll.
+
+entao 4000 tem q virar mais ou menos 620
+- se der uma shiftada de 3 o radio fica 500.
+- se multiplica por 3 e shifta 4 ele fica 750.
+- Mult por 5 shifta 5 fica 625! (perfecto) mas o problema eh q 2000 fica em 312. entao tem q fazer algo que deixe em 1240 mais ou menos
+- multi por 5 e shifta 4 right
+
+4000 -> 1250
+2000 -> 625
+
+offset = 625 + (625 / 2) = 937
+
+4000 -> 313
+2000 -> -312
+ficou show de bola!
+- 

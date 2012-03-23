@@ -1,4 +1,0 @@
-Added Component: Designator=U*(AMS1111)
-Added Net: Name=GND
-Added Net: Name=NetC*
-Added Member To Class: ClassName=FCStellarisSCH Member=Component U* AMS1111

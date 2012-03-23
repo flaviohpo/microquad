@@ -1,0 +1,23 @@
+ADC12 lendo o gyro na saida nao amplificada
+output max 100º/s ( isso eh uma coisa muito sensivel, o miniquad com esse gyro eh horrivel pra manobra, mas eh bom pra estabilizacao e movimentos precisos ) 
+
+total = 100º/s
+2.5 mV/ º/ s
+zero = 1.23V
+
+minimo = 1.23 - 0.0025 * 100 = 0.98V
+maximo = 1.23 + 0.0025 * 100 = 1.48V
+
+4096 = 3.3V
+maximo = 1.48V
+maximo = 1837
+
+zero = 1527
+
+4096 = 3.3V
+?    = 0.98V
+minimo = 1217
+
+tem 310 pra cima e 310 pra baixo
+entao a precisao maxima eh 100/310 º/s, 
+= 0.3225 º/s
