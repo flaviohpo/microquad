@@ -1,15 +1,5 @@
-//
-// ****************************************************************
-// **                                                            **
-// **  LABORATORIO DE PROCESSADORES I (2010/I)                   **
-// **                                                            **
-// **  Rotinas de delay por software (@16MHz)                    **
-// **                                                            **
-// **                                    (C) by JCLima, 2010/1   **
-// **                                                            **
-// ****************************************************************
-//
 #include "msp430f2618.h"
+#include "legacymsp430.h"
 #include "delay.h"
 
 unsigned volatile int TimeDelay[TIMEDELAY_LEN];
@@ -58,4 +48,21 @@ unsigned char get_delay(DELAY_INDEX index){
     }
     return 0;
 }
+
+
+// delay
+interrupt (TIMERA1_VECTOR) TIMERA1_ISR_HOOK(void){ // 2ms
+    int i = 0;
+    i = TIMEDELAY_LEN;
+           
+    do{
+        i--;
+        if(TimeDelay[i] > 0){
+            TimeDelay[i]--;
+        }
+    }while(i);
+    // ver no datasheet se tem q zerar o flag da interrupt
+    TACTL &= ~0x01;
+}
+
 

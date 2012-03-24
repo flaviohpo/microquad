@@ -1,32 +1,39 @@
 <project version="Crimson Editor 3.60">
-    <localfile path="Z:\analog.c" />
-    <localfile path="Z:\analog.h" />
-    <localfile path="Z:\color.h" />
-    <localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
-    <localfile path="Z:\current.cob" />
-    <localfile path="Z:\delay.c" />
-    <localfile path="Z:\delay.h" />
-    <localfile path="Z:\eeprom.c" />
-    <localfile path="Z:\eeprom.h" />
-    <localfile path="Z:\i2c.c" />
-    <localfile path="Z:\i2c.h" />
-    <localfile path="Z:\itg3200.c" />
-    <localfile path="Z:\itg3200.h" />
-    <localfile path="Z:\lcd6100.c" />
-    <localfile path="Z:\lcd6100.h" />
-    <localfile path="Z:\main.c" />
-    <localfile path="Z:\main2.c" />
-    <localfile path="Z:\menu.c" />
-    <localfile path="Z:\menu.h" />
-    <localfile path="Z:\microquad.h" />
-    <localfile path="Z:\resources.h" />
-    <localfile path="Z:\shorttypes.h" />
-    <localfile path="Z:\uart.c" />
-    <localfile path="Z:\uart.h" />
-    <localfile path="Z:\usefullibs.c" />
-    <localfile path="Z:\usefullibs.h" />
+	<localfile path="Z:\analog.c" />
+	<localfile path="Z:\analog.h" />
+	<localfile path="Z:\color.h" />
+	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
+	<localfile path="Z:\current.cob" />
+	<localfile path="Z:\delay.c" />
+	<localfile path="Z:\delay.h" />
+	<localfile path="Z:\eeprom.c" />
+	<localfile path="Z:\eeprom.h" />
+	<localfile path="Z:\i2c.c" />
+	<localfile path="Z:\i2c.h" />
+	<localfile path="Z:\itg3200.c" />
+	<localfile path="Z:\itg3200.h" />
+	<localfile path="Z:\lcd6100.c" />
+	<localfile path="Z:\lcd6100.h" />
+	<localfile path="Z:\main.c" />
+	<localfile path="Z:\main2.c" />
+	<localfile path="Z:\menu.c" />
+	<localfile path="Z:\menu.h" />
+	<localfile path="Z:\microquad.h" />
+	<localfile path="Z:\radiorec.c" />
+	<localfile path="Z:\radiorec.h" />
+	<localfile path="Z:\resources.h" />
+	<localfile path="Z:\shorttypes.h" />
+	<localfile path="Z:\uart.c" />
+	<localfile path="Z:\uart.h" />
+	<localfile path="Z:\usefullibs.c" />
+	<localfile path="Z:\usefullibs.h" />
 </project>
 
 <workspace version="Crimson Editor 3.60">
+	<localfile path="Z:\main.c" linenum="84" placement="0:1:-1:-1:-8:-30:100:100:1042:474" />
+	<localfile path="Z:\microquad.h" linenum="178" placement="0:1:-1:-1:-8:-30:75:75:1021:403" />
+	<localfile path="Z:\menu.c" linenum="58" placement="0:1:-1:-1:-8:-30:100:100:1046:428" />
+	<localfile path="Z:\radiorec.h" linenum="1" placement="2:3:-1:-1:-8:-30:125:125:1071:453" />
+	<localfile path="Z:\radiorec.c" linenum="1" placement="0:1:-1:-1:-8:-30:150:150:1096:478" />
 </workspace>
 

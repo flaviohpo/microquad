@@ -1,7 +1,6 @@
 /*
-CALIBRACAO DE THROTTLE ESTA DESABILITADA PQ DA PRA CALIBRAR THROTTLE NO CALIBRATE ESC
-soh entra nos menus se throttle for < STICK_LOWER_THRESHOLD
 
+- fazer verificador de calibracao
 - fazer grafico para o Vdrop
 
 POSSIVEIS TCCs
@@ -11,18 +10,22 @@ controle de posicao(x,y,z) com gps e magnetometro
 controle de altitude com barometro e yaw com magnet
 controle de posicao indoor, com sonar e infrared
 colocar uma camera mirando pro chao para controle de posicao
+
 --- SOFT
 usar CI de wifi para que o quad seja um servidor wifi
+fazer interface usb com android pra passar waypoints, coletar logs, config, etc
 depois que o quad for um servidor de wifi, fazer um controle remoto no android para controlar
-fazer um fpv com osd
+fazer um fpv com osd 
 
 fazer o analog por DMA
-adicionar integrador nos 3 eixos
 gravar e ler da flash
 gravar parametros
 carregar parametros
 fazer rotinas I2C com timeout
-fazer tudo pro itg3200
+
+****************************************************************************
+****************************************************************************
+****************************************************************************
 
 SOBRE POSICIONAMENTO DOS SENSORES
 
@@ -37,40 +40,39 @@ yaw diminui horario
 yaw aumenta anti-horario
 */
 
-#include "stdio.h"
-#include "stdlib.h"
-#include "string.h"
-#include "legacymsp430.h"
-#include "msp430f2618.h"
-#include "color.h"
-#include "delay.h"
-#include "analog.h"
-#include "lcd6100.h"
-//#include "itg3200.h"
-#include "eeprom.h"
-#include "i2c.h"
-#include "usefullibs.h"
-#include "menu.h"
-#include "microquad.h"
-#include "resources.h"
-#include "shorttypes.h"
-
-// variaveis ajuste radio - roll pitch e yaw
-int16 PPMOffset[8] = {0,0,0,0,0,0,0,0};
-// variaveis leitura radio raw
-uint16 TimeUpEdge[8] = {0,0,0,0,0,0,0,0};
-int16 PPMValue[8] = {0,0,0,0,0,0,0,0};
-int16 PPMRaw[8] = {0,0,0,0,0,0,0,0};
+#include "stdio.h"          // printf, sprintf
+#include "stdlib.h"         
+#include "string.h"         // malloc, free
+#include "legacymsp430.h"   // usado para interruption
+#include "msp430f2618.h"    
+#include "color.h"          // cores utilizadas no LCD
+#include "delay.h"          // time delay, delay por polling
+#include "analog.h"         // abstracao analog
+#include "lcd6100.h"        // escrita e desenho no lcd
+#include "eeprom.h"         // not used
+#include "i2c.h"            // not used
+#include "usefullibs.h"     // list, queue e stack
+#include "menu.h"           // menu manager
+#include "microquad.h"      // todos defines de controle, arrays, constants, etc
+#include "resources.h"      // todas strings, limits (menu)
+#include "shorttypes.h"     // uint16, uchar, etc
+#include "radiorec.h"       // leitura dos canais PPM input do radio
 
 //variaveis controle
 volatile uchar ControlSample = 0;       // sample time flag - indica a hora de fazer um sample e um controle
+
+// variaveis controle atuadores
+uint16 MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
+
 uint16 ThrottleFiltered = 0;
 int16 PitchRollPSaturation = 0;
+
 // variaveis controle realimentacao
 int16 AccelValue[3] = {0,0,0};
 int16 AccelOffset[3] = {0,0,0};
 int16 GyroValue[3] = {0,0,0};
 int16 GyroOffset[3] = {0,0,0};
+
 // variaveis controle ganhos
 int16 ControlProportionalMul[3];
 int16 ControlProportionalDiv[3];
@@ -86,9 +88,6 @@ int16 GyroLPMul;
 int16 GyroLPDiv;     
 int16 AccelLPMul;        
 int16 AccelLPDiv;        
-
-// variaveis controle atuadores
-uint16 MotorOutput[6] = {MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR, MIN_MOTOR};
 
 // general purpose
 long FlightTime = 0;
@@ -117,10 +116,6 @@ MENU* ThrottleCalibrationMenu;
 unsigned int VdropMinBat = 0;
 unsigned int VdropMaxBat = 0;
 unsigned int Vbat = 0;
-// misc
-char SetupDone = 0;
-
-
 
 int main(void){
     // variavel que guarda o estado da state-machine principal
@@ -149,18 +144,7 @@ int main(void){
             }
             PPMValue[GPCounter] = PPMRaw[GPCounter];
         }
-    
-        if(get_delay(DELAY_SIDELEDS)){
-            LED_LEFT_TOGGLE();
-            LED_RIGHT_TOGGLE();
-            set_delay(DELAY_SIDELEDS, 500);
-        }
-        
-        if(get_delay(DELAY_BACKLED)){
-            LED_BACK_TOGGLE();
-            set_delay(DELAY_SIDELEDS, 1200);
-        }
-             
+                
         analog_refresh_all();
         adjust_readings();
                  
@@ -632,6 +616,7 @@ inline void process_vibration_analyzer_menu(void){
     //  mostra uma seta no meio da tela que aponta pro eixo que tem mais vibracao x,y
 }
 
+// esta funcao utiliza registrador do uC diretamente
 // tudo para 16MHz
 void clock_init(void){
     BCSCTL2 = SELM_0 + DIVM_0 + DIVS_0;
@@ -640,7 +625,7 @@ void clock_init(void){
     BCSCTL3 = 0xA0;
 }
 
-// ok
+// esta funcao utiliza registrador do uC diretamente
 void P1_init(void){
     /* Port 1 Output Register */
     P1OUT = PPM_P1MASK;
@@ -654,6 +639,7 @@ void P1_init(void){
     P1IE = PPM_P1MASK;
 }
 
+// esta funcao utiliza registrador do uC diretamente
 inline void set_motor_output(void){
     TBCCR1 = constrain(MotorOutput[0], 0, MAX_MOTOR);
     TBCCR2 = constrain(MotorOutput[1], 0, MAX_MOTOR);
@@ -663,6 +649,7 @@ inline void set_motor_output(void){
     TBCCR6 = constrain(MotorOutput[5], 0, MAX_MOTOR);
 }
 
+// esta funcao utiliza registrador do uC diretamente
 void timer_init(void){
     /* 
      * TBCCTL1, Capture/Compare Control Register 1
@@ -730,33 +717,7 @@ void timer_init(void){
     P2DIR |= 0x08;
 }
 
-interrupt (PORT1_VECTOR) PORT1_ISR_HOOK(void){
-    int16 PPM_aux, channel_num, PPM_ch_counter;
-    
-    PPM_aux = TAR;                                                                              // captura aqui pra ser mais exato
-    channel_num = 0;
-    for(PPM_ch_counter = 0x01; PPM_ch_counter <= 0x80; PPM_ch_counter = PPM_ch_counter << 1){
-        if(P1IFG & (PPM_ch_counter & PPM_P1MASK)){                                              // aqui eh usado PPM_P1_MASK, pq eh a interrupcao da P1 
-            if(!(P1IES & PPM_ch_counter)){                                                      // low to high
-                TimeUpEdge[channel_num] = PPM_aux;
-                P1IES |= (PPM_ch_counter & PPM_P1MASK);                                         // configura high to low
-            }
-            else{                                                                               // high to low
-            
-                if(TimeUpEdge[channel_num] > PPM_aux){                                          // se deu overflow na contagem do timer
-                    PPMRaw[channel_num] = ((TACCR0 - TimeUpEdge[channel_num] + PPM_aux));
-                }
-                else{                                                                           // se nao deu overflow na contagem do timer
-                    PPMRaw[channel_num] = ((PPM_aux - TimeUpEdge[channel_num]));
-                }
-                P1IES &= ~(PPM_ch_counter & PPM_P1MASK);                                        // configure low to high      
-            }
-            P1IFG &= ~(PPM_ch_counter & PPM_P1MASK);                                            // apaga o interruption flag da P1
-        }
-        channel_num++;
-    }
-}
-
+// esta funcao utiliza registrador do uC diretamente
 void setup(void){   
     //P2DIR |= 0x08;
     //P2OUT |= 0x08;
@@ -850,12 +811,6 @@ void setup(void){
     
     lcd_clear(LCDBackColor);        
     menu_init();
-    ENABLE_BUZZER();
-    BUZZER_ON();
-    
-    BUZZER_OFF();
-
-    SetupDone = 1;
 }
 
 void process_analog_graph(void){
@@ -1100,6 +1055,7 @@ void set_all_motors(uint16 val){
     set_motor_output();
 }
 
+// esta funcao utiliza registrador do uC diretamente
 void screen_flash(int Color, int interval, int times){
     // iluminacao progressiva do LCD
     while(times--){    
@@ -1121,28 +1077,7 @@ void screen_flash(int Color, int interval, int times){
     }
 }
 
-void calibrate_radio(void){
-    unsigned i = 8, j = 8;
-    do{
-        i--;
-        PPMOffset[i] = 0;
-    }while(i);
-    i=8;
-    do{
-        i--;
-        do{
-            j--;
-            PPMOffset[j] += PPMRaw[j];
-        }while(j);
-        j=8;
-        delayms(50);
-    }while(i);
-    i=8;
-    do{
-        i--;
-        PPMOffset[i] = PPMOffset[i] >> 3;
-    }while(i);
-}
+
 
 inline void control_loop(void){
     // variaveis controle sinais de controle
@@ -1193,7 +1128,7 @@ inline void control_loop(void){
     
     if(PPMValue[RADIO_THROTTLE_CH] > STICK_LOWER_THRESHOLD){    
         ThrottleFiltered = ((ThrottleFiltered * (int16)ThrottleLPMul + PPMValue[RADIO_THROTTLE_CH]) >> (int16)ThrottleLPDiv);
-
+        
         // ajusta radio para funcionar de +313 a -312
         // 313 = 100º/s e -312 = -100º/s
         ControlRadioResult[ROLL_INDEX] = PPMValue[RADIO_ROLL_CH] - PPMOffset[RADIO_ROLL_CH];
@@ -1328,21 +1263,7 @@ void init_vars(){
     }
 }
 
-// delay
-interrupt (TIMERA1_VECTOR) TIMERA1_ISR_HOOK(void){ // 2ms
-    int i = 0;
-    i = TIMEDELAY_LEN;
-           
-    do{
-        i--;
-        if(TimeDelay[i] > 0){
-            TimeDelay[i]--;
-        }
-    }while(i);
-    // ver no datasheet se tem q zerar o flag da interrupt
-    TACTL &= ~0x01;
-}
-
+// sample rate 400Hz
 interrupt (TIMERB1_VECTOR) TIMERB1_ISR_HOOK(void){ // 2.5ms
     ControlSample = 1;
     TBCTL &= ~0x01;

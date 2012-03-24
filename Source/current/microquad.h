@@ -1,37 +1,17 @@
-//pag 29
+#ifndef __MINIQUAD_H
+#define __MINIQUAD_H
+
+// esse macro limita o valor entre o min e o max, pode ser int, float, long, etc
 #define constrain(val, min, max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
 
-#define LIGHTS_ON_I2C
-#ifdef LIGHTS_ON_I2C
-#define LED_RIGHT_TOGGLE() (P3OUT^=0x02)
-#define LED_BACK_TOGGLE() (P3OUT^=0x04)
-#endif
+// sample rate
+#define SAMPLE_TIME           25 // * 100us = (2500ns) = 400Hz
 
-#define LIGHTS_ON_UART
-#ifdef LIGHTS_ON_UART
-#define LED_LEFT_TOGGLE()   (P3OUT^=0x20)
-#endif
-//#define TEST_LOOP_PERIOD
-//#define ITG3200
-#define SAMPLE_TIME           20 // * 100us (2000ns)
+/*****************************************************************************/
+/*****************************************************************************/
+/*****************************************************************************/
 
-#define BUZZER                0x10
-#define BUZZER_ON()          (P2OUT |= BUZZER)
-#define BUZZER_OFF()         (P2OUT &= ~BUZZER)
-#define BUZZER_TOOGLE()      (P2OUT ^= BUZZER)
-#define ENABLE_BUZZER()      (P2DIR |= BUZZER)
-#define DISABLE_BUZZER()     (P2DIR &=~ BUZZER)
-
-#define LCD_CENTER_VIBRATION_X 64
-#define LCD_CENTER_VIBRATION_Y 70
-
-#define MIN_BATTERY           1520
-#define MAX_BATTERY           1850
-// battery colors
-#define BATTERY_YELLOW        1720
-#define BATTERY_RED           1590
-#define BATTERY_CHECK_TIME    2000
-
+// CONTROL PARAMS
 
 /* se usar motor fraco de high rpm considerar como se fosse low rpm */
 #ifdef HIGH_RPM_MOTOR
@@ -69,16 +49,43 @@
 #define PITCH_INTEGRAL_LIMIT    32000
 #define ROLL_INTEGRAL_LIMIT     32000
 
-#define RETURN_INDEX            0
-#define CALIBR_INDEX            1
-#define THROTTLE_CALIBR_INDEX   2
+/*****************************************************************************/
+/*****************************************************************************/
+/*****************************************************************************/
+
+// default filters
+// esses filtros devem ser tais que (mul + 1) = 2^div
+#define THROTTLE_LP_MUL         3
+#define THROTTLE_LP_DIV         2
+#define MOTOR_OUTPUT_LP_MUL     3
+#define MOTOR_OUTPUT_LP_DIV     2
+#define GYRO_LP_MUL             1
+#define GYRO_LP_DIV             1
+#define ACCEL_LP_MUL            3
+#define ACCEL_LP_DIV            2         
+
+#define BATTERY_ACH             7 
+#define GYRO_YAW_ACH            2
+#define GYRO_PITCH_ACH          1
+#define GYRO_ROLL_ACH           0
+#define ACCELX_ACH              4
+#define ACCELY_ACH              3
+#define ACCELZ_ACH              5
+
+/* arrays indexes */
+#define RADIO_PITCH_CH          2
+#define RADIO_YAW_CH            4
+#define RADIO_THROTTLE_CH       3
+#define RADIO_ROLL_CH           0
+
+#define MOTOR_FRONT             2
+#define MOTOR_BACK              1
+#define MOTOR_RIGHT             3
+#define MOTOR_LEFT              0
 
 #define YAW_INDEX               0
 #define PITCH_INDEX             1
 #define ROLL_INDEX              2
-
-#define SAVE_INDEX              1
-#define RESET_INDEX             2
 
 #define ACCEL_X_INDEX           0
 #define ACCEL_Y_INDEX           1
@@ -97,44 +104,22 @@
 #define ANALOG_CH6_INDEX        8
 #define ANALOG_CH7_INDEX        9
 
-// default filters
-// esses filtros devem ser tais que (mul + 1) = 2^div
-#define THROTTLE_LP_MUL         7       // 7+1 = 2^3
-#define THROTTLE_LP_DIV         3
-#define MOTOR_OUTPUT_LP_MUL     1       // 3+1 = 2^2
-#define MOTOR_OUTPUT_LP_DIV     1
-#define GYRO_LP_MUL             1       // com 3 de mul e 2 de div fica bom tbm
-#define GYRO_LP_DIV             1
-#define ACCEL_LP_MUL            3       // 3+1 = 2^2
-#define ACCEL_LP_DIV            2         
+/* menu indexes */
+#define RETURN_INDEX            0
+#define CALIBR_INDEX            1
+#define THROTTLE_CALIBR_INDEX   2
+#define SAVE_INDEX              1
+#define RESET_INDEX             2
 
-#define BATTERY_ACH             7 
-#define GYRO_YAW_ACH            2
-#define GYRO_PITCH_ACH          1
-#define GYRO_ROLL_ACH           0
-#define ACCELX_ACH              4
-#define ACCELY_ACH              3
-#define ACCELZ_ACH              5
-
+/* constantes e limites */
 #define LCD_MAX_BRIGHT          1800
-#define PPM_P1MASK              0xFF
 
 #define MIN_MOTOR               2000
 #define MAX_MOTOR               4000
-#define MIN_MOTOR_WORK          2450
-
-#define MOTOR_FRONT             2
-#define MOTOR_BACK              1
-#define MOTOR_RIGHT             3
-#define MOTOR_LEFT              0
+#define MIN_MOTOR_WORK          2450 // parece q nao esta sendo usado
 
 #define STICK_UPPER_THRESHOLD   3000
 #define STICK_LOWER_THRESHOLD   2300
-
-#define RADIO_PITCH_CH          2
-#define RADIO_YAW_CH            4
-#define RADIO_THROTTLE_CH       3
-#define RADIO_ROLL_CH           0
 
 #define GRAPH_LENGHT            56
 #define GRAPH_OFFSETX           36
@@ -142,7 +127,21 @@
 #define GRAPH_START             64
 #define GRAPH_HEIGHT            52
 
-enum{
+#define LCD_CENTER_VIBRATION_X  64
+#define LCD_CENTER_VIBRATION_Y  70
+
+#define BATTERY_YELLOW          1720
+#define BATTERY_RED             1590
+#define BATTERY_CHECK_TIME      2000
+#define MIN_BATTERY             1520
+#define MAX_BATTERY             1850
+
+/*************************************************************************/
+/*************************************************************************/
+/*************************************************************************/
+// ENUMERATORS
+
+typedef enum{
     LETSFLY_INDEX               ,
     ANALOG_MENU_INDEX           ,
     CONTROL_MENU_INDEX          ,
@@ -152,19 +151,8 @@ enum{
     SENSOR_MENU_INDEX           ,
     VOLTAGE_DROP_INDEX          ,
     VIBRATION_ANALYZER_INDEX    ,
-    OPTION_MENU_INDEX           
+    OPTION_MENU_INDEX           ,
 }MENU_INDEX;
-
-typedef struct{
-    int AccelHigher[3];
-    int GyroHigher[3];
-    int AccelLower[3];
-    int GyroLower[3];
-    int ControlResultHigher[3];
-    int ControlResultLower[3];
-    int MotorOutputHigher[6];
-    int MotorOutputLower[6];
-}BlackBox;
 
 typedef enum{
     PROCESS_MAIN_MENU                   = 0xFF,
@@ -177,8 +165,25 @@ typedef enum{
     PROCESS_FILTER_MENU                 = FILTER_MENU_INDEX,
     PROCESS_VIBRATION_ANALYZER_MENU     = VIBRATION_ANALYZER_INDEX,
     PROCESS_VOLTAGE_DROP_MENU           = VOLTAGE_DROP_INDEX,
-    PROCESS_CONTROL                     = LETSFLY_INDEX
+    PROCESS_CONTROL                     = LETSFLY_INDEX,
 }PROGRAM_STEP;
+
+/**************************************************************************/
+/**************************************************************************/
+/**************************************************************************/
+// STRUCTURES
+
+/*
+sugestoes:
+- Controller (Filter + Control + Sensor)
+- ScrPatern ( screen patern ) talves deveria ir no menu.c
+- RadioReceiver
+*/
+
+/**************************************************************************/
+/**************************************************************************/
+/**************************************************************************/
+// function prototypes
 
 int main(void);
 
@@ -196,11 +201,12 @@ void clock_init(void);
 void set_motor_output(void);
 void set_all_motors(unsigned int val);
 void screen_flash(int Color, int interval, int times);
-void calibrate_radio(void);
 void control_loop(void);
 void process_analog_graph(void);
 void analog_graph_clear(int i);
 void process_vibration_analyzer_menu(void);
 
 ACTION get_radio_action(void);
+
+#endif // __MINIQUAD_H
 

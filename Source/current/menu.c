@@ -8,12 +8,13 @@
 #include "usefullibs.h"
 #include "menu.h"
     
+// esses defines devem coincidir com a tabela de characteres do display LCD
 #define SETABAIXO   25
 #define SETACIMA    24
 #define SETALEFT    27
 #define SETARIGHT   26
 
-// remark: arrowpositionH must never be NULL or ZERO.
+// remark: arrowpositionH must never be ZERO.
 // se o menu contem items diferentes de SUBMENUS, nenhum parametro deve ser NULL.
 MENU* menu_create(const char *tittle, Item *FirstItem,  const uchar *janelasize,  const uchar *barsposh,  const uchar *valueposh,  const uchar *arrowposh,  const uchar *barslen){
     MENU* oMenu = (MENU*)malloc(sizeof(MENU));
