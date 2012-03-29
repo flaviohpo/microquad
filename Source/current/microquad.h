@@ -55,10 +55,10 @@
 
 // default filters
 // esses filtros devem ser tais que (mul + 1) = 2^div
-#define THROTTLE_LP_MUL         3
-#define THROTTLE_LP_DIV         2
-#define MOTOR_OUTPUT_LP_MUL     3
-#define MOTOR_OUTPUT_LP_DIV     2
+#define THROTTLE_LP_MUL         7
+#define THROTTLE_LP_DIV         3
+#define MOTOR_OUTPUT_LP_MUL     1
+#define MOTOR_OUTPUT_LP_DIV     1
 #define GYRO_LP_MUL             1
 #define GYRO_LP_DIV             1
 #define ACCEL_LP_MUL            3
@@ -68,8 +68,8 @@
 #define GYRO_YAW_ACH            2
 #define GYRO_PITCH_ACH          1
 #define GYRO_ROLL_ACH           0
-#define ACCELX_ACH              4
-#define ACCELY_ACH              3
+#define ACCELX_ACH              4   // roll
+#define ACCELY_ACH              3   // pitch
 #define ACCELZ_ACH              5
 
 /* arrays indexes */
@@ -86,14 +86,6 @@
 #define YAW_INDEX               0
 #define PITCH_INDEX             1
 #define ROLL_INDEX              2
-
-#define ACCEL_X_INDEX           0
-#define ACCEL_Y_INDEX           1
-#define ACCEL_Z_INDEX           2
-
-#define GYRO_X_INDEX            2
-#define GYRO_Y_INDEX            1
-#define GYRO_Z_INDEX            0
 
 #define ANALOG_CH0_INDEX        2
 #define ANALOG_CH1_INDEX        3
@@ -142,6 +134,11 @@
 // ENUMERATORS
 
 typedef enum{
+    FLYMODE_ACRO,
+    FLYMODE_STABLE,
+}FLIGHT_MODE;
+
+enum{
     LETSFLY_INDEX               ,
     ANALOG_MENU_INDEX           ,
     CONTROL_MENU_INDEX          ,
@@ -201,7 +198,8 @@ void clock_init(void);
 void set_motor_output(void);
 void set_all_motors(unsigned int val);
 void screen_flash(int Color, int interval, int times);
-void control_loop(void);
+void control_loop_acro(void);
+void control_loop_stable(void);
 void process_analog_graph(void);
 void analog_graph_clear(int i);
 void process_vibration_analyzer_menu(void);

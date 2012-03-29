@@ -30,10 +30,8 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="Z:\main.c" linenum="84" placement="0:1:-1:-1:-8:-30:100:100:1042:474" />
-	<localfile path="Z:\microquad.h" linenum="178" placement="0:1:-1:-1:-8:-30:75:75:1021:403" />
-	<localfile path="Z:\menu.c" linenum="58" placement="0:1:-1:-1:-8:-30:100:100:1046:428" />
-	<localfile path="Z:\radiorec.h" linenum="1" placement="2:3:-1:-1:-8:-30:125:125:1071:453" />
-	<localfile path="Z:\radiorec.c" linenum="1" placement="0:1:-1:-1:-8:-30:150:150:1096:478" />
+	<localfile path="Z:\main.c" linenum="1216" placement="0:1:-1:-1:-8:-30:75:75:1096:295" />
+	<localfile path="Z:\microquad.h" linenum="65" placement="0:1:-1:-1:-8:-30:75:75:1096:270" />
+	<localfile path="C:\Users\flaviohpo\Desktop\current STABLE 22032012\current\main.c" linenum="1" placement="2:3:-1:-1:-8:-30:0:0:1021:195" />
 </workspace>
 

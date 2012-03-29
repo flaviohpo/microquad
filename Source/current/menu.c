@@ -244,6 +244,10 @@ MENU_RESPONSE menu_process(MENU* oMenu, ACTION act){
                             result = RESP_BUSY;
                         }
                     }
+                    
+                    default:
+                    // outros nao faz nada
+                    break;
                 break;
             }        
                     

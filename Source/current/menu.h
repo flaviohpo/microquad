@@ -25,7 +25,9 @@ typedef enum{
     ACTION_UP,
     ACTION_DOWN,
     ACTION_LEFT,
-    ACTION_RIGHT
+    ACTION_RIGHT,
+    ACTION_TURN_CW,
+    ACTION_TURN_C,
 }ACTION;
 
 typedef enum{
