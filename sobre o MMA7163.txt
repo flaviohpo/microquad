@@ -1,0 +1,30 @@
+total = 1.5g
+800 mV/g
+zero = 1.65V
+
+minimo = 1.65 - 800 * 1 = 0.45V
+maximo = 1.65 + 800 * 1 = 2.85V
+
+4096 = 3.3V
+maximo = 2.45V
+maximo = 3040 (ADC)
+
+zero = 2048 (ADC)
+
+4096 = 3.3V
+?    = 0.85V
+minimo = 1055
+
+tem 992 pra cima e 992 pra baixo
+entao a precisao maxima eh 1/992 = 0.001g
+
+---------------------------------------
+
+Entao se o controle vai de -312 a +312, o accel tem q ter o mesmo range.
+Multiplicando por 5 e shiftando 4 pra direita consegue o valor -310 a +310.
+
+----------------------------------------
+
+comportamento:
+* quando inclina o quad em roll para a direita, diminui o roll angle
+* quando inclina o quad em pitch para traz diminui o pitch angle
