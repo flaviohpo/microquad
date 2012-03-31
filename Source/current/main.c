@@ -126,7 +126,7 @@ MENU* ThrottleCalibrationMenu;
 unsigned int VdropMinBat = 0;
 unsigned int VdropMaxBat = 0;
 unsigned int Vbat = 0;
-
+.
 FLIGHT_MODE FlightMode = FLYMODE_ACRO;
 
 int main(void){
