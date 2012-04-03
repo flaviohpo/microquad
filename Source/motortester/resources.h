@@ -1,0 +1,12 @@
+const char * motor_stab_txt = "\n\rStab. Time: Informe um valor de 1 a 100: ";
+const char * motor_inc_txt = "\n\rIncrement: Informe um valor de 1 a 200: ";
+const char * testing_txt = "\n\rTesting...";
+const char * calibrate_esc_txt = "\n\rCalibrando ESC...";
+const char * calibrate_load_txt = "\n\rCalibrando Celula de carga...";
+const char * calibrate_current_txt = "\n\rCalibrando Sensor de corrente...";
+const char * calibrate_light_txt = "\n\rCalibrando Sensor de rotacao...";
+const char * startup_txt = "\n\rMOTOR TESTER by flaviohpo and JCLima\n\r";
+const char * params_saved_txt = "\n\rParametros salvos..";
+const char * params_not_saved_txt = "\n\rParametros nao foram salvos..";
+const char * showmenu_txt = "\n\rSTART: A\n\rCALIBRATE ANALOG: C\n\rCALIBRATE ESC: D\n\rSET MOTOR INC: E\n\rSET MOTOR STAB: F\n\rSAVE PARAMS: G";
+const char * eeprom_not_found_txt = "\n\rEEPROM not found.";
