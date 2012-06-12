@@ -1,29 +1,30 @@
 <project version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\analog.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\analog.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\color.h" />
+	<localfile path="Y:\miniquadITG3200\analog.c" />
+	<localfile path="Y:\miniquadITG3200\analog.h" />
+	<localfile path="Y:\miniquadITG3200\color.h" />
 	<localfile path="C:\Program Files\Emerald Editor Community\Crimson Editor 3.72\tools\compila.bat" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\delay.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\delay.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\hardware_config.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\hardware_config.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\i2c.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\i2c.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\lcd6100.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\lcd6100.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\main.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\miniquad.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\miniquad.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\misc.c" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\misc.h" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\resources.h" />
+	<localfile path="Y:\miniquadITG3200\delay.c" />
+	<localfile path="Y:\miniquadITG3200\delay.h" />
+	<localfile path="Y:\miniquadITG3200\hardware_config.c" />
+	<localfile path="Y:\miniquadITG3200\hardware_config.h" />
+	<localfile path="Y:\miniquadITG3200\i2c.c" />
+	<localfile path="Y:\miniquadITG3200\i2c.h" />
+	<localfile path="Y:\miniquadITG3200\lcd6100.c" />
+	<localfile path="Y:\miniquadITG3200\lcd6100.h" />
+	<localfile path="Y:\miniquadITG3200\main.c" />
+	<localfile path="Y:\miniquadITG3200\miniquad.c" />
+	<localfile path="Y:\miniquadITG3200\miniquad.h" />
+	<localfile path="Y:\miniquadITG3200\misc.c" />
+	<localfile path="Y:\miniquadITG3200\misc.h" />
+	<localfile path="Y:\miniquadITG3200\resources.h" />
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\main.c" linenum="34" placement="2:3:-1:-1:-8:-30:0:0:766:236" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\i2c.c" linenum="77" placement="0:1:-1:-1:-8:-30:25:25:795:265" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\i2c.h" linenum="59" placement="0:1:-1:-1:-8:-30:50:50:820:290" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\hardware_config.c" linenum="7" placement="0:1:-1:-1:-8:-30:75:75:845:315" />
-	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\miniquad\miniquadITG3200\hardware_config.h" linenum="6" placement="0:1:-1:-1:-8:-30:100:100:870:340" />
+	<localfile path="Y:\miniquadITG3200\main.c" linenum="36" placement="0:1:-1:-1:-8:-30:0:0:892:420" />
+	<localfile path="C:\Users\flaviohpo\Desktop\miniquad\slac151d\MSP430F241x, MSP430F261x Code Examples\C\msp430x261x_uscib0_i2c_16.c" linenum="123" placement="0:1:-1:-1:-8:-30:50:50:1021:303" />
+	<localfile path="Y:\miniquadITG3200\i2c.c" linenum="82" placement="2:3:-1:-1:-8:-30:75:75:1046:328" />
+	<localfile path="Y:\miniquadITG3200\hardware_config.c" linenum="1" placement="0:1:-1:-1:-8:-30:100:100:1071:353" />
+	<localfile path="Y:\miniquadITG3200\hardware_config.h" linenum="1" placement="0:1:-1:-1:-8:-30:125:125:1096:378" />
+	<localfile path="Y:\miniquadITG3200\i2c.h" linenum="44" placement="0:1:-1:-1:-8:-30:25:25:996:278" />
 </workspace>
 

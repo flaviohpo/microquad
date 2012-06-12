@@ -9,7 +9,7 @@
 #include "msp430f2618.h"
 #include "delay.h"
 
-#define I2C_INTERVAL    1
+#define I2C_INTERVAL    100
 
 /*
 ITG3200 config:
@@ -18,29 +18,52 @@ ITG3200 config:
 */
 
 int main(void){
+ 
+    // enderecos 7 bits
     unsigned char ITG3200_I2CAddress = 0x68;
     unsigned char EEPROM_I2CAddress = 0x50;
+    unsigned char HMC5843_I2CAddress = 0x1E;
     
     unsigned char Data = 0;
 
     hardware_setup();
     
     lcd_init(LCDBackColor);
+         
+    //i2c_write_register(0x00, 0x18, HMC5843_I2CAddress);
+    delayms(100);
     
-
-    // config ITG3200
-    delayms(150);
-    i2c_write_register(0x17, 0x05, ITG3200_I2CAddress);
-    delayms(100);
-    i2c_write_register(0x3E, 0x01, ITG3200_I2CAddress);
-    delayms(100);
-    i2c_write_register(0x16, 0x18, ITG3200_I2CAddress);
-    delayms(100);
-    i2c_write_register(0x15, 0x00, ITG3200_I2CAddress);
+    //i2c_write_register(0x02, 0x00, HMC5843_I2CAddress);
     delayms(100);
     
     // i2c test
     while(1){
+        
+        lcd_goto(0,0);
+        printf("%X\n", UCB0STAT);        
+        delayms(1);
+        
+        i2c_read_register(0, &Data, HMC5843_I2CAddress);
+        printf("00: %02X\n", Data);
+        delayms(I2C_INTERVAL);
+        
+        i2c_read_register(1, &Data, HMC5843_I2CAddress);
+        printf("01: %02X\n", Data);
+        delayms(I2C_INTERVAL);
+        
+        i2c_read_register(2, &Data, HMC5843_I2CAddress);
+        printf("02: %02X\n", Data);
+        delayms(I2C_INTERVAL);
+        
+        i2c_read_register(3, &Data, HMC5843_I2CAddress);
+        printf("03: %02X\n", Data);
+        delayms(I2C_INTERVAL);
+        
+        
+        
+        
+        
+        /***** visualizar registradores do ITG3200
         lcd_goto(0,0);
         printf("%X\n", UCB0STAT);        
         delayms(1);
@@ -99,7 +122,7 @@ int main(void){
         
         i2c_read_register(62, &Data, ITG3200_I2CAddress);
         printf("62: %02X\n", Data);
-        delayms(I2C_INTERVAL);
+        delayms(I2C_INTERVAL);    */
         
     }
 }

@@ -9,7 +9,7 @@ incluir acelerometro no loop de controle
 controle de posicao(x,y,z) com gps e magnetometro
 controle de altitude com barometro e yaw com magnet
 controle de posicao indoor, com sonar e infrared
-colocar uma camera mirando pro chao para controle de posicao
+colocar uma camera mirando pro chao para controle de posicao+
 
 --- SOFT
 usar CI de wifi para que o quad seja um servidor wifi
@@ -126,7 +126,7 @@ MENU* ThrottleCalibrationMenu;
 unsigned int VdropMinBat = 0;
 unsigned int VdropMaxBat = 0;
 unsigned int Vbat = 0;
-.
+
 FLIGHT_MODE FlightMode = FLYMODE_ACRO;
 
 int main(void){

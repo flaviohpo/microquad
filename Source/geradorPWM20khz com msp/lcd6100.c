@@ -33,8 +33,8 @@
 
 unsigned char LCDLineCount = 0;
 unsigned char LCDCharCount = 0;
-unsigned char LCDBackColor = WHITE;
-unsigned char LCDForeColor = BLACK;
+unsigned char LCDBackColor = LCD_DEFAULT_BACKCOLOR;
+unsigned char LCDForeColor = LCD_DEFAULT_FORECOLOR;
 
 const char asciitable[640] = {
                             0x00,0x00,0x00,0x00,0x00,    // NULL char...
@@ -186,7 +186,7 @@ void lcd_setcolor(unsigned char foreground_color, unsigned char background_color
     cmd = 2 writecommand with stop
     cmd = 3 writecommand without stop
 */
-void n6100_send(unsigned char data, unsigned char cmd)
+ void n6100_send(unsigned char data, unsigned char cmd)
 {
     unsigned char mask = 0x80;
     unsigned char i;
@@ -237,7 +237,7 @@ void lcd_init(unsigned char color)
   // Sleep out...
   n6100_send(0x11,2);   
   // Ajusta o contraste...
-  n6100_sendcom1(0x25, 0x40);
+  n6100_sendcom1(0x25, 0x50);
   // Liga o display e o booster...    
   n6100_send(0x29,2);
   n6100_send(0x03,2);
@@ -284,20 +284,20 @@ void lcd_clear(unsigned char color)
   lcd_fillrect(0, 0, 132, 132, color);
 }
 
-void n6100_sendcom1(unsigned char comm, unsigned char dat)
+ void n6100_sendcom1(unsigned char comm, unsigned char dat)
 {
     n6100_send(comm, 3);
     n6100_send(dat, 0);
 }
 
-void n6100_sendcom2(unsigned char comm, unsigned char dat1, unsigned char dat2)
+ void n6100_sendcom2(unsigned char comm, unsigned char dat1, unsigned char dat2)
 {
     n6100_send(comm, 3);
     n6100_send(dat1, 1);
     n6100_send(dat2, 0);
 }
 
-void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char color)
+ void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned char ly, unsigned char color)
 {
     unsigned int addr, max;
     
@@ -320,7 +320,7 @@ void lcd_fillrect(unsigned char x, unsigned char y, unsigned char lx, unsigned c
 }
 
 
-void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsigned char color, int width){
+ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsigned char color, int width){
     int f = 1 - radius;
     int ddF_x = 0;
     int ddF_y = -2 * radius;
@@ -350,7 +350,7 @@ void lcd_drawcircle(unsigned int x0, unsigned int y0, unsigned int radius, unsig
     }
 }
 
-void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
+ void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
     int dy = y1 - y0;
     int dx = x1 - x0;
     int stepx, stepy;
@@ -399,7 +399,7 @@ void lcd_drawline(int x0, int y0, int x1, int y1, unsigned char color) {
     }
 }
 
-void lcd_drawpoint(unsigned char x, unsigned char y, unsigned char color)
+ void lcd_drawpoint(unsigned char x, unsigned char y, unsigned char color)
 {
     n6100_sendcom2(0x2a, x, x);
     n6100_sendcom2(0x2b, y, y);

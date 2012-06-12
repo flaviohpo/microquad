@@ -7,6 +7,12 @@
 I2C_STATUS i2c_init_module(void){   
     // desable i2c module
     UCB0CTL1 = UCSWRST;
+    // config ports
+    I2C_PORTS_CFG();
+    // clock MSCLK
+    UCB0CTL0 = UCMST + UCMODE_3 + UCSYNC;    
+    // I2CMODE
+    UCB0CTL1 = UCSSEL1 | UCSWRST;
     // baudrate
     // fbaud = FBRclk / UCBRx
     // 0x640 = 10kbps
@@ -24,12 +30,6 @@ I2C_STATUS i2c_init_module(void){
     UCB0BR1 = 0x00;
  #endif
 #endif
-    // I2CMODE
-    UCB0CTL1 |= UCSSEL1;
-    // clock MSCLK
-    UCB0CTL0 = UCMST + UCMODE_3 + UCSYNC;    
-    // config ports
-    I2C_PORTS_CFG();
     // libera o reset
     UCB0CTL1 &= ~UCSWRST;
 
@@ -66,8 +66,14 @@ I2C_STATUS i2c_find_address(unsigned char SlaveAddress){
 
 I2C_STATUS i2c_write_register(unsigned char Register, unsigned char Data, unsigned char SlaveAddress){
     I2C_STATUS Result = I2C_STAT_NONE;
+    
+    if(UCB0CTL1 & UCTXSTP){
+        return I2C_STAT_BUSY;
+    }
+    
     I2C_SET_SLAVE_ADDR(SlaveAddress);
     I2C_START_TRANSMIT();
+    
     Result = i2c_write_byte(0, Register);
     if(Result == I2C_STAT_DONE){
         Result = i2c_write_byte(1, Data);

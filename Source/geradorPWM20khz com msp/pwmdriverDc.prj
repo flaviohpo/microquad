@@ -1,0 +1,18 @@
+<project version="Crimson Editor 3.60">
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\analog.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\analog.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\color.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\delay.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\delay.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\lcd6100.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\lcd6100.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\main.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\shorttypes.h" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\uart.c" />
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\uart.h" />
+</project>
+
+<workspace version="Crimson Editor 3.60">
+	<localfile path="C:\Users\flaviohpo\Desktop\geradorPWM20khz com msp\main.c" linenum="160" placement="2:3:-1:-1:-8:-30:0:0:992:274" />
+</workspace>
+

@@ -4,7 +4,7 @@
 // esse macro limita o valor entre o min e o max, pode ser int, float, long, etc
 #define constrain(val, min, max) ((val)<(min)?(min):(val)>(max)?(max):val) // limita um valor entre min e max
 
-// sample rate
+// sample rate, nao eh usado no programa, soh informativo
 #define SAMPLE_TIME           25 // * 100us = (2500ns) = 400Hz
 
 /*****************************************************************************/
@@ -13,20 +13,6 @@
 
 // CONTROL PARAMS
 
-/* se usar motor fraco de high rpm considerar como se fosse low rpm */
-#ifdef HIGH_RPM_MOTOR
-#define YAW_PROPORTIONAL_MUL    2
-#define PITCH_PROPORTIONAL_MUL  1
-#define ROLL_PROPORTIONAL_MUL   1
-#define YAW_PROPORTIONAL_DIV    1
-#define PITCH_PROPORTIONAL_DIV  1
-#define ROLL_PROPORTIONAL_DIV   1
-
-// control saturation
-#define PITCH_ROLL_P_SATURATION 250
-#define YAW_P_SATURATION        100 // not used
-
-#else // LOW_RPM_MOTOR
 #define YAW_PROPORTIONAL_MUL    2
 #define PITCH_PROPORTIONAL_MUL  1
 #define ROLL_PROPORTIONAL_MUL   1
@@ -35,10 +21,8 @@
 #define ROLL_PROPORTIONAL_DIV   0
 
 // control saturation
-#define PITCH_ROLL_P_SATURATION 650
+#define PITCH_ROLL_P_SATURATION 750
 #define YAW_P_SATURATION        500 // not used
-
-#endif // HIGH_RP_MOTOR
 
 // default integral gain, soh tem DIV pro integral, pode ser 1, 2, 4, 8, 32, 64, 128, 256....
 #define YAW_INTEGRAL_DIV        7   // = 2^DIV
@@ -59,8 +43,8 @@
 #define THROTTLE_LP_DIV         3
 #define MOTOR_OUTPUT_LP_MUL     1
 #define MOTOR_OUTPUT_LP_DIV     1
-#define GYRO_LP_MUL             1
-#define GYRO_LP_DIV             1
+#define GYRO_LP_MUL             3
+#define GYRO_LP_DIV             2
 #define ACCEL_LP_MUL            3
 #define ACCEL_LP_DIV            2         
 
@@ -78,10 +62,10 @@
 #define RADIO_THROTTLE_CH       3
 #define RADIO_ROLL_CH           0
 
-#define MOTOR_FRONT             2
-#define MOTOR_BACK              1
-#define MOTOR_RIGHT             3
 #define MOTOR_LEFT              0
+#define MOTOR_BACK              1
+#define MOTOR_FRONT             2
+#define MOTOR_RIGHT             3
 
 #define YAW_INDEX               0
 #define PITCH_INDEX             1
@@ -104,7 +88,7 @@
 #define RESET_INDEX             2
 
 /* constantes e limites */
-#define LCD_MAX_BRIGHT          1800
+#define LCD_MAX_BRIGHT          2800
 
 #define MIN_MOTOR               2000
 #define MAX_MOTOR               4000
