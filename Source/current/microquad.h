@@ -17,8 +17,8 @@
 #define PITCH_PROPORTIONAL_MUL  1
 #define ROLL_PROPORTIONAL_MUL   1
 #define YAW_PROPORTIONAL_DIV    0
-#define PITCH_PROPORTIONAL_DIV  0
-#define ROLL_PROPORTIONAL_DIV   0
+#define PITCH_PROPORTIONAL_DIV  1
+#define ROLL_PROPORTIONAL_DIV   1
 
 // control saturation
 #define PITCH_ROLL_P_SATURATION 750
@@ -26,8 +26,8 @@
 
 // default integral gain, soh tem DIV pro integral, pode ser 1, 2, 4, 8, 32, 64, 128, 256....
 #define YAW_INTEGRAL_DIV        7   // = 2^DIV
-#define PITCH_INTEGRAL_DIV      7   // 8 vai limitar o integral em 128, 7 vai limitar em 256
-#define ROLL_INTEGRAL_DIV       7
+#define PITCH_INTEGRAL_DIV      8   // 8 vai limitar o integral em 128, 7 vai limitar em 256
+#define ROLL_INTEGRAL_DIV       8
 
 #define YAW_INTEGRAL_LIMIT      32000
 #define PITCH_INTEGRAL_LIMIT    32000
@@ -41,8 +41,8 @@
 // esses filtros devem ser tais que (mul + 1) = 2^div
 #define THROTTLE_LP_MUL         7
 #define THROTTLE_LP_DIV         3
-#define MOTOR_OUTPUT_LP_MUL     1
-#define MOTOR_OUTPUT_LP_DIV     1
+#define MOTOR_OUTPUT_LP_MUL     3
+#define MOTOR_OUTPUT_LP_DIV     2
 #define GYRO_LP_MUL             3
 #define GYRO_LP_DIV             2
 #define ACCEL_LP_MUL            3

@@ -30,6 +30,7 @@
 </project>
 
 <workspace version="Crimson Editor 3.60">
-	<localfile path="Z:\main.c" linenum="6" placement="2:3:-1:-1:-8:-30:100:100:1092:374" />
+	<localfile path="Z:\main.c" linenum="12" placement="2:3:-1:-1:-8:-30:100:100:1092:374" />
+	<localfile path="Z:\microquad.h" linenum="45" placement="0:1:-1:-1:-8:-30:50:50:1017:303" />
 </workspace>
 
